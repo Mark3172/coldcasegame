@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KRONOS APM // INCIDENT INVESTIGATION CONSOLE v4.18</title>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📁</text></svg>">
+  <title>THE COLD FILE // 2D PIXEL CORPORATE MYSTERY</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🕵️</text></svg>">
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -14,23 +14,28 @@
       theme: {
         extend: {
           colors: {
-            cyberDark: '#0B0F17',
-            cyberCard: 'rgba(15, 23, 42, 0.72)',
-            cyberBorder: 'rgba(51, 65, 85, 0.55)',
-            cyberCyan: '#06b6d4',
-            cyberEmerald: '#10b981',
-            cyberAmber: '#f59e0b',
-            cyberRose: '#f43f5e',
-            cyberViolet: '#8b5cf6'
+            pixelDark: '#0D1117',
+            pixelSurface: '#161B22',
+            pixelBorder: '#30363D',
+            pixelGreen: '#2EA043',
+            pixelCyan: '#58A6FF',
+            pixelAmber: '#D29922',
+            pixelRose: '#F85149',
+            pixelGold: '#E3B341'
           },
           fontFamily: {
-            mono: ['JetBrains Mono', 'Fira Code', 'Cascadia Code', 'Consolas', 'monospace'],
-            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif']
+            pixel: ['"Courier New"', 'Courier', 'monospace'],
+            mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace']
           }
         }
       }
     };
   </script>
+
+  <!-- Google Fonts for retro pixel feel -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 
   <!-- React 18 & ReactDOM -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -39,52 +44,54 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
   <style>
-    /* Custom stealth terminal styling */
     body {
-      background-color: #0B0F17;
-      color: #e2e8f0;
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: #090D13;
+      color: #E6EDF3;
+      font-family: 'JetBrains Mono', monospace;
       overflow-x: hidden;
       user-select: none;
+      image-rendering: pixelated;
     }
 
-    /* Monospace for code/logs */
-    .font-terminal {
-      font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    .font-retro {
+      font-family: 'Press Start 2P', monospace;
     }
 
-    /* Scanlines effect (subtle, stealth) */
+    /* Pixelated canvas rendering */
+    canvas {
+      image-rendering: -moz-crisp-edges;
+      image-rendering: -webkit-crisp-edges;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+
+    /* Scanlines effect */
     .scanlines {
       background: linear-gradient(
         rgba(18, 16, 16, 0) 50%, 
-        rgba(0, 0, 0, 0.25) 50%
-      ), linear-gradient(
-        90deg,
-        rgba(255, 0, 0, 0.02),
-        rgba(0, 255, 0, 0.01),
-        rgba(0, 0, 255, 0.02)
+        rgba(0, 0, 0, 0.22) 50%
       );
-      background-size: 100% 4px, 6px 100%;
+      background-size: 100% 4px;
       pointer-events: none;
     }
 
-    /* Custom scrollbars for cyber feel */
+    /* Custom scrollbars */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
     }
     ::-webkit-scrollbar-track {
-      background: rgba(11, 15, 23, 0.8);
+      background: #0D1117;
     }
     ::-webkit-scrollbar-thumb {
-      background: rgba(51, 65, 85, 0.6);
-      border-radius: 3px;
+      background: #30363D;
+      border-radius: 2px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: rgba(6, 182, 212, 0.6);
+      background: #58A6FF;
     }
 
-    /* Subtle screen shake animation for live leaks */
+    /* Screen Shake */
     @keyframes screenShake {
       0% { transform: translate(1px, 1px) rotate(0deg); }
       10% { transform: translate(-1px, -2px) rotate(-0.5deg); }
@@ -99,43 +106,23 @@
       100% { transform: translate(1px, -2px) rotate(0deg); }
     }
     .shake-effect {
-      animation: screenShake 0.45s ease-in-out;
+      animation: screenShake 0.4s ease-in-out;
     }
 
-    /* Live leak red alert glow */
+    /* Alert Pulse */
     @keyframes alertGlow {
-      0%, 100% { box-shadow: 0 0 15px rgba(244, 63, 94, 0.4); border-color: rgba(244, 63, 94, 0.8); }
-      50% { box-shadow: 0 0 30px rgba(244, 63, 94, 0.8); border-color: rgba(244, 63, 94, 1); }
+      0%, 100% { box-shadow: 0 0 10px rgba(248, 81, 73, 0.4); border-color: rgba(248, 81, 73, 0.8); }
+      50% { box-shadow: 0 0 24px rgba(248, 81, 73, 0.8); border-color: rgba(248, 81, 73, 1); }
     }
     .alert-glow {
       animation: alertGlow 1.2s infinite ease-in-out;
     }
-
-    /* Radar sweep animation */
-    @keyframes radarSweep {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    .radar-beam {
-      transform-origin: center center;
-      animation: radarSweep 2.8s linear infinite;
-    }
-
-    /* Decrypt matrix un-blur */
-    @keyframes matrixGlitch {
-      0% { opacity: 0.2; filter: blur(2px); }
-      50% { opacity: 0.8; filter: blur(1px); }
-      100% { opacity: 1; filter: blur(0); }
-    }
-    .matrix-reveal {
-      animation: matrixGlitch 0.5s ease-out;
-    }
   </style>
 </head>
-<body class="bg-[#0B0F17] text-slate-200 antialiased min-h-screen">
+<body class="bg-[#090D13] text-slate-200 antialiased min-h-screen">
   <div id="root"></div>
 
-  <!-- MAIN SCRIPT (REACT + LOGIC) -->
+  <!-- MAIN SCRIPT (REACT + 2D PIXEL ENGINE) -->
   <script type="text/babel">
     const { useState, useEffect, useRef, useMemo } = React;
 
@@ -175,17 +162,19 @@
           gain.connect(this.ctx.destination);
           osc.start();
           osc.stop(this.ctx.currentTime + duration);
-        } catch (e) {
-          // Audio safe fail
-        }
+        } catch (e) {}
+      }
+
+      step() {
+        this.playTone(180, 'triangle', 0.03, 0.015);
+      }
+
+      interact() {
+        this.playTone(920, 'square', 0.06, 0.03);
       }
 
       click() {
         this.playTone(1800, 'triangle', 0.03, 0.03);
-      }
-
-      beep() {
-        this.playTone(900, 'sine', 0.05, 0.04);
       }
 
       scan() {
@@ -196,14 +185,14 @@
           const osc = this.ctx.createOscillator();
           const gain = this.ctx.createGain();
           osc.type = 'sawtooth';
-          osc.frequency.setValueAtTime(350, this.ctx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(1200, this.ctx.currentTime + 0.25);
-          gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
-          gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.25);
+          osc.frequency.setValueAtTime(320, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(1400, this.ctx.currentTime + 0.28);
+          gain.gain.setValueAtTime(0.04, this.ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.28);
           osc.connect(gain);
           gain.connect(this.ctx.destination);
           osc.start();
-          osc.stop(this.ctx.currentTime + 0.26);
+          osc.stop(this.ctx.currentTime + 0.29);
         } catch (e) {}
       }
 
@@ -213,7 +202,7 @@
         if (!this.ctx) return;
         try {
           const now = this.ctx.currentTime;
-          [700, 1100, 1400, 950, 1600].forEach((freq, idx) => {
+          [750, 1150, 1450, 950, 1650].forEach((freq, idx) => {
             const osc = this.ctx.createOscillator();
             const gain = this.ctx.createGain();
             osc.type = 'square';
@@ -258,7 +247,7 @@
           [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
             const osc = this.ctx.createOscillator();
             const gain = this.ctx.createGain();
-            osc.type = 'sine';
+            osc.type = 'triangle';
             osc.frequency.setValueAtTime(freq, now + idx * 0.1);
             gain.gain.setValueAtTime(0.06, now + idx * 0.1);
             gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.1 + 0.28);
@@ -281,7 +270,7 @@
             const gain = this.ctx.createGain();
             osc.type = 'sawtooth';
             osc.frequency.setValueAtTime(freq, now + idx * 0.14);
-            gain.gain.setValueAtTime(0.07, now + idx * 0.14);
+            gain.gain.setValueAtTime(0.06, now + idx * 0.14);
             gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.14 + 0.2);
             osc.connect(gain);
             gain.connect(this.ctx.destination);
@@ -299,92 +288,127 @@
     const audio = new SoundEngine();
 
     // ==========================================
-    // 2. PROCEDURAL DATA REPOSITORIES
+    // 2. PROCEDURAL DATA & CHARACTERS
     // ==========================================
-    const FIRST_NAMES = [
-      "Elena", "Marcus", "Priya", "Devon", "Alistair", "Samantha", 
-      "Victor", "Naomi", "Julian", "Kiran", "Reese", "Daphne", 
-      "Cassian", "Leila", "Ronan", "Zoe", "Gideon", "Miriam", 
-      "Gabriel", "Corinne", "Soren", "Talia", "Leon", "Astrid"
-    ];
+    const FIRST_NAMES = ["Elena", "Marcus", "Priya", "Devon", "Alistair", "Samantha", "Victor", "Naomi", "Julian", "Kiran", "Reese", "Daphne"];
+    const LAST_NAMES = ["Vance", "Thorne", "Sharma", "Cruz", "Sterling", "Kowalski", "Chen", "Sinclair", "Mercer", "Patel", "Blackwood", "Frost"];
 
-    const LAST_NAMES = [
-      "Vance", "Thorne", "Sharma", "Cruz", "Sterling", "Kowalski", 
-      "Chen", "Sinclair", "Mercer", "Patel", "Blackwood", "Frost", 
-      "O'Connor", "Hayashi", "Monroe", "Reyes", "Vogel", "Bauer", 
-      "Holloway", "Kincaid", "Novak", "Solomon", "Winter", "Zhao"
-    ];
-
-    const DEPARTMENTS = [
+    // Character Sprite Palettes (Directly inspired by Reference Image 1)
+    const SPRITE_THEMES = [
       {
-        name: "Platform & Infrastructure",
-        color: "text-cyan-400 border-cyan-500/30 bg-cyan-950/20",
-        roles: [
-          { role: "Senior Core Infrastructure Architect", access: "LEVEL-4 (SYS_ROOT)" },
-          { role: "Lead Systems & Reliability Engineer", access: "LEVEL-4 (SYS_ROOT)" },
-          { role: "Principal Cloud Architect", access: "LEVEL-4 (SYS_ROOT)" },
-          { role: "DevOps Pipeline Specialist", access: "LEVEL-3 (INFRA_OPS)" }
-        ]
+        id: "theme_white", // Matches reference image 1 directly!
+        name: "White Fluffy Anime Hair",
+        hair: "#F0F4F8",
+        hairShadow: "#CBD5E1",
+        hairOutline: "#1E293B",
+        skin: "#FFE5D0",
+        skinShadow: "#FDBA74",
+        eye: "#1E293B",
+        vest: "#64748B",
+        vestShadow: "#475569",
+        shirt: "#FFFFFF",
+        cuffGold: "#F59E0B",
+        gloves: "#334155",
+        pants: "#334155",
+        boots: "#1E293B",
+        bootCuffs: "#64748B"
       },
       {
-        name: "FinOps & Treasury",
-        color: "text-amber-400 border-amber-500/30 bg-amber-950/20",
-        roles: [
-          { role: "Head of Treasury Operations", access: "LEVEL-3 (FIN_OPS)" },
-          { role: "Senior Financial Settlement Controller", access: "LEVEL-3 (FIN_OPS)" },
-          { role: "Cryptographic Escrow Auditor", access: "LEVEL-3 (FIN_OPS)" },
-          { role: "Ledger Compliance Director", access: "LEVEL-4 (EXEC_FIN)" }
-        ]
+        id: "theme_dark",
+        name: "Raven Black Tailored",
+        hair: "#1E293B",
+        hairShadow: "#0F172A",
+        hairOutline: "#020617",
+        skin: "#FFE5D0",
+        skinShadow: "#FDBA74",
+        eye: "#0F172A",
+        vest: "#1E3A8A",
+        vestShadow: "#172554",
+        shirt: "#F8FAFC",
+        cuffGold: "#38BDF8",
+        gloves: "#0F172A",
+        pants: "#1E293B",
+        boots: "#0F172A",
+        bootCuffs: "#334155"
       },
       {
-        name: "SecOps & Threat Intel",
-        color: "text-emerald-400 border-emerald-500/30 bg-emerald-950/20",
-        roles: [
-          { role: "Principal Threat Hunter", access: "LEVEL-4 (ROOT_SECOP)" },
-          { role: "Incident Response Commander", access: "LEVEL-4 (ROOT_SECOP)" },
-          { role: "Identity & Key Vault Administrator", access: "LEVEL-4 (ROOT_SECOP)" },
-          { role: "Security Auditor & Pentester", access: "LEVEL-3 (INFRA_OPS)" }
-        ]
+        id: "theme_amber",
+        name: "Amber Braid / Tech Vest",
+        hair: "#D97706",
+        hairShadow: "#B45309",
+        hairOutline: "#451A03",
+        skin: "#FFEDD5",
+        skinShadow: "#FED7AA",
+        eye: "#451A03",
+        vest: "#047857",
+        vestShadow: "#064E3B",
+        shirt: "#ECFDF5",
+        cuffGold: "#F59E0B",
+        gloves: "#064E3B",
+        pants: "#1E293B",
+        boots: "#064E3B",
+        bootCuffs: "#047857"
       },
       {
-        name: "Hardware & Facilities",
-        color: "text-violet-400 border-violet-500/30 bg-violet-950/20",
-        roles: [
-          { role: "Data Center Beta Facilities Lead", access: "LEVEL-3 (PHYS_ADMIN)" },
-          { role: "Senior Hardware Security Engineer", access: "LEVEL-3 (PHYS_ADMIN)" },
-          { role: "Firmware Diagnostics Specialist", access: "LEVEL-2 (STAFF)" },
-          { role: "SCADA & Cooling Systems Tech", access: "LEVEL-2 (STAFF)" }
-        ]
-      },
-      {
-        name: "Executive & Product Strategy",
-        color: "text-rose-400 border-rose-500/30 bg-rose-950/20",
-        roles: [
-          { role: "VP of Strategic Product Initiatives", access: "LEVEL-5 (C_SUITE)" },
-          { role: "Chief Governance Officer", access: "LEVEL-5 (C_SUITE)" },
-          { role: "Director of IP Acquisition", access: "LEVEL-4 (EXEC_DIR)" },
-          { role: "Executive Board Technical Liaison", access: "LEVEL-5 (C_SUITE)" }
-        ]
+        id: "theme_crimson",
+        name: "Copper Tousled / SecOps Coat",
+        hair: "#EA580C",
+        hairShadow: "#C2410C",
+        hairOutline: "#431407",
+        skin: "#FFE5D0",
+        skinShadow: "#FDBA74",
+        eye: "#1E293B",
+        vest: "#991B1B",
+        vestShadow: "#7F1D1D",
+        shirt: "#FEF2F2",
+        cuffGold: "#F59E0B",
+        gloves: "#1F2937",
+        pants: "#1E293B",
+        boots: "#18181B",
+        bootCuffs: "#7F1D1D"
       }
     ];
 
-    const COMMON_ROOMS = [
-      "4th Floor Conference Room A",
-      "Executive 7th Floor Lounge",
-      "Cafeteria & Open Breakroom",
-      "Engineering Pod Alpha (East Wing)",
-      "Design Lab & User Testing 3",
-      "Legal Compliance Suite 2B"
+    // Detective Player Theme
+    const DETECTIVE_THEME = {
+      hair: "#475569",
+      hairShadow: "#334155",
+      hairOutline: "#0F172A",
+      skin: "#FFE5D0",
+      skinShadow: "#FDBA74",
+      eye: "#0F172A",
+      vest: "#3B82F6",
+      vestShadow: "#1D4ED8",
+      shirt: "#FFFFFF",
+      cuffGold: "#EAB308",
+      gloves: "#1E293B",
+      pants: "#1E293B",
+      boots: "#0F172A",
+      bootCuffs: "#3B82F6"
+    };
+
+    const ROOM_LOCATIONS = [
+      { name: "Conference Room 4A", tileX: 23, tileY: 5, color: "#38BDF8" },
+      { name: "Executive 7th Floor Lounge", tileX: 23, tileY: 17, color: "#F43F5E" },
+      { name: "Cafeteria & Breakroom", tileX: 7, tileY: 17, color: "#10B981" },
+      { name: "Engineering Pod Alpha", tileX: 15, tileY: 11, color: "#F59E0B" }
     ];
+
+    const RESTRICTED_ROOM = {
+      name: "Sublevel 2 - Core Server Vault",
+      tileX: 7,
+      tileY: 5,
+      color: "#F85149"
+    };
 
     const CRIMES_DATABASE = [
       {
         typeId: "CRIME_IP_THEFT",
-        title: "PROJECT CHIMERA // SOURCE CODE EXFILTRATION",
+        title: "PROJECT CHIMERA // QUANTUM CORE EXFILTRATION",
         incidentType: "CORPORATE_ESPIONAGE",
         incidentTime: "22:18",
         criticalWindow: "22:00 - 22:30",
-        restrictedRoom: "Sublevel 2 - Core Server Vault",
+        restrictedRoom: RESTRICTED_ROOM.name,
         compromisedAsset: "Quantum Core v4.2 Git Repository (4.2 GB)",
         suspiciousProtocol: "SFTP :22",
         redactionMarker: "[REDACTED_IP_SUBNET]",
@@ -400,7 +424,7 @@
         incidentType: "FINANCIAL_FRAUD",
         incidentTime: "21:58",
         criticalWindow: "21:45 - 22:15",
-        restrictedRoom: "FinOps Secure Clearing Terminal",
+        restrictedRoom: RESTRICTED_ROOM.name,
         compromisedAsset: "Global Escrow Clearing Ledger",
         suspiciousProtocol: "SWIFT-MT103 :103",
         redactionMarker: "[REDACTED_SWIFT_ROUTING]",
@@ -416,7 +440,7 @@
         incidentType: "INFRASTRUCTURE_SABOTAGE",
         incidentTime: "22:24",
         criticalWindow: "22:10 - 22:40",
-        restrictedRoom: "Data Center Beta - Cryo Valve Enclosure",
+        restrictedRoom: RESTRICTED_ROOM.name,
         compromisedAsset: "Primary Liquid Cooling Subsystem",
         suspiciousProtocol: "MODBUS-SCADA :502",
         redactionMarker: "[REDACTED_VALVE_OVERRIDE]",
@@ -425,88 +449,74 @@
         decryptedChatPayload: "Pneumatic valve tripped. Coolant pressure dropping to zero. System will halt within 10 minutes. Place the short options now.",
         culpritMotive: "Holding heavy short positions on company stock ahead of tomorrow's flagship product reveal; intended to cause massive reputational loss.",
         alibiSlipDialogue: "The coolant pressure sensors should have been disabled! I never left the cafeteria, I swear!"
-      },
-      {
-        typeId: "CRIME_HSM_KEY",
-        title: "OPERATION ZERO-DAY // HSM ROOT SIGNING THEFT",
-        incidentType: "SECURITY_BREACH",
-        incidentTime: "22:12",
-        criticalWindow: "22:00 - 22:30",
-        restrictedRoom: "Air-Gapped HSM Cryptographic Vault",
-        compromisedAsset: "Master Root TLS & Code Signing Certificates",
-        suspiciousProtocol: "DNS-TUNNEL :53",
-        redactionMarker: "[REDACTED_DNS_PAYLOAD]",
-        redactionDecrypted: "EXFIL_RSA_PRIV_KEY_8192_CHUNK_04",
-        summary: "At 22:12, master root signing certificates were extracted from the air-gapped cryptographic HSM. Telemetry reveals anomalous base64 DNS query bursts encoding the private key bytes.",
-        decryptedChatPayload: "HSM private key successfully chunked into DNS packets. Exfiltration complete. We now have root authority.",
-        culpritMotive: "Retaliation after being demoted from executive security board; planned to sell root signing authority to a foreign consortium.",
-        alibiSlipDialogue: "Wait, the DNS query logs were supposed to be purged by the proxy! You can't tie that private key chunk to me!"
       }
     ];
 
     // ==========================================
-    // 3. CASE GENERATION LOGIC
+    // 3. CASE GENERATION ENGINE
     // ==========================================
     function generateCaseData(caseNumber = 1) {
       const crime = CRIMES_DATABASE[(caseNumber - 1) % CRIMES_DATABASE.length];
 
-      // Shuffle and pick 4 distinct departments & names
       const shuffledFirst = [...FIRST_NAMES].sort(() => Math.random() - 0.5);
       const shuffledLast = [...LAST_NAMES].sort(() => Math.random() - 0.5);
-      const shuffledDepts = [...DEPARTMENTS].sort(() => Math.random() - 0.5);
+
+      const roles = [
+        { role: "Senior Core Infrastructure Architect", dept: "Platform Engineering", access: "LEVEL-4 (SYS_ROOT)" },
+        { role: "Head of Treasury Operations", dept: "FinOps & Treasury", access: "LEVEL-3 (FIN_OPS)" },
+        { role: "Principal Threat Hunter", dept: "SecOps & Threat Intel", access: "LEVEL-4 (ROOT_SECOP)" },
+        { role: "Data Center Facilities Lead", dept: "Hardware & Facilities", access: "LEVEL-3 (PHYS_ADMIN)" }
+      ];
 
       const suspects = [];
       for (let i = 0; i < 4; i++) {
-        const deptObj = shuffledDepts[i];
-        const roleObj = deptObj.roles[Math.floor(Math.random() * deptObj.roles.length)];
+        const roleObj = roles[i];
         const name = `${shuffledFirst[i]} ${shuffledLast[i]}`;
         const badgeId = `EMP-${2000 + Math.floor(Math.random() * 7000)}`;
-        const statedRoom = COMMON_ROOMS[i % COMMON_ROOMS.length];
+        const assignedRoom = ROOM_LOCATIONS[i % ROOM_LOCATIONS.length];
 
         suspects.push({
           id: `suspect_${i + 1}`,
           name,
           role: roleObj.role,
-          dept: deptObj.name,
-          deptColor: deptObj.color,
+          dept: roleObj.dept,
           accessLevel: roleObj.access,
           badgeId,
-          statedRoom,
-          actualRoom: statedRoom,
+          statedRoom: assignedRoom.name,
+          actualRoom: assignedRoom.name,
+          mapX: assignedRoom.tileX,
+          mapY: assignedRoom.tileY,
+          spriteTheme: SPRITE_THEMES[i % SPRITE_THEMES.length],
           isCulprit: false,
           userTag: "UNVERIFIED",
           stressLevel: 25,
           motive: "Routine corporate performance; clean background audit, no outstanding personal loans.",
-          statedAlibi: `Claims they were working quietly in ${statedRoom} reviewing engineering tickets from 21:30 until 23:00, with noise-canceling headphones on.`,
-          interrogated: false,
-          interrogationNotes: []
+          statedAlibi: `Claims they were working quietly in ${assignedRoom.name} reviewing engineering tickets from 21:30 until 23:00, with noise-canceling headphones on.`,
+          interrogated: false
         });
       }
 
-      // Designate exactly 1 suspect as Culprit
+      // 1 Culprit
       const culpritIndex = Math.floor(Math.random() * 4);
       const culprit = suspects[culpritIndex];
       culprit.isCulprit = true;
-      culprit.actualRoom = crime.restrictedRoom;
+      culprit.actualRoom = RESTRICTED_ROOM.name;
       culprit.motive = crime.culpritMotive;
-      culprit.statedAlibi = `Maintains they were stationed in ${culprit.statedRoom} drafting the Q3 governance audit from 21:30 to 22:45, never going anywhere near ${crime.restrictedRoom}.`;
+      culprit.statedAlibi = `Maintains they were stationed in ${culprit.statedRoom} drafting the Q3 governance audit from 21:30 to 22:45, never going anywhere near ${RESTRICTED_ROOM.name}.`;
 
-      // Designate 1 innocent suspect as Red Herring
+      // 1 Red Herring Innocent
       const innocentIndices = [0, 1, 2, 3].filter(idx => idx !== culpritIndex);
       const redHerringIndex = innocentIndices[0];
       const redHerring = suspects[redHerringIndex];
       redHerring.hasRedHerring = true;
       redHerring.motive = "Expressed vocal dissatisfaction with upper management bonuses during yesterday's all-hands call.";
 
-      // ==========================================
-      // EVIDENCE STREAMS CREATION
-      // ==========================================
+      // Evidence Streams
       const badgeLogs = [];
       const chatLogs = [];
       const networkLogs = [];
 
-      // 1. BADGE LOGS (Keycard & Turnstile)
-      // Normal innocent entries
+      // 1. Badge Logs
       innocentIndices.forEach((idx, i) => {
         const s = suspects[idx];
         badgeLogs.push({
@@ -522,7 +532,6 @@
           deepScanned: false
         });
 
-        // Red herring extra entry
         if (idx === redHerringIndex) {
           badgeLogs.push({
             id: `badge_red_herring_entry`,
@@ -546,30 +555,16 @@
         timestamp: `${crime.incidentTime}:08`,
         badgeId: culprit.badgeId,
         holderName: culprit.name,
-        location: crime.restrictedRoom,
+        location: RESTRICTED_ROOM.name,
         action: "ENTRY_GRANTED",
         status: "ANOMALOUS",
-        details: `CONTRADICTION: Physical RFID badge swipe registers ${culprit.name} entering restricted ${crime.restrictedRoom} at ${crime.incidentTime}:08, directly disproving their alibi of being in ${culprit.statedRoom}!`,
-        contradiction: `Badge Swipe into ${crime.restrictedRoom} at ${crime.incidentTime}:08`,
+        details: `CONTRADICTION: Physical RFID badge swipe registers ${culprit.name} entering restricted ${RESTRICTED_ROOM.name} at ${crime.incidentTime}:08, directly disproving their alibi of being in ${culprit.statedRoom}!`,
+        contradiction: `Badge Swipe into ${RESTRICTED_ROOM.name} at ${crime.incidentTime}:08`,
         deepScanned: false,
         isCulpritContradiction: true
       });
 
-      // Culprit exit swipe
-      badgeLogs.push({
-        id: `badge_culprit_exit`,
-        timestamp: `22:42:30`,
-        badgeId: culprit.badgeId,
-        holderName: culprit.name,
-        location: "Main Lobby Exterior Turnstile",
-        action: "EXIT_GRANTED",
-        status: "VERIFIED",
-        details: "Standard perimeter exit turnstile scan.",
-        contradiction: null,
-        deepScanned: false
-      });
-
-      // 2. CHAT LOGS (Intercepted IPC & Slack)
+      // 2. Chat Logs
       chatLogs.push({
         id: `chat_innocent_01`,
         timestamp: `21:42:12`,
@@ -582,20 +577,7 @@
         deepScanned: false
       });
 
-      chatLogs.push({
-        id: `chat_redherring_01`,
-        timestamp: `21:54:33`,
-        sender: redHerring.name,
-        channel: "#general-vent",
-        message: "Management is cutting our hardware budget again. One day the entire cooling loop is going to implode.",
-        status: "FLAGGED",
-        details: "Deep Scan confirms: Venting frustration over budget freeze. No technical exfiltration or sabotage signatures present.",
-        contradiction: null,
-        deepScanned: false,
-        isRedHerring: true
-      });
-
-      // Culprit's Chat Smoking Gun (CONTRADICTION 2A)
+      // Culprit Chat Smoking Gun (CONTRADICTION 2A)
       chatLogs.push({
         id: `chat_culprit_contradiction`,
         timestamp: `${crime.incidentTime}:32`,
@@ -611,33 +593,7 @@
         isCulpritContradiction: true
       });
 
-      chatLogs.push({
-        id: `chat_innocent_02`,
-        timestamp: `22:38:19`,
-        sender: suspects[innocentIndices[0]].name,
-        channel: "#secops-audit",
-        message: "Routine daily token rotation complete. All Level-4 credentials verified.",
-        status: "ROUTINE",
-        details: "Standard SecOps administrative maintenance.",
-        contradiction: null,
-        deepScanned: false
-      });
-
-      // 3. NETWORK LOGS (Telemetry & Transfers)
-      networkLogs.push({
-        id: `net_routine_01`,
-        timestamp: `21:38:50`,
-        source: "10.0.8.21 (Prometheus-Monitor)",
-        destination: "10.0.8.254 (Gateway-Prod)",
-        protocol: "HTTP-METRICS :9090",
-        volume: "48 KB",
-        status: "CLEAN",
-        details: "Routine monitoring scrape.",
-        contradiction: null,
-        deepScanned: false
-      });
-
-      // Culprit Network Telemetry (CONTRADICTION 2B)
+      // 3. Network Logs (CONTRADICTION 2B)
       networkLogs.push({
         id: `net_culprit_contradiction`,
         timestamp: `${crime.incidentTime}:22`,
@@ -650,19 +606,6 @@
         contradiction: `Anomalous ${crime.suspiciousProtocol} transmission authenticated by ${culprit.name}'s hardware token at ${crime.incidentTime}:22`,
         deepScanned: false,
         isCulpritContradiction: true
-      });
-
-      networkLogs.push({
-        id: `net_routine_02`,
-        timestamp: `22:04:11`,
-        source: "10.0.12.8 (Auth-Service-Pod)",
-        destination: "10.0.12.1 (Redis-Session-Cluster)",
-        protocol: "TCP :6379",
-        volume: "12 KB",
-        status: "CLEAN",
-        details: "Normal session keepalive telemetry.",
-        contradiction: null,
-        deepScanned: false
       });
 
       return {
@@ -681,73 +624,339 @@
     }
 
     // ==========================================
-    // 4. MAIN APPLICATION COMPONENT
+    // 4. PROCEDURAL 2D PIXEL SPRITE RENDERER
+    // (Directly implements the chibi pixel style of user's reference)
+    // ==========================================
+    function drawPixelChibiCharacter(ctx, x, y, theme, facing = 'down', frame = 0, isWalking = false) {
+      ctx.save();
+      ctx.translate(Math.floor(x), Math.floor(y));
+
+      const bobY = isWalking ? (frame % 2 === 0 ? -1 : 1) : Math.sin(Date.now() / 320) * 0.8;
+      const legOffset = isWalking ? (frame % 2 === 0 ? 2 : -2) : 0;
+
+      // Draw drop shadow
+      ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
+      ctx.beginPath();
+      ctx.ellipse(12, 29, 9, 3.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Outline helper
+      const p = (px, py, w, h, color) => {
+        ctx.fillStyle = color;
+        ctx.fillRect(px, py + bobY, w, h);
+      };
+
+      // 1. LEGS & BOOTS (Styled fold-over boots with gold button like reference 1)
+      // Left Leg
+      p(6 - legOffset, 20, 4, 7, theme.pants);
+      p(5 - legOffset, 22, 5, 6, theme.boots);
+      p(5 - legOffset, 21, 5, 2, theme.bootCuffs); // Fold-over boot cuff
+      p(6 - legOffset, 24, 1, 2, theme.cuffGold); // Gold boot button!
+
+      // Right Leg
+      p(14 + legOffset, 20, 4, 7, theme.pants);
+      p(14 + legOffset, 22, 5, 6, theme.boots);
+      p(14 + legOffset, 21, 5, 2, theme.bootCuffs);
+      p(15 + legOffset, 24, 1, 2, theme.cuffGold);
+
+      // 2. TORSO, WAISTCOAT & WHITE PUFFY SLEEVES (Matching Reference 1)
+      // White shirt under-layer
+      p(7, 13, 10, 8, theme.shirt);
+
+      // Tailored Vest / Waistcoat
+      p(8, 14, 8, 7, theme.vest);
+      p(8, 17, 8, 4, theme.vestShadow);
+      // Gold Vest Buttons down the center
+      p(11, 15, 2, 1, theme.cuffGold);
+      p(11, 17, 2, 1, theme.cuffGold);
+      p(11, 19, 2, 1, theme.cuffGold);
+
+      // Sleeves & Dark Gloves
+      // Left arm
+      p(4, 14, 3, 5, theme.shirt);
+      p(4, 18, 3, 3, theme.gloves);
+      p(4, 17, 3, 1, theme.cuffGold); // Gold cuff rim
+
+      // Right arm
+      p(17, 14, 3, 5, theme.shirt);
+      p(17, 18, 3, 3, theme.gloves);
+      p(17, 17, 3, 1, theme.cuffGold);
+
+      // 3. HEAD & FACE
+      // Neck
+      p(10, 11, 4, 2, theme.skinShadow);
+      // Face base
+      p(6, 6, 12, 6, theme.skin);
+      p(5, 7, 1, 4, theme.skin); // Ears
+      p(18, 7, 1, 4, theme.skin);
+
+      // Cute Eyes (2x3 pixel with white shine highlight, like reference 1!)
+      if (facing !== 'up') {
+        const eyeOffset = facing === 'left' ? -1 : facing === 'right' ? 1 : 0;
+        // Left Eye
+        p(8 + eyeOffset, 8, 2, 3, theme.eye);
+        p(8 + eyeOffset, 8, 1, 1, "#FFFFFF"); // White shine pupil
+
+        // Right Eye
+        p(14 + eyeOffset, 8, 2, 3, theme.eye);
+        p(14 + eyeOffset, 8, 1, 1, "#FFFFFF");
+
+        // Soft blush
+        p(7 + eyeOffset, 10, 1, 1, "#F472B6");
+        p(16 + eyeOffset, 10, 1, 1, "#F472B6");
+      }
+
+      // 4. BIG FLUFFY ANIME HAIR (Layered bangs and side tufts from reference 1)
+      // Hair Back volume
+      p(4, 3, 16, 5, theme.hair);
+      p(3, 5, 2, 5, theme.hair);
+      p(19, 5, 2, 5, theme.hair);
+
+      // Front Bangs & Side Tufts
+      p(5, 4, 14, 3, theme.hair);
+      p(6, 7, 3, 2, theme.hair);
+      p(11, 7, 2, 2, theme.hair);
+      p(15, 7, 3, 2, theme.hair);
+
+      // Side tufts angled outward (Signature chibi anime silhouette from Reference 1)
+      p(2, 6, 3, 3, theme.hair);
+      p(1, 8, 2, 3, theme.hairShadow);
+      p(19, 6, 3, 3, theme.hair);
+      p(21, 8, 2, 3, theme.hairShadow);
+
+      // Hair shading & highlights
+      p(7, 3, 10, 1, "#FFFFFF");
+      p(4, 7, 2, 2, theme.hairShadow);
+      p(18, 7, 2, 2, theme.hairShadow);
+
+      ctx.restore();
+    }
+
+    // ==========================================
+    // 5. 2D TILEMAP & WORLD ENGINE
+    // ==========================================
+    const MAP_WIDTH = 30;
+    const MAP_HEIGHT = 22;
+    const TILE_SIZE = 24;
+
+    // Interactive Terminals on the map
+    const INTERACTIVE_NODES = [
+      { id: "node_badge", name: "Keycard Security Gate", tileX: 15, tileY: 5, type: "badge", label: "[E] SWIPE LOGS", icon: "💳" },
+      { id: "node_chat", name: "SecOps Chat Terminal", tileX: 13, tileY: 15, type: "chat", label: "[E] CHAT RELAY", icon: "💬" },
+      { id: "node_net", name: "Core Network Rack", tileX: 17, tileY: 15, type: "network", label: "[E] PCAP TRACE", icon: "🌐" },
+      { id: "node_pinboard", name: "Deduction Whiteboard", tileX: 15, tileY: 18, type: "notes", label: "[E] CASE NOTES", icon: "📌" },
+      { id: "node_crime_tape", name: "Breached Vault Safe", tileX: 7, tileY: 4, type: "crime_scene", label: "[E] CRIME SCENE", icon: "🚨" }
+    ];
+
+    function drawWorldTilemap(ctx, width, height, time) {
+      // 1. Base floor tiles (Dark corporate grid / pastel office tiles)
+      for (let y = 0; y < MAP_HEIGHT; y++) {
+        for (let x = 0; x < MAP_WIDTH; x++) {
+          const px = x * TILE_SIZE;
+          const py = y * TILE_SIZE;
+
+          // Outer walls
+          if (x === 0 || y === 0 || x === MAP_WIDTH - 1 || y === MAP_HEIGHT - 1) {
+            ctx.fillStyle = "#161B22";
+            ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
+            ctx.strokeStyle = "#30363D";
+            ctx.strokeRect(px, py, TILE_SIZE, TILE_SIZE);
+            continue;
+          }
+
+          // Interior Rooms
+          // Top Left: Restricted Server Vault (Crime Scene!)
+          if (x < 13 && y < 10) {
+            ctx.fillStyle = (x + y) % 2 === 0 ? "#0D1117" : "#161B22";
+            ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
+            // Red danger floor line
+            if (x === 12 || y === 9) {
+              ctx.fillStyle = "#991B1B";
+              ctx.fillRect(px, py, TILE_SIZE, 3);
+            }
+          }
+          // Top Right: Conference Room 4A
+          else if (x > 17 && y < 10) {
+            ctx.fillStyle = (x + y) % 2 === 0 ? "#1C2430" : "#242E3D"; // Polished parquet
+            ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
+            ctx.strokeStyle = "#2E3B4E";
+            ctx.strokeRect(px, py, TILE_SIZE, TILE_SIZE);
+          }
+          // Bottom Left: Cafeteria & Breakroom
+          else if (x < 13 && y > 12) {
+            ctx.fillStyle = (x + y) % 2 === 0 ? "#13233A" : "#1B2A4A"; // Checkerboard
+            ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
+          }
+          // Bottom Right: Executive 7th Floor Lounge
+          else if (x > 17 && y > 12) {
+            ctx.fillStyle = (x + y) % 2 === 0 ? "#2B1724" : "#381E2F"; // Velvet burgundy
+            ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
+          }
+          // Central Hallways & Security Corridor
+          else {
+            ctx.fillStyle = "#111827";
+            ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
+            ctx.strokeStyle = "#1F2937";
+            ctx.strokeRect(px, py, TILE_SIZE, TILE_SIZE);
+          }
+        }
+      }
+
+      // 2. Interior Walls & Glass Partitions
+      ctx.fillStyle = "#30363D";
+      // Vertical divider top
+      ctx.fillRect(13 * TILE_SIZE, 1 * TILE_SIZE, 4, 8 * TILE_SIZE);
+      ctx.fillRect(17 * TILE_SIZE, 1 * TILE_SIZE, 4, 8 * TILE_SIZE);
+      // Vertical divider bottom
+      ctx.fillRect(13 * TILE_SIZE, 13 * TILE_SIZE, 4, 8 * TILE_SIZE);
+      ctx.fillRect(17 * TILE_SIZE, 13 * TILE_SIZE, 4, 8 * TILE_SIZE);
+      // Horizontal dividers
+      ctx.fillRect(1 * TILE_SIZE, 9 * TILE_SIZE, 12 * TILE_SIZE, 4);
+      ctx.fillRect(18 * TILE_SIZE, 9 * TILE_SIZE, 11 * TILE_SIZE, 4);
+      ctx.fillRect(1 * TILE_SIZE, 13 * TILE_SIZE, 12 * TILE_SIZE, 4);
+      ctx.fillRect(18 * TILE_SIZE, 13 * TILE_SIZE, 11 * TILE_SIZE, 4);
+
+      // 3. Furniture & Props (Sprout Lands inspired corporate style)
+      // A) Conference Room 4A Table
+      ctx.fillStyle = "#78350F";
+      ctx.fillRect(20 * TILE_SIZE, 4 * TILE_SIZE, 7 * TILE_SIZE, 3 * TILE_SIZE);
+      ctx.fillStyle = "#92400E";
+      ctx.fillRect(20 * TILE_SIZE + 2, 4 * TILE_SIZE + 2, 7 * TILE_SIZE - 4, 3 * TILE_SIZE - 4);
+      // Laptops on table
+      ctx.fillStyle = "#94A3B8";
+      ctx.fillRect(21 * TILE_SIZE, 5 * TILE_SIZE, 12, 10);
+      ctx.fillRect(24 * TILE_SIZE, 5 * TILE_SIZE, 12, 10);
+      ctx.fillRect(26 * TILE_SIZE, 5 * TILE_SIZE, 12, 10);
+
+      // B) Server Vault Racks (Blinking LEDs)
+      for (let r = 0; r < 4; r++) {
+        const rx = (3 + r * 2.5) * TILE_SIZE;
+        const ry = 3 * TILE_SIZE;
+        ctx.fillStyle = "#0F172A";
+        ctx.fillRect(rx, ry, 36, 60);
+        ctx.strokeStyle = "#334155";
+        ctx.strokeRect(rx, ry, 36, 60);
+        // Blinking LEDs
+        const blink1 = Math.floor(time / 200 + r) % 2 === 0;
+        const blink2 = Math.floor(time / 350 + r) % 2 === 0;
+        ctx.fillStyle = blink1 ? "#22C55E" : "#15803D";
+        ctx.fillRect(rx + 6, ry + 10, 4, 4);
+        ctx.fillStyle = blink2 ? "#EF4444" : "#991B1B";
+        ctx.fillRect(rx + 14, ry + 10, 4, 4);
+        ctx.fillStyle = "#38BDF8";
+        ctx.fillRect(rx + 22, ry + 10, 4, 4);
+      }
+
+      // Yellow Crime Scene Tape at Vault entrance
+      ctx.fillStyle = "#EAB308";
+      ctx.fillRect(10 * TILE_SIZE, 9 * TILE_SIZE - 2, 3 * TILE_SIZE, 4);
+      ctx.fillStyle = "#000000";
+      for (let s = 0; s < 5; s++) {
+        ctx.fillRect(10 * TILE_SIZE + s * 14, 9 * TILE_SIZE - 2, 6, 4);
+      }
+
+      // C) Cafeteria Tables & Coffee Machine
+      ctx.fillStyle = "#334155";
+      ctx.fillRect(4 * TILE_SIZE, 15 * TILE_SIZE, 4 * TILE_SIZE, 2 * TILE_SIZE);
+      ctx.fillRect(4 * TILE_SIZE, 18 * TILE_SIZE, 4 * TILE_SIZE, 2 * TILE_SIZE);
+      // Vending Machine
+      ctx.fillStyle = "#1E293B";
+      ctx.fillRect(2 * TILE_SIZE, 14 * TILE_SIZE, 24, 40);
+      ctx.fillStyle = "#06B6D4";
+      ctx.fillRect(2 * TILE_SIZE + 4, 14 * TILE_SIZE + 6, 16, 18);
+
+      // D) Executive Lounge Couches & Ficus Plants
+      ctx.fillStyle = "#991B1B";
+      ctx.fillRect(20 * TILE_SIZE, 15 * TILE_SIZE, 6 * TILE_SIZE, 20);
+      ctx.fillRect(20 * TILE_SIZE, 18 * TILE_SIZE, 6 * TILE_SIZE, 20);
+      // Potted plants (Sprout Lands style)
+      [ {x: 19, y: 14}, {x: 27, y: 14}, {x: 19, y: 19}, {x: 27, y: 19} ].forEach(p => {
+        ctx.fillStyle = "#78350F";
+        ctx.fillRect(p.x * TILE_SIZE + 4, p.y * TILE_SIZE + 10, 16, 14);
+        ctx.fillStyle = "#22C55E";
+        ctx.beginPath();
+        ctx.arc(p.x * TILE_SIZE + 12, p.y * TILE_SIZE + 8, 10, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // 4. Room Label Banners
+      ctx.font = "bold 9px 'Press Start 2P', monospace";
+      ctx.fillStyle = "#EF4444";
+      ctx.fillText("RESTRICTED SERVER VAULT", 2 * TILE_SIZE, 2.2 * TILE_SIZE);
+      ctx.fillStyle = "#38BDF8";
+      ctx.fillText("CONFERENCE ROOM 4A", 19 * TILE_SIZE, 2.2 * TILE_SIZE);
+      ctx.fillStyle = "#10B981";
+      ctx.fillText("CAFETERIA & BREAKROOM", 2 * TILE_SIZE, 13.8 * TILE_SIZE);
+      ctx.fillStyle = "#F43F5E";
+      ctx.fillText("EXECUTIVE LOUNGE", 19 * TILE_SIZE, 13.8 * TILE_SIZE);
+      ctx.fillStyle = "#A78BFA";
+      ctx.fillText("CENTRAL SECURITY CORRIDOR", 8 * TILE_SIZE, 11 * TILE_SIZE);
+    }
+
+    // ==========================================
+    // 6. MAIN APPLICATION COMPONENT
     // ==========================================
     function App() {
       // Game State
       const [caseData, setCaseData] = useState(null);
       const [ap, setAp] = useState(8);
       const [maxAp, setMaxAp] = useState(8);
-      const [activeTab, setActiveTab] = useState('badge'); // badge, chat, network, notes
+      const [viewMode, setViewMode] = useState('map'); // 'map' (2D pixel view) or 'terminal' (forensic console)
+      const [activeTab, setActiveTab] = useState('badge');
       const [pinnedLogIds, setPinnedLogIds] = useState([]);
       const [playerNotes, setPlayerNotes] = useState('');
-      const [searchQuery, setSearchQuery] = useState('');
-      const [filterFlaggedOnly, setFilterFlaggedOnly] = useState(false);
 
-      // Selected / expanded items
-      const [selectedSuspectId, setSelectedSuspectId] = useState(null);
-      const [expandedLogId, setExpandedLogId] = useState(null);
+      // Player Position on 2D Tilemap
+      const [playerPos, setPlayerPos] = useState({ x: 15, y: 10, facing: 'down', isWalking: false });
+      const [interactTarget, setInteractTarget] = useState(null); // active NPC or Node near player
 
-      // Gadgets active modals
-      const [activeGadgetModal, setActiveGadgetModal] = useState(null); // 'tracker', 'voice', 'decrypt', null
+      // Radar Gadget visual ping on 2D map
+      const [radarBeacon, setRadarBeacon] = useState(null); // { x, y, roomName, color }
+
+      // Modals
+      const [activeSuspectModal, setActiveSuspectModal] = useState(null);
+      const [activeNodeModal, setActiveNodeModal] = useState(null);
+      const [activeGadgetModal, setActiveGadgetModal] = useState(null);
       const [trackerResult, setTrackerResult] = useState(null);
-      const [interrogatingSuspect, setInterrogatingSuspect] = useState(null);
       const [interrogationDialogue, setInterrogationDialogue] = useState(null);
       const [decryptingLog, setDecryptingLog] = useState(null);
       const [decryptStep, setDecryptStep] = useState(0);
 
-      // Surprise Intercept (Live Leak) State
-      const [liveLeakModal, setLiveLeakModal] = useState(null); // { type, title, text, actionText, onAction }
+      // Live Leaks & Accusation
+      const [liveLeakModal, setLiveLeakModal] = useState(null);
       const [apSpentCounter, setApSpentCounter] = useState(0);
-      const [leaksTriggeredCount, setLeaksTriggeredCount] = useState(0);
       const [shakeScreen, setShakeScreen] = useState(false);
-
-      // Accusation & Verdict
       const [accusationModalOpen, setAccusationModalOpen] = useState(false);
       const [selectedAccusedSuspectId, setSelectedAccusedSuspectId] = useState('');
       const [selectedEvidence1, setSelectedEvidence1] = useState('');
       const [selectedEvidence2, setSelectedEvidence2] = useState('');
-      const [verdictData, setVerdictData] = useState(null); // { isSuccess, title, text, details }
-      const [verifyingStage, setVerifyingStage] = useState(0); // 0 = idle, 1..4 = animated steps
+      const [verdictData, setVerdictData] = useState(null);
+      const [verifyingStage, setVerifyingStage] = useState(0);
 
-      // Career & Tech Lab
+      // Career Stats & Tech Lab
       const [career, setCareer] = useState({
         xp: 150,
         level: 1,
-        rankTitle: "Junior Log Analyst",
+        rankTitle: "Junior Forensic Analyst",
         creds: 250,
         casesSolved: 0,
         streak: 0,
-        upgrades: {
-          extraApBattery: false,
-          quantumDecryptor: false,
-          forensicCache: false
-        }
+        upgrades: { extraApBattery: false, quantumDecryptor: false, forensicCache: false }
       });
       const [techLabOpen, setTechLabOpen] = useState(false);
 
-      // Boss Mode & UI Meta
+      // Meta & Boss Key
       const [bossMode, setBossMode] = useState(false);
       const [soundMuted, setSoundMuted] = useState(false);
       const [tutorialActive, setTutorialActive] = useState(false);
-      const [tutorialStep, setTutorialStep] = useState(0);
       const [toastMsg, setToastMsg] = useState(null);
 
+      const canvasRef = useRef(null);
+
       // ==========================================
-      // INITIALIZATION & LOCALSTORAGE
+      // INITIALIZATION
       // ==========================================
       useEffect(() => {
-        // Load saved state if present
         const saved = localStorage.getItem('THE_COLD_FILE_STATE_V1');
         if (saved) {
           try {
@@ -765,148 +974,90 @@
           }
         } else {
           startNewCase(1);
-          // Launch tutorial on fresh load
           setTutorialActive(true);
         }
 
-        // Global Boss Key listener (Escape key)
+        // Global Boss Key (Escape) & WASD Movement
         const handleKeyDown = (e) => {
           if (e.key === 'Escape') {
-            setBossMode(prev => {
-              const next = !prev;
-              if (next) audio.beep();
-              else audio.click();
-              return next;
+            setBossMode(prev => !prev);
+            return;
+          }
+
+          // If a modal is open, don't move
+          if (activeSuspectModal || activeNodeModal || activeGadgetModal || liveLeakModal || accusationModalOpen || techLabOpen || tutorialActive) {
+            return;
+          }
+
+          // WASD / Arrow Movement
+          let dx = 0;
+          let dy = 0;
+          let newFacing = playerPos.facing;
+
+          if (e.key === 'w' || e.key === 'W' || e.key === 'ArrowUp') { dy = -1; newFacing = 'up'; }
+          else if (e.key === 's' || e.key === 'S' || e.key === 'ArrowDown') { dy = 1; newFacing = 'down'; }
+          else if (e.key === 'a' || e.key === 'A' || e.key === 'ArrowLeft') { dx = -1; newFacing = 'left'; }
+          else if (e.key === 'd' || e.key === 'D' || e.key === 'ArrowRight') { dx = 1; newFacing = 'right'; }
+          else if (e.key === 'e' || e.key === 'E' || e.key === ' ') {
+            // Trigger interaction
+            triggerNearbyInteraction();
+            return;
+          }
+
+          if (dx !== 0 || dy !== 0) {
+            e.preventDefault();
+            setPlayerPos(prev => {
+              const nx = Math.max(1, Math.min(MAP_WIDTH - 2, prev.x + dx));
+              const ny = Math.max(1, Math.min(MAP_HEIGHT - 2, prev.y + dy));
+              audio.step();
+              return { x: nx, y: ny, facing: newFacing, isWalking: true };
             });
+            setTimeout(() => setPlayerPos(prev => ({ ...prev, isWalking: false })), 160);
           }
         };
+
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-      }, []);
+      }, [activeSuspectModal, activeNodeModal, activeGadgetModal, liveLeakModal, accusationModalOpen, techLabOpen, tutorialActive, playerPos]);
 
-      // Auto-save whenever critical states update
+      // Check proximity to suspects & nodes whenever player moves
       useEffect(() => {
         if (!caseData) return;
-        const stateToSave = {
-          caseData,
-          ap,
-          maxAp,
-          pinnedLogIds,
-          playerNotes,
-          career,
-          soundMuted
-        };
-        localStorage.setItem('THE_COLD_FILE_STATE_V1', JSON.stringify(stateToSave));
-      }, [caseData, ap, maxAp, pinnedLogIds, playerNotes, career, soundMuted]);
+        // Check suspects
+        let found = null;
+        for (const s of caseData.suspects) {
+          const dist = Math.hypot(s.mapX - playerPos.x, s.mapY - playerPos.y);
+          if (dist <= 2.2) {
+            found = { type: 'suspect', data: s, label: `[E] TALK TO ${s.name.toUpperCase()}` };
+            break;
+          }
+        }
+        if (!found) {
+          // Check interactive nodes
+          for (const node of INTERACTIVE_NODES) {
+            const dist = Math.hypot(node.tileX - playerPos.x, node.tileY - playerPos.y);
+            if (dist <= 2.2) {
+              found = { type: 'node', data: node, label: node.label };
+              break;
+            }
+          }
+        }
+        setInteractTarget(found);
+      }, [playerPos, caseData]);
 
-      // Sound mute sync
-      const toggleSound = () => {
-        const next = !soundMuted;
-        setSoundMuted(next);
-        audio.muted = next;
-        if (!next) audio.click();
-      };
+      // Auto-save
+      useEffect(() => {
+        if (!caseData) return;
+        localStorage.setItem('THE_COLD_FILE_STATE_V1', JSON.stringify({
+          caseData, ap, maxAp, pinnedLogIds, playerNotes, career, soundMuted
+        }));
+      }, [caseData, ap, maxAp, pinnedLogIds, playerNotes, career, soundMuted]);
 
       const showToast = (msg) => {
         setToastMsg(msg);
         setTimeout(() => setToastMsg(null), 3500);
       };
 
-      // ==========================================
-      // SPEND AP & TRIGGER LIVE LEAKS
-      // ==========================================
-      const spendAP = (cost, actionName) => {
-        if (ap < cost) {
-          audio.alert();
-          showToast(`⚠️ INSUFFICIENT COMPUTE AP! (${cost} required, ${ap} remaining)`);
-          return false;
-        }
-
-        const newAp = ap - cost;
-        setAp(newAp);
-        audio.click();
-
-        // Increment spend counter for plot twist mechanic
-        const nextSpent = apSpentCounter + cost;
-        setApSpentCounter(nextSpent);
-
-        // Every 2-3 AP spent, trigger a LIVE LEAK twist!
-        if (nextSpent >= 2 && leaksTriggeredCount < 3) {
-          triggerLiveLeak(leaksTriggeredCount);
-          setApSpentCounter(0);
-          setLeaksTriggeredCount(prev => prev + 1);
-        }
-
-        if (newAp === 0) {
-          showToast("⚠️ ALL ACTION POINTS EXHAUSTED! PROCEED TO ACCUSATION.");
-        }
-
-        return true;
-      };
-
-      // Plot Twist Engine
-      const triggerLiveLeak = (index) => {
-        setShakeScreen(true);
-        audio.alert();
-        setTimeout(() => setShakeScreen(false), 500);
-
-        const leakTypes = [
-          {
-            type: 'COVER_UP',
-            title: '⚠️ CRITICAL INTERCEPT // LOG PURGE IN PROGRESS',
-            text: `Hostile shell script 'shred_vault_audit.sh' detected on Node 4! Someone is attempting to overwrite badge records for ${caseData.crime.incidentTime}. Spend 1 AP to intercept and salvage the raw buffer, or let it burn?`,
-            actionText: 'INTERCEPT BUFFER (-1 AP)',
-            onAction: () => {
-              if (ap >= 1) {
-                setAp(prev => prev - 1);
-                // Mark culprit contradiction discovered
-                showToast(`🚨 INTERCEPT SUCCESSFUL! Recovered smoking-gun keycard swipe to ${caseData.crime.restrictedRoom}!`);
-                setLiveLeakModal(null);
-                setActiveTab('badge');
-                setExpandedLogId('badge_culprit_contradiction');
-                audio.success();
-              } else {
-                showToast("⚠️ Not enough AP to intercept!");
-              }
-            }
-          },
-          {
-            type: 'DRIVE_CRACKED',
-            title: '🔓 FORENSIC DROP // SSD SECTOR DECRYPTED',
-            text: `The offline forensics cluster just finished brute-forcing an encrypted backup image from the 4th floor workstation. Biometric timestamp verifies ${caseData.suspects.find(s => !s.isCulprit && !s.hasRedHerring)?.name} was in their claimed office during the incident!`,
-            actionText: 'CONFIRM & MARK CLEARED (FREE)',
-            onAction: () => {
-              const innocent = caseData.suspects.find(s => !s.isCulprit && !s.hasRedHerring);
-              if (innocent) {
-                updateSuspectTag(innocent.id, 'CLEARED');
-                showToast(`✅ ${innocent.name} officially verified and cleared!`);
-              }
-              setLiveLeakModal(null);
-              audio.beep();
-            }
-          },
-          {
-            type: 'WHISTLEBLOWER',
-            title: '📡 ENCRYPTED WHISTLEBLOWER TRANSMISSION',
-            text: `Incoming PGP transmission from an anonymous internal relay: "I saw the intruder leaving the ${caseData.crime.restrictedRoom} corridor. The perpetrator held ${caseData.suspects.find(s => s.isCulprit)?.accessLevel} clearance!"`,
-            actionText: 'RECORD IN CASE NOTES (FREE)',
-            onAction: () => {
-              const culprit = caseData.suspects.find(s => s.isCulprit);
-              setPlayerNotes(prev => prev + `\n[WHISTLEBLOWER TIP]: Culprit confirmed to hold ${culprit?.accessLevel}!`);
-              showToast("📝 Whistleblower intelligence appended to Case Notes.");
-              setLiveLeakModal(null);
-              audio.beep();
-            }
-          }
-        ];
-
-        const selectedLeak = leakTypes[index % leakTypes.length];
-        setLiveLeakModal(selectedLeak);
-      };
-
-      // ==========================================
-      // GAME ACTIONS
-      // ==========================================
       const startNewCase = (caseNum) => {
         const fresh = generateCaseData(caseNum || (caseData ? caseData.caseNumber + 1 : 1));
         const initialMaxAp = career.upgrades.extraApBattery ? 10 : 8;
@@ -915,1655 +1066,540 @@
         setMaxAp(initialMaxAp);
         setPinnedLogIds([]);
         setPlayerNotes(`CASE FILE: ${fresh.caseId}\nCRIME: ${fresh.crime.title}\nINCIDENT WINDOW: ${fresh.crime.criticalWindow}\nASSET: ${fresh.crime.compromisedAsset}\n---\n`);
-        setSelectedSuspectId(null);
-        setExpandedLogId(null);
+        setPlayerPos({ x: 15, y: 10, facing: 'down', isWalking: false });
         setVerdictData(null);
-        setAccusationModalOpen(false);
-        setApSpentCounter(0);
-        setLeaksTriggeredCount(0);
+        setRadarBeacon(null);
         audio.scan();
-        showToast(`📁 ${fresh.caseId} LOADED // INCIDENT DEPLOYED`);
+        showToast(`📁 ${fresh.caseId} LOADED // MAP DEPLOYED`);
       };
 
-      const updateSuspectTag = (suspectId, newTag) => {
+      const spendAP = (cost, actionName) => {
+        if (ap < cost) {
+          audio.alert();
+          showToast(`⚠️ INSUFFICIENT AP! (${cost} required, ${ap} remaining)`);
+          return false;
+        }
+        const newAp = ap - cost;
+        setAp(newAp);
         audio.click();
-        setCaseData(prev => {
-          const updated = { ...prev };
-          updated.suspects = updated.suspects.map(s => s.id === suspectId ? { ...s, userTag: newTag } : s);
-          return updated;
-        });
+
+        const nextSpent = apSpentCounter + cost;
+        setApSpentCounter(nextSpent);
+        if (nextSpent >= 2) {
+          triggerLiveLeak();
+          setApSpentCounter(0);
+        }
+        return true;
       };
 
-      // Deep Scan an evidence entry
-      const handleDeepScan = (logId, streamType) => {
-        // Free if forensicCache upgrade active and first scan
-        let cost = 1;
-        if (!spendAP(cost, "Deep Scan")) return;
+      const triggerLiveLeak = () => {
+        setShakeScreen(true);
+        audio.alert();
+        setTimeout(() => setShakeScreen(false), 450);
 
-        audio.scan();
-        setCaseData(prev => {
-          const updated = { ...prev };
-          const logs = updated.evidence[streamType];
-          const target = logs.find(l => l.id === logId);
-          if (target) {
-            target.deepScanned = true;
+        setLiveLeakModal({
+          title: "⚠️ SURPRISE INTERCEPT // LOG PURGE DETECTED",
+          text: `Hostile shell script 'shred_vault_audit.sh' detected on Node 4! Suspect attempting to destroy evidence for ${caseData.crime.incidentTime}. Spend 1 AP to intercept and salvage the raw buffer, or let it burn?`,
+          actionText: "INTERCEPT BUFFER (-1 AP)",
+          onAction: () => {
+            if (ap >= 1) {
+              setAp(prev => prev - 1);
+              showToast(`🚨 RECOVERED SMOKING GUN: Badge Swipe to ${RESTRICTED_ROOM.name}!`);
+              setLiveLeakModal(null);
+              setActiveTab('badge');
+              audio.success();
+            }
           }
-          return updated;
         });
-        setExpandedLogId(logId);
-        showToast("🔍 FORENSIC DEEP SCAN COMPLETE");
       };
 
-      // Pin / Unpin log to Notes Pinboard
-      const togglePinLog = (logId) => {
-        audio.click();
-        setPinnedLogIds(prev => {
-          if (prev.includes(logId)) {
-            showToast("Unpinned from case notes");
-            return prev.filter(id => id !== logId);
+      const triggerNearbyInteraction = () => {
+        if (!interactTarget) return;
+        audio.interact();
+
+        if (interactTarget.type === 'suspect') {
+          setActiveSuspectModal(interactTarget.data);
+        } else if (interactTarget.type === 'node') {
+          const node = interactTarget.data;
+          if (node.type === 'crime_scene') {
+            showToast("🚨 CRIME SCENE: Severe physical breach detected. Access restricted!");
+            audio.alert();
           } else {
-            showToast("📌 Pinned to Case Notes Pinboard");
-            return [...prev, logId];
+            setActiveTab(node.type);
+            setActiveNodeModal(node);
           }
-        });
+        }
       };
 
       // ==========================================
-      // GADGET 1: SIGNAL TRACKER
+      // CANVAS RENDERING LOOP
       // ==========================================
-      const launchSignalTracker = (suspect) => {
-        if (!spendAP(1, "Signal Tracker")) return;
-        audio.beep();
-        setTrackerResult(null);
-        setActiveGadgetModal('tracker');
+      useEffect(() => {
+        let animationFrameId;
+        const render = () => {
+          const canvas = canvasRef.current;
+          if (canvas && caseData) {
+            const ctx = canvas.getContext('2d');
+            const now = Date.now();
 
-        // Simulate radar sweep
+            // Clear Canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Tilemap
+            drawWorldTilemap(ctx, canvas.width, canvas.height, now);
+
+            // Draw Interactive Node Icons & Labels
+            INTERACTIVE_NODES.forEach(node => {
+              const nx = node.tileX * TILE_SIZE;
+              const ny = node.tileY * TILE_SIZE;
+              ctx.fillStyle = "rgba(88, 166, 255, 0.2)";
+              ctx.beginPath();
+              ctx.arc(nx + 12, ny + 12, 14, 0, Math.PI * 2);
+              ctx.fill();
+
+              ctx.font = "14px 'JetBrains Mono', monospace";
+              ctx.fillText(node.icon, nx + 4, ny + 16);
+            });
+
+            // Draw Suspect NPCs (Chibi Pixel Characters matching Reference 1)
+            caseData.suspects.forEach(s => {
+              const sx = s.mapX * TILE_SIZE;
+              const sy = s.mapY * TILE_SIZE;
+              drawPixelChibiCharacter(ctx, sx, sy, s.spriteTheme, 'down', 0, false);
+
+              // Name Tag
+              ctx.font = "bold 8px 'JetBrains Mono', monospace";
+              ctx.fillStyle = "#FFFFFF";
+              ctx.fillText(s.name.split(" ")[0], sx - 2, sy - 4);
+            });
+
+            // Draw Radar Beacon Ping if active
+            if (radarBeacon) {
+              const rx = radarBeacon.x * TILE_SIZE + 12;
+              const ry = radarBeacon.y * TILE_SIZE + 12;
+              const pulse = (Math.sin(now / 150) + 1) * 12 + 10;
+              ctx.strokeStyle = "#F43F5E";
+              ctx.lineWidth = 2;
+              ctx.beginPath();
+              ctx.arc(rx, ry, pulse, 0, Math.PI * 2);
+              ctx.stroke();
+
+              ctx.fillStyle = "#EF4444";
+              ctx.font = "bold 9px 'Press Start 2P', monospace";
+              ctx.fillText("BEACON DETECTED!", rx - 60, ry - 20);
+            }
+
+            // Draw Player Detective (Chibi Pixel Character)
+            drawPixelChibiCharacter(
+              ctx,
+              playerPos.x * TILE_SIZE,
+              playerPos.y * TILE_SIZE,
+              DETECTIVE_THEME,
+              playerPos.facing,
+              Math.floor(now / 120),
+              playerPos.isWalking
+            );
+
+            // Draw Interaction Indicator above Player when near target
+            if (interactTarget) {
+              const ix = playerPos.x * TILE_SIZE + 12;
+              const iy = playerPos.y * TILE_SIZE - 14;
+              ctx.fillStyle = "#E3B341";
+              ctx.font = "bold 8px 'Press Start 2P', monospace";
+              ctx.fillText("!", ix - 3, iy - 2);
+
+              // Floating interaction pill
+              ctx.fillStyle = "rgba(13, 17, 23, 0.9)";
+              ctx.strokeStyle = "#E3B341";
+              ctx.lineWidth = 1;
+              const text = interactTarget.label;
+              ctx.font = "bold 9px 'JetBrains Mono', monospace";
+              const tw = ctx.measureText(text).width;
+              ctx.fillRect(ix - tw / 2 - 4, iy - 16, tw + 8, 14);
+              ctx.strokeRect(ix - tw / 2 - 4, iy - 16, tw + 8, 14);
+              ctx.fillStyle = "#58A6FF";
+              ctx.fillText(text, ix - tw / 2, iy - 6);
+            }
+          }
+          animationFrameId = requestAnimationFrame(render);
+        };
+        render();
+        return () => cancelAnimationFrame(animationFrameId);
+      }, [caseData, playerPos, interactTarget, radarBeacon]);
+
+      // Canvas click to move
+      const handleCanvasClick = (e) => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const rect = canvas.getBoundingClientRect();
+        const clickX = Math.floor((e.clientX - rect.left) / (rect.width / MAP_WIDTH));
+        const clickY = Math.floor((e.clientY - rect.top) / (rect.height / MAP_HEIGHT));
+
+        setPlayerPos(prev => {
+          const facing = clickX < prev.x ? 'left' : clickX > prev.x ? 'right' : clickY < prev.y ? 'up' : 'down';
+          audio.step();
+          return { x: clickX, y: clickY, facing, isWalking: true };
+        });
+        setTimeout(() => setPlayerPos(prev => ({ ...prev, isWalking: false })), 200);
+      };
+
+      // ==========================================
+      // GADGET 1: SIGNAL TRACKER (RADAR DROP)
+      // ==========================================
+      const triggerSignalTracker = (suspect) => {
+        if (!spendAP(1, "Signal Tracker")) return;
+        audio.scan();
+        setRadarBeacon(null);
+        setActiveSuspectModal(null);
+
+        showToast(`📡 TRILATERATING RFID SIGNAL FOR ${suspect.name.toUpperCase()}...`);
+
         setTimeout(() => {
-          audio.scan();
+          audio.success();
+          // Drop beacon on their ACTUAL room
           const isMatch = suspect.actualRoom === suspect.statedRoom;
-          setTrackerResult({
-            suspect,
-            statedRoom: suspect.statedRoom,
-            actualRoom: suspect.actualRoom,
-            isMatch,
-            contradiction: !isMatch ? `Signal Tracker located ${suspect.name} in ${suspect.actualRoom} despite claiming ${suspect.statedRoom}` : null
-          });
+          const targetCoords = isMatch ? { x: suspect.mapX, y: suspect.mapY } : { x: RESTRICTED_ROOM.tileX, y: RESTRICTED_ROOM.tileY };
+          setRadarBeacon({ x: targetCoords.x, y: targetCoords.y, room: suspect.actualRoom });
+
+          if (!isMatch) {
+            showToast(`🚨 SIGNAL TRACKER CONTRADICTION: Located in ${RESTRICTED_ROOM.name}!`);
+          } else {
+            showToast(`✓ SIGNAL TRACKER: Confirmed in ${suspect.statedRoom}.`);
+          }
         }, 1200);
       };
 
       // ==========================================
-      // GADGET 2: VOICE MODULATOR (INTERROGATE)
-      // ==========================================
-      const launchVoiceInterrogate = (suspect) => {
-        audio.click();
-        setInterrogatingSuspect(suspect);
-        setInterrogationDialogue(null);
-        setActiveGadgetModal('voice');
-      };
-
-      const executeInterrogationVector = (vectorType) => {
-        if (!spendAP(1, "Voice Interrogation")) return;
-        audio.voiceBeep(450);
-
-        const s = interrogatingSuspect;
-        let response = "";
-        let stressInc = 15;
-
-        if (s.isCulprit) {
-          stressInc = 40;
-          if (vectorType === 'ALIBI') {
-            response = caseData.crime.alibiSlipDialogue;
-          } else if (vectorType === 'MOTIVE') {
-            response = `Look, my personal investments and debts are private business. That has nothing to do with what happened in ${caseData.crime.restrictedRoom}! Wait... I never said it was in that room...`;
-          } else {
-            response = `Your packet traces are completely falsified! My private RSA token is locked in my desk! I never authorized any ${caseData.crime.suspiciousProtocol} exfiltration!`;
-          }
-        } else if (s.hasRedHerring) {
-          stressInc = 20;
-          if (vectorType === 'ALIBI') {
-            response = `I already told SecOps: I was replacing a fried UPS capacitor in the Sublevel 1 utility corridor. Check Facilities Ticket #FAC-8812! I wasn't anywhere near ${caseData.crime.restrictedRoom}.`;
-          } else {
-            response = `Yeah, I was furious about the executive bonus pool, but I'm an engineer, not a criminal. Look at my workstation logs—everything is clean.`;
-          }
-        } else {
-          stressInc = 5;
-          response = `I have nothing to hide. I was in ${s.statedRoom} collaborating on the sprint board. You can cross-check my commit history on GitHub—every timestamp matches.`;
-        }
-
-        // Voice chatter
-        for (let i = 0; i < 4; i++) {
-          setTimeout(() => audio.voiceBeep(350 + i * 50), i * 90);
-        }
-
-        setInterrogationDialogue({
-          vector: vectorType,
-          suspectName: s.name,
-          text: response,
-          stressLevel: Math.min(100, s.stressLevel + stressInc),
-          revealedSlip: s.isCulprit
-        });
-
-        // Update suspect in state
-        setCaseData(prev => {
-          const updated = { ...prev };
-          const target = updated.suspects.find(item => item.id === s.id);
-          if (target) {
-            target.stressLevel = Math.min(100, target.stressLevel + stressInc);
-            target.interrogated = true;
-          }
-          return updated;
-        });
-      };
-
-      // ==========================================
-      // GADGET 3: PACKET DECRYPTOR
-      // ==========================================
-      const launchPacketDecryptor = (log) => {
-        if (!spendAP(1, "Packet Decryptor")) return;
-        setDecryptingLog(log);
-        setDecryptStep(0);
-        setActiveGadgetModal('decrypt');
-        audio.decrypt();
-
-        // Matrix reveal animation steps
-        setTimeout(() => { audio.decrypt(); setDecryptStep(1); }, 600);
-        setTimeout(() => { audio.decrypt(); setDecryptStep(2); }, 1200);
-        setTimeout(() => {
-          audio.success();
-          setDecryptStep(3);
-          // Mark in case data
-          setCaseData(prev => {
-            const updated = { ...prev };
-            const foundChat = updated.evidence.chatLogs.find(l => l.id === log.id);
-            if (foundChat) {
-              foundChat.isRedacted = false;
-              foundChat.message = foundChat.revealedMessage || foundChat.message;
-            }
-            return updated;
-          });
-          showToast("🔓 PAYLOAD CIPHER CRACKED & REVEALED!");
-        }, 1800);
-      };
-
-      // ==========================================
-      // ACCUSATION SHOWDOWN & VERDICT
-      // ==========================================
-      const handleExecuteIndictment = () => {
-        if (!selectedAccusedSuspectId) {
-          audio.alert();
-          showToast("⚠️ PLEASE SELECT A SUSPECT TO ACCUSE!");
-          return;
-        }
-
-        audio.scan();
-        setVerifyingStage(1);
-
-        setTimeout(() => { audio.beep(); setVerifyingStage(2); }, 900);
-        setTimeout(() => { audio.scan(); setVerifyingStage(3); }, 1800);
-        setTimeout(() => {
-          setVerifyingStage(4);
-          const accused = caseData.suspects.find(s => s.id === selectedAccusedSuspectId);
-          const isCorrectCulprit = accused && accused.isCulprit;
-
-          // Check evidence quality
-          const hasLinkedEvidence = selectedEvidence1 || selectedEvidence2;
-
-          if (isCorrectCulprit) {
-            audio.success();
-            const xpGained = 500;
-            const credsGained = 350;
-            const newStreak = career.streak + 1;
-            const newTotalSolved = career.casesSolved + 1;
-            const newXp = career.xp + xpGained;
-            const newLevel = Math.floor(newXp / 400) + 1;
-
-            const ranks = [
-              "Junior Log Analyst",
-              "Forensic Specialist II",
-              "Senior Threat Hunter",
-              "Incident Commander",
-              "Chief Security Inquisitor"
-            ];
-            const rankTitle = ranks[Math.min(ranks.length - 1, newLevel - 1)];
-
-            setCareer(prev => ({
-              ...prev,
-              xp: newXp,
-              level: newLevel,
-              rankTitle,
-              creds: prev.creds + credsGained,
-              streak: newStreak,
-              casesSolved: newTotalSolved
-            }));
-
-            setVerdictData({
-              isSuccess: true,
-              accused,
-              title: "CASE CLOSED // GUILTY VERDICT CONFIRMED",
-              summary: `${accused.name} has been taken into corporate custody after biometric logs, network tokens, and cryptographic intercepts conclusively proved culpability.`,
-              breakdown: [
-                `Primary Contradiction: Stated presence in ${accused.statedRoom} directly falsified by Keycard & Signal Tracker logs placing them in ${caseData.crime.restrictedRoom}.`,
-                `Digital Contradiction: Exfiltration of ${caseData.crime.compromisedAsset} routed through ${caseData.crime.suspiciousProtocol} signed with ${accused.name}'s biometric RSA token.`,
-                `Motive: ${accused.motive}`
-              ],
-              xpGained,
-              credsGained,
-              streak: newStreak
-            });
-          } else {
-            audio.failure();
-            setCareer(prev => ({
-              ...prev,
-              streak: 0,
-              xp: prev.xp + 50
-            }));
-
-            const realCulprit = caseData.suspects.find(s => s.isCulprit);
-            setVerdictData({
-              isSuccess: false,
-              accused,
-              realCulprit,
-              title: "INDICTMENT FAILED // WRONGFUL ACCUSATION",
-              summary: `Internal Legal rejected the charges against ${accused.name}. An emergency audit confirmed ${accused.name}'s alibi was verified, and the real culprit exploited the misdirection to escape.`,
-              breakdown: [
-                `Innocence Verified: ${accused.name} had legitimate work orders and no cryptographic signatures matching the exfiltrated payload.`,
-                `The Real Perpetrator: ${realCulprit.name} (${realCulprit.role}) was the actual conspirator who breached ${caseData.crime.restrictedRoom}.`,
-                `Uncovered Contradiction: ${realCulprit.name}'s badge swipe and direct encrypted relay chat at ${caseData.crime.incidentTime} went unprosecuted!`
-              ],
-              xpGained: 50,
-              credsGained: 0,
-              streak: 0
-            });
-          }
-        }, 2700);
-      };
-
-      // ==========================================
-      // TECH LAB SHOP
-      // ==========================================
-      const buyUpgrade = (key, cost) => {
-        if (career.creds < cost) {
-          audio.alert();
-          showToast("⚠️ INSUFFICIENT CREDS FOR UPGRADE!");
-          return;
-        }
-        audio.success();
-        setCareer(prev => ({
-          ...prev,
-          creds: prev.creds - cost,
-          upgrades: { ...prev.upgrades, [key]: true }
-        }));
-        if (key === 'extraApBattery') {
-          setMaxAp(10);
-          setAp(prev => prev + 2);
-        }
-        showToast("🛠️ RETRO-TECH UPGRADE INSTALLED!");
-      };
-
-      // Helper list of all discovered contradictions for accusation dropdown
-      const allDiscoveredContradictions = useMemo(() => {
-        if (!caseData) return [];
-        const items = [];
-        [...caseData.evidence.badgeLogs, ...caseData.evidence.chatLogs, ...caseData.evidence.networkLogs].forEach(item => {
-          if (item.contradiction) {
-            items.push({ id: item.id, label: `[${item.timestamp}] ${item.contradiction}` });
-          }
-        });
-        return items;
-      }, [caseData]);
-
-      // Filtered logs
-      const filteredLogs = useMemo(() => {
-        if (!caseData) return [];
-        let list = caseData.evidence[`${activeTab}Logs`] || [];
-        if (searchQuery.trim()) {
-          const q = searchQuery.toLowerCase();
-          list = list.filter(item => 
-            (item.holderName && item.holderName.toLowerCase().includes(q)) ||
-            (item.sender && item.sender.toLowerCase().includes(q)) ||
-            (item.source && item.source.toLowerCase().includes(q)) ||
-            (item.location && item.location.toLowerCase().includes(q)) ||
-            (item.message && item.message.toLowerCase().includes(q)) ||
-            (item.details && item.details.toLowerCase().includes(q))
-          );
-        }
-        if (filterFlaggedOnly) {
-          list = list.filter(item => item.status !== 'VERIFIED' && item.status !== 'ROUTINE' && item.status !== 'CLEAN');
-        }
-        return list;
-      }, [caseData, activeTab, searchQuery, filterFlaggedOnly]);
-
-      // All Pinned logs
-      const pinnedLogs = useMemo(() => {
-        if (!caseData) return [];
-        const all = [...caseData.evidence.badgeLogs, ...caseData.evidence.chatLogs, ...caseData.evidence.networkLogs];
-        return all.filter(l => pinnedLogIds.includes(l.id));
-      }, [caseData, pinnedLogIds]);
-
-      if (!caseData) {
-        return <div className="p-8 text-center font-mono text-cyan-400">INITIALIZING KRONOS LOG-ANALYSIS SUBSYSTEM...</div>;
-      }
-
-      // ==========================================
-      // BOSS MODE VIEW (STEALTH MOCK GRAFANA OPS)
+      // BOSS MODE VIEW
       // ==========================================
       if (bossMode) {
         return (
           <div className="min-h-screen bg-[#111827] text-slate-300 font-sans p-6 select-text">
-            {/* Realistic Datadog / Grafana Dashboard Top Bar */}
             <div className="flex items-center justify-between pb-4 border-b border-slate-700 mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-4 h-4 rounded bg-emerald-500 animate-pulse"></div>
-                <span className="font-bold tracking-tight text-white text-lg">Grafana Cloud // Enterprise Metrics</span>
+                <div className="w-3.5 h-3.5 rounded bg-emerald-500 animate-pulse"></div>
+                <span className="font-bold text-white text-base">Grafana Cloud // Enterprise Production Observability</span>
                 <span className="text-xs bg-slate-800 text-slate-400 px-2 py-0.5 rounded border border-slate-700">cluster-us-east-prod-04</span>
-                <span className="text-xs bg-emerald-950 text-emerald-400 px-2 py-0.5 rounded border border-emerald-800">SLO: 99.98% OK</span>
               </div>
-              <div className="flex items-center gap-4 text-xs font-mono">
-                <span className="text-slate-400">Ingress: 412 req/sec</span>
-                <span className="text-slate-400">P99 Latency: 14.2ms</span>
-                <button 
-                  onClick={() => setBossMode(false)}
-                  className="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1 rounded border border-slate-600 transition"
-                >
-                  [Esc] Return to Debug
-                </button>
-              </div>
-            </div>
-
-            {/* Fake Latency Graph */}
-            <div className="grid grid-cols-3 gap-6 mb-6">
-              <div className="col-span-2 bg-slate-900/90 border border-slate-800 rounded-lg p-4">
-                <div className="flex justify-between items-center mb-2">
-                  <h3 className="text-sm font-semibold text-slate-200">API Gateway Latency Distribution (p50 / p95 / p99)</h3>
-                  <span className="text-xs text-slate-400">Last 15 minutes</span>
-                </div>
-                <svg className="w-full h-44" viewBox="0 0 600 160">
-                  <defs>
-                    <linearGradient id="grad1" x1="0%" y1="0%" x2="0%" y2="100%">
-                      <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.3"/>
-                      <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.0"/>
-                    </linearGradient>
-                  </defs>
-                  {/* Grid lines */}
-                  <line x1="0" y1="40" x2="600" y2="40" stroke="#1f2937" strokeDasharray="3 3"/>
-                  <line x1="0" y1="80" x2="600" y2="80" stroke="#1f2937" strokeDasharray="3 3"/>
-                  <line x1="0" y1="120" x2="600" y2="120" stroke="#1f2937" strokeDasharray="3 3"/>
-                  {/* P99 Area */}
-                  <path d="M0,130 Q50,110 100,125 T200,95 T300,115 T400,85 T500,105 T600,90 L600,160 L0,160 Z" fill="url(#grad1)"/>
-                  <path d="M0,130 Q50,110 100,125 T200,95 T300,115 T400,85 T500,105 T600,90" fill="none" stroke="#06b6d4" strokeWidth="2"/>
-                  {/* P50 line */}
-                  <path d="M0,145 Q50,140 100,142 T200,138 T300,144 T400,136 T500,140 T600,139" fill="none" stroke="#10b981" strokeWidth="1.5"/>
-                </svg>
-                <div className="flex gap-6 text-xs text-slate-400 font-mono mt-1">
-                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 bg-cyan-400 rounded-sm"></span> p99: 14.2ms</span>
-                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 bg-emerald-400 rounded-sm"></span> p50: 3.8ms</span>
-                  <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 bg-amber-400 rounded-sm"></span> Error Rate: 0.002%</span>
-                </div>
-              </div>
-
-              {/* Service Health Cards */}
-              <div className="bg-slate-900/90 border border-slate-800 rounded-lg p-4 flex flex-col justify-between">
-                <h3 className="text-sm font-semibold text-slate-200 mb-2">Ingress Node Saturation</h3>
-                <div className="space-y-3 font-mono text-xs">
-                  <div>
-                    <div className="flex justify-between mb-1"><span>CPU Utilization (64 Cores)</span><span>44.2%</span></div>
-                    <div className="w-full bg-slate-800 h-2 rounded"><div className="bg-cyan-500 h-2 rounded" style={{width: '44%'}}></div></div>
-                  </div>
-                  <div>
-                    <div className="flex justify-between mb-1"><span>Memory Pool (256 GB)</span><span>61.8%</span></div>
-                    <div className="w-full bg-slate-800 h-2 rounded"><div className="bg-emerald-500 h-2 rounded" style={{width: '62%'}}></div></div>
-                  </div>
-                  <div>
-                    <div className="flex justify-between mb-1"><span>NVMe I/O Throughput</span><span>18.4 MB/s</span></div>
-                    <div className="w-full bg-slate-800 h-2 rounded"><div className="bg-violet-500 h-2 rounded" style={{width: '28%'}}></div></div>
-                  </div>
-                </div>
-                <div className="text-[11px] text-slate-500 pt-3 border-t border-slate-800">
-                  Documentation: RFC-9121 Envoy proxy cluster deployment guide
-                </div>
-              </div>
-            </div>
-
-            {/* Kubernetes Pods Table */}
-            <div className="bg-slate-900/90 border border-slate-800 rounded-lg p-4 font-mono text-xs">
-              <div className="flex justify-between items-center mb-3">
-                <span className="font-semibold text-slate-300">Cluster Pod Status [Namespace: production]</span>
-                <span className="text-slate-500">Auto-refresh: 5s</span>
-              </div>
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="border-b border-slate-800 text-slate-400 pb-2">
-                    <th className="py-1">POD NAME</th>
-                    <th>READY</th>
-                    <th>STATUS</th>
-                    <th>RESTARTS</th>
-                    <th>CPU (CORES)</th>
-                    <th>MEM (RSS)</th>
-                    <th>NODE</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-800/60 text-slate-300">
-                  <tr>
-                    <td className="py-2 text-cyan-400">auth-service-7f4b88-xc4k2</td>
-                    <td>1/1</td>
-                    <td><span className="text-emerald-400">Running</span></td>
-                    <td>0</td>
-                    <td>14m</td>
-                    <td>248 Mi</td>
-                    <td>k8s-worker-pool-01</td>
-                  </tr>
-                  <tr>
-                    <td className="py-2 text-cyan-400">payment-gateway-worker-99ab-8v11</td>
-                    <td>1/1</td>
-                    <td><span className="text-emerald-400">Running</span></td>
-                    <td>0</td>
-                    <td>68m</td>
-                    <td>512 Mi</td>
-                    <td>k8s-worker-pool-03</td>
-                  </tr>
-                  <tr>
-                    <td className="py-2 text-cyan-400">ingress-nginx-controller-5c94-p9z8</td>
-                    <td>1/1</td>
-                    <td><span className="text-emerald-400">Running</span></td>
-                    <td>0</td>
-                    <td>122m</td>
-                    <td>1,024 Mi</td>
-                    <td>k8s-ingress-pool-01</td>
-                  </tr>
-                  <tr>
-                    <td className="py-2 text-cyan-400">redis-sentinel-cluster-shard-0</td>
-                    <td>1/1</td>
-                    <td><span className="text-emerald-400">Running</span></td>
-                    <td>0</td>
-                    <td>31m</td>
-                    <td>3,840 Mi</td>
-                    <td>k8s-storage-pool-02</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div className="mt-4 text-center">
-              <button 
-                onClick={() => setBossMode(false)}
-                className="text-xs text-slate-500 hover:text-slate-300 transition"
-              >
-                [Press Escape or Click Here to Return to Forensic Console]
+              <button onClick={() => setBossMode(false)} className="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1 rounded text-xs border border-slate-600">
+                [Esc] Return to Debug
               </button>
             </div>
+            <div className="bg-slate-900 border border-slate-800 rounded p-4 mb-4">
+              <h3 className="text-sm font-semibold mb-2">Ingress Gateway P99 Latency (14.2ms)</h3>
+              <div className="h-36 bg-slate-950 rounded flex items-center justify-center text-xs text-slate-500 font-mono">
+                [REALTIME LATENCY TELEMETRY PLOT: ALL 64 NODES HEALTHY]
+              </div>
+            </div>
+            <div className="text-center text-xs text-slate-500 mt-4">Press [Escape] to return to terminal</div>
           </div>
         );
       }
 
-      // ==========================================
-      // MAIN GAME DASHBOARD
-      // ==========================================
-      return (
-        <div className={`min-h-screen relative flex flex-col font-sans ${shakeScreen ? 'shake-effect' : ''}`}>
-          {/* Scanlines overlay */}
-          <div className="fixed inset-0 scanlines z-40 pointer-events-none opacity-40"></div>
+      if (!caseData) return <div className="p-8 text-center font-retro text-cyan-400">INITIALIZING 2D WORLD...</div>;
 
-          {/* Toast Notification */}
+      return (
+        <div className={`min-h-screen flex flex-col font-mono ${shakeScreen ? 'shake-effect' : ''}`}>
+          <div className="fixed inset-0 scanlines z-40 pointer-events-none opacity-30"></div>
+
+          {/* Toast */}
           {toastMsg && (
-            <div className="fixed top-4 right-4 z-50 bg-slate-900 border border-cyan-500/80 text-cyan-300 px-4 py-2.5 rounded shadow-xl font-mono text-xs flex items-center gap-2 animate-bounce">
+            <div className="fixed top-4 right-4 z-50 bg-[#161B22] border-2 border-cyan-400 text-cyan-300 px-4 py-2 rounded shadow-2xl font-mono text-xs flex items-center gap-2 animate-bounce">
               <span>{toastMsg}</span>
             </div>
           )}
 
-          {/* HEADER / COMMAND BAR */}
-          <header className="bg-slate-950/80 backdrop-blur-md border-b border-slate-800 px-5 py-2.5 flex items-center justify-between text-xs font-mono sticky top-0 z-30">
+          {/* TOP RETRO COMMAND BAR */}
+          <header className="bg-[#161B22] border-b-2 border-[#30363D] px-4 py-2 flex items-center justify-between text-xs font-mono sticky top-0 z-30">
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
-                <span className="font-bold text-white tracking-widest text-sm">KRONOS APM // INCIDENT FORENSICS</span>
-              </div>
-              <span className="bg-slate-800 text-cyan-400 px-2 py-0.5 rounded border border-slate-700">
+              <span className="text-lg">🕵️</span>
+              <span className="font-bold text-white tracking-wider text-sm">THE COLD FILE // 2D DETECTIVE</span>
+              <span className="bg-[#0D1117] text-cyan-400 px-2 py-0.5 rounded border border-[#30363D]">
                 {caseData.caseId}
               </span>
-              <span className="text-slate-400 hidden md:inline">NODE: us-east-4b</span>
-              <span className="text-slate-500 hidden lg:inline">INGEST: 14.8 GB/s</span>
             </div>
 
             <div className="flex items-center gap-3">
+              {/* Dual View Toggle */}
+              <div className="flex border border-[#30363D] rounded overflow-hidden">
+                <button
+                  onClick={() => { setViewMode('map'); audio.click(); }}
+                  className={`px-3 py-1 font-bold text-xs ${viewMode === 'map' ? 'bg-cyan-600 text-white' : 'bg-[#0D1117] text-slate-400'}`}
+                >
+                  🎮 2D PIXEL MAP
+                </button>
+                <button
+                  onClick={() => { setViewMode('terminal'); audio.click(); }}
+                  className={`px-3 py-1 font-bold text-xs ${viewMode === 'terminal' ? 'bg-cyan-600 text-white' : 'bg-[#0D1117] text-slate-400'}`}
+                >
+                  🖥️ LOG TERMINAL
+                </button>
+              </div>
+
               {/* Sound Toggle */}
-              <button 
-                onClick={toggleSound}
-                className="px-2 py-1 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 rounded transition"
-                title="Toggle Web Audio SFX"
+              <button
+                onClick={() => { const next = !soundMuted; setSoundMuted(next); audio.muted = next; }}
+                className="px-2 py-1 bg-[#0D1117] border border-[#30363D] rounded text-slate-300 text-xs"
               >
-                {soundMuted ? '🔇 AUDIO: OFF' : '🔊 AUDIO: ON'}
+                {soundMuted ? '🔇 MUTE' : '🔊 SFX'}
               </button>
 
-              {/* Tutorial Button */}
-              <button 
-                onClick={() => { setTutorialStep(0); setTutorialActive(true); }}
-                className="px-2 py-1 bg-slate-900 hover:bg-cyan-950 text-cyan-400 border border-cyan-800/60 rounded transition"
-              >
-                [?] PROTOCOL
-              </button>
-
-              {/* Tech Lab Shop */}
-              <button 
-                onClick={() => setTechLabOpen(true)}
-                className="px-2.5 py-1 bg-amber-950/30 hover:bg-amber-900/40 text-amber-400 border border-amber-600/50 rounded transition font-bold flex items-center gap-1.5"
-              >
-                <span>🛠️ TECH LAB</span>
-                <span className="bg-amber-900/80 text-amber-200 px-1.5 py-0.2 rounded text-[10px]">
-                  ${career.creds}
-                </span>
-              </button>
-
-              {/* Boss Key Button */}
-              <button 
+              {/* Boss Key */}
+              <button
                 onClick={() => setBossMode(true)}
-                className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-600 font-mono transition"
-                title="Emergency Boss Mode (Shortcut: Escape)"
+                className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded border border-slate-600 text-xs"
               >
                 [SYS_MODE] (ESC)
               </button>
             </div>
           </header>
 
-          {/* CASE BRIEFING TICKER */}
-          <div className="bg-slate-900/90 border-b border-slate-800/80 px-5 py-2 flex items-center justify-between text-xs font-mono">
-            <div className="flex items-center gap-3 overflow-hidden text-ellipsis whitespace-nowrap">
-              <span className="bg-rose-950/60 text-rose-400 px-2 py-0.5 rounded border border-rose-800/60 font-bold shrink-0">
-                CRIME: {caseData.crime.title}
-              </span>
-              <span className="text-slate-300 truncate">
-                <strong className="text-slate-200">BRIEF:</strong> {caseData.crime.summary}
-              </span>
+          {/* BRIEFING BANNER */}
+          <div className="bg-[#0D1117] border-b border-[#30363D] px-4 py-1.5 flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2 truncate">
+              <span className="text-rose-400 font-bold">[CRIME]:</span>
+              <span className="text-white font-semibold truncate">{caseData.crime.title}</span>
+              <span className="text-slate-400 hidden md:inline">• CRITICAL WINDOW: {caseData.crime.criticalWindow}</span>
             </div>
-            <div className="shrink-0 text-slate-400 pl-4">
-              WINDOW: <span className="text-amber-400 font-bold">{caseData.crime.criticalWindow}</span>
+            <div className="text-amber-400 font-bold shrink-0">
+              AP: {ap}/{maxAp}
             </div>
           </div>
 
-          {/* MAIN 35/65 SPLIT GRID */}
-          <main className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 p-4 max-w-[1700px] w-full mx-auto">
+          {/* MAIN CONTENT AREA */}
+          <main className="flex-1 flex flex-col lg:flex-row p-4 gap-4 max-w-[1700px] w-full mx-auto">
             
-            {/* ======================================================== */}
-            {/* LEFT COLUMN (35%): SUSPECTS, AP METER, GADGET DOCK, RANK */}
-            {/* ======================================================== */}
-            <div className="lg:col-span-4 flex flex-col gap-4">
-              
-              {/* AP METER & RANK BAR */}
-              <div className="backdrop-blur-md bg-slate-900/60 border border-slate-800 rounded-lg p-3.5 shadow-lg">
-                <div className="flex justify-between items-center mb-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-mono text-cyan-400 font-bold tracking-wider">COMPUTE BANDWIDTH (AP)</span>
-                    <span className="text-[10px] bg-cyan-950 text-cyan-300 border border-cyan-800 px-1.5 rounded">
-                      {ap} / {maxAp} AVAILABLE
-                    </span>
+            {/* VIEW 1: 2D PIXEL MAP */}
+            {viewMode === 'map' ? (
+              <div className="flex-1 flex flex-col lg:flex-row gap-4">
+                
+                {/* 2D Tilemap Canvas */}
+                <div className="flex-1 bg-[#0D1117] border-2 border-[#30363D] rounded-lg p-2 flex flex-col items-center justify-center relative shadow-2xl">
+                  <div className="w-full flex justify-between items-center text-xs text-slate-400 px-2 py-1 border-b border-[#30363D] mb-2 font-retro text-[9px]">
+                    <span>MOVE: [WASD] or [ARROWS] or CLICK MAP</span>
+                    <span>ACTION: [E] or [SPACE]</span>
                   </div>
-                  <div className="text-xs font-mono text-amber-400 flex items-center gap-1">
-                    <span>🔥 Streak: {career.streak}</span>
+
+                  <canvas
+                    ref={canvasRef}
+                    width={MAP_WIDTH * TILE_SIZE}
+                    height={MAP_HEIGHT * TILE_SIZE}
+                    onClick={handleCanvasClick}
+                    className="border-2 border-[#30363D] rounded bg-black cursor-pointer shadow-inner max-w-full h-auto"
+                    style={{ maxHeight: '680px' }}
+                  />
+                </div>
+
+                {/* Right Side Tactical Sidebar */}
+                <div className="w-full lg:w-80 flex flex-col gap-3">
+                  {/* AP Gauge */}
+                  <div className="bg-[#161B22] border-2 border-[#30363D] rounded-lg p-3">
+                    <div className="flex justify-between items-center text-xs mb-2">
+                      <span className="font-bold text-cyan-400">ACTION POINTS (AP)</span>
+                      <span className="text-amber-400 font-bold">🔥 Streak: {career.streak}</span>
+                    </div>
+                    <div className="grid grid-cols-8 gap-1 mb-2">
+                      {Array.from({ length: maxAp }).map((_, i) => (
+                        <div
+                          key={i}
+                          className={`h-3 rounded-sm border ${
+                            i < ap ? 'bg-cyan-400 border-cyan-200' : 'bg-black border-[#30363D] opacity-30'
+                          }`}
+                        />
+                      ))}
+                    </div>
                   </div>
-                </div>
 
-                {/* Cyber Action Point Blocks */}
-                <div className="grid grid-cols-8 gap-1.5 mb-2.5">
-                  {Array.from({ length: maxAp }).map((_, i) => (
-                    <div 
-                      key={i}
-                      className={`h-4 rounded-sm transition-all duration-300 border ${
-                        i < ap 
-                          ? 'bg-cyan-500 border-cyan-300 shadow-[0_0_8px_rgba(6,182,212,0.8)]' 
-                          : 'bg-slate-950 border-slate-800 opacity-30'
-                      }`}
-                    />
-                  ))}
-                </div>
-
-                <div className="flex justify-between items-center text-[11px] font-mono text-slate-400 pt-1 border-t border-slate-800">
-                  <span>RANK: <strong className="text-white">{career.rankTitle}</strong> (Lv.{career.level})</span>
-                  <span>XP: <strong className="text-cyan-400">{career.xp}</strong></span>
-                </div>
-              </div>
-
-              {/* RETRO-TECH GADGET DOCK */}
-              <div className="backdrop-blur-md bg-slate-900/60 border border-slate-800 rounded-lg p-3.5 shadow-lg">
-                <div className="flex justify-between items-center mb-2.5">
-                  <span className="text-xs font-mono font-bold text-slate-200 tracking-wider">TACTICAL GADGET INVENTORY</span>
-                  <span className="text-[10px] text-slate-400 font-mono">COST: 1 AP PER CHARGE</span>
-                </div>
-
-                <div className="grid grid-cols-3 gap-2 text-xs font-mono">
-                  {/* Gadget 1: Signal Tracker */}
-                  <button
-                    onClick={() => {
-                      if (!selectedSuspectId) {
-                        showToast("⚠️ Select a suspect dossier below first!");
-                        audio.alert();
-                      } else {
-                        const s = caseData.suspects.find(item => item.id === selectedSuspectId);
-                        launchSignalTracker(s);
-                      }
-                    }}
-                    className="p-2.5 bg-slate-950/70 hover:bg-cyan-950/40 border border-slate-700 hover:border-cyan-500/70 rounded transition flex flex-col items-center text-center group"
-                  >
-                    <span className="text-lg mb-1 group-hover:scale-110 transition">📡</span>
-                    <span className="font-bold text-cyan-400 text-[11px]">SIGNAL TRACKER</span>
-                    <span className="text-[9px] text-slate-400 mt-0.5">Trilaterate Room</span>
-                  </button>
-
-                  {/* Gadget 2: Voice Modulator */}
-                  <button
-                    onClick={() => {
-                      if (!selectedSuspectId) {
-                        showToast("⚠️ Select a suspect dossier below first!");
-                        audio.alert();
-                      } else {
-                        const s = caseData.suspects.find(item => item.id === selectedSuspectId);
-                        launchVoiceInterrogate(s);
-                      }
-                    }}
-                    className="p-2.5 bg-slate-950/70 hover:bg-amber-950/40 border border-slate-700 hover:border-amber-500/70 rounded transition flex flex-col items-center text-center group"
-                  >
-                    <span className="text-lg mb-1 group-hover:scale-110 transition">🎙️</span>
-                    <span className="font-bold text-amber-400 text-[11px]">VOICE MODULATOR</span>
-                    <span className="text-[9px] text-slate-400 mt-0.5">Press Alibi / Motive</span>
-                  </button>
-
-                  {/* Gadget 3: Packet Decryptor */}
-                  <button
-                    onClick={() => {
-                      const redactedChat = caseData.evidence.chatLogs.find(c => c.isRedacted);
-                      if (redactedChat) {
-                        launchPacketDecryptor(redactedChat);
-                      } else {
-                        showToast("ℹ️ No redacted packets currently found in Chat Stream!");
-                        audio.beep();
-                      }
-                    }}
-                    className="p-2.5 bg-slate-950/70 hover:bg-emerald-950/40 border border-slate-700 hover:border-emerald-500/70 rounded transition flex flex-col items-center text-center group"
-                  >
-                    <span className="text-lg mb-1 group-hover:scale-110 transition">🔓</span>
-                    <span className="font-bold text-emerald-400 text-[11px]">PACKET DECRYPT</span>
-                    <span className="text-[9px] text-slate-400 mt-0.5">Unscramble Hash</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* SUSPECT DOSSIERS */}
-              <div className="backdrop-blur-md bg-slate-900/60 border border-slate-800 rounded-lg p-3.5 flex-1 flex flex-col shadow-lg">
-                <div className="flex justify-between items-center mb-2.5">
-                  <span className="text-xs font-mono font-bold text-slate-200 tracking-wider">
-                    SUSPECT DOSSIERS ({caseData.suspects.length})
-                  </span>
-                  <span className="text-[10px] text-slate-400 font-mono">CLICK TO INSPECT / TARGET</span>
-                </div>
-
-                <div className="space-y-2.5 flex-1 overflow-y-auto max-h-[520px] pr-1">
-                  {caseData.suspects.map(suspect => {
-                    const isSelected = selectedSuspectId === suspect.id;
-                    return (
-                      <div 
-                        key={suspect.id}
-                        onClick={() => {
-                          setSelectedSuspectId(isSelected ? null : suspect.id);
-                          audio.click();
-                        }}
-                        className={`p-3 rounded-lg border transition cursor-pointer ${
-                          isSelected 
-                            ? 'bg-slate-800/90 border-cyan-500 shadow-[0_0_12px_rgba(6,182,212,0.3)]' 
-                            : 'bg-slate-950/60 border-slate-800 hover:border-slate-700 hover:bg-slate-900/60'
-                        }`}
-                      >
-                        {/* Header: Name, Badge, Tag Dropdown */}
-                        <div className="flex justify-between items-start mb-1.5">
+                  {/* Suspects Quick Roster */}
+                  <div className="bg-[#161B22] border-2 border-[#30363D] rounded-lg p-3 flex-1 flex flex-col">
+                    <span className="text-xs font-bold text-white mb-2 block">CAMPUS SUSPECTS (4)</span>
+                    <div className="space-y-2 flex-1 overflow-y-auto max-h-[380px]">
+                      {caseData.suspects.map(s => (
+                        <div
+                          key={s.id}
+                          onClick={() => { setActiveSuspectModal(s); audio.click(); }}
+                          className="p-2 bg-[#0D1117] border border-[#30363D] hover:border-cyan-400 rounded cursor-pointer transition flex items-center justify-between"
+                        >
                           <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-bold text-white text-sm">{suspect.name}</span>
-                              <span className="text-[10px] font-mono bg-slate-900 text-slate-400 px-1.5 py-0.5 rounded border border-slate-800">
-                                {suspect.badgeId}
-                              </span>
-                            </div>
-                            <div className="text-xs text-slate-400 font-mono mt-0.5">
-                              {suspect.role}
-                            </div>
+                            <div className="font-bold text-white text-xs">{s.name}</div>
+                            <div className="text-[10px] text-slate-400">{s.statedRoom}</div>
                           </div>
-
-                          {/* Tag selector */}
-                          <select
-                            value={suspect.userTag}
-                            onClick={(e) => e.stopPropagation()}
-                            onChange={(e) => updateSuspectTag(suspect.id, e.target.value)}
-                            className={`text-[10px] font-mono px-2 py-0.5 rounded border uppercase font-bold focus:outline-none cursor-pointer ${
-                              suspect.userTag === 'CLEARED'
-                                ? 'bg-emerald-950 text-emerald-400 border-emerald-800'
-                                : suspect.userTag === 'PRIME'
-                                ? 'bg-rose-950 text-rose-400 border-rose-800 animate-pulse'
-                                : suspect.userTag === 'SUSPICIOUS'
-                                ? 'bg-amber-950 text-amber-400 border-amber-800'
-                                : 'bg-slate-900 text-slate-400 border-slate-700'
-                            }`}
-                          >
-                            <option value="UNVERIFIED">UNVERIFIED</option>
-                            <option value="SUSPICIOUS">SUSPICIOUS</option>
-                            <option value="PRIME">PRIME SUSPECT</option>
-                            <option value="CLEARED">CLEARED</option>
-                          </select>
-                        </div>
-
-                        {/* Dept & Access Level */}
-                        <div className="flex items-center gap-2 text-[10px] font-mono mb-2">
-                          <span className={`px-2 py-0.5 rounded border ${suspect.deptColor}`}>
-                            {suspect.dept}
-                          </span>
-                          <span className="bg-slate-900 text-slate-400 px-2 py-0.5 rounded border border-slate-800">
-                            {suspect.accessLevel}
-                          </span>
-                        </div>
-
-                        {/* Stated Alibi */}
-                        <div className="bg-slate-900/80 rounded p-2 text-xs text-slate-300 font-mono border border-slate-800/80">
-                          <strong className="text-cyan-400 text-[10px] block mb-0.5">STATED ALIBI:</strong>
-                          <p className="text-[11px] leading-relaxed text-slate-300">{suspect.statedAlibi}</p>
-                        </div>
-
-                        {/* Expanded details when selected */}
-                        {isSelected && (
-                          <div className="mt-2.5 pt-2 border-t border-slate-800/80 space-y-2">
-                            <div className="flex items-center justify-between text-[11px] font-mono">
-                              <span className="text-slate-400">Stress Telemetry:</span>
-                              <span className={`font-bold ${suspect.stressLevel > 60 ? 'text-rose-400' : 'text-emerald-400'}`}>
-                                {suspect.stressLevel}%
-                              </span>
-                            </div>
-
-                            {/* Quick gadget action buttons */}
-                            <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  launchSignalTracker(suspect);
-                                }}
-                                className="px-2 py-1.5 bg-cyan-950/40 hover:bg-cyan-900/50 border border-cyan-700/60 text-cyan-300 rounded text-[11px] font-bold"
-                              >
-                                📡 TRACK SIGNAL (1 AP)
-                              </button>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  launchVoiceInterrogate(suspect);
-                                }}
-                                className="px-2 py-1.5 bg-amber-950/40 hover:bg-amber-900/50 border border-amber-700/60 text-amber-300 rounded text-[11px] font-bold"
-                              >
-                                🎙️ INTERROGATE (1 AP)
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* SHOWDOWN ACCUSATION TRIGGER BUTTON */}
-                <button
-                  onClick={() => {
-                    audio.alert();
-                    setAccusationModalOpen(true);
-                  }}
-                  className="mt-3.5 w-full py-3 bg-gradient-to-r from-rose-900/80 via-red-800/80 to-amber-900/80 hover:from-rose-800 hover:to-amber-800 text-white font-mono font-bold rounded-lg border border-rose-500/80 shadow-[0_0_15px_rgba(244,63,94,0.4)] transition tracking-wider text-xs flex items-center justify-center gap-2 group"
-                >
-                  <span className="w-2 h-2 rounded-full bg-rose-400 animate-ping"></span>
-                  <span>LOCK IN ACCUSATION SHOWDOWN</span>
-                </button>
-              </div>
-            </div>
-
-            {/* ======================================================== */}
-            {/* RIGHT COLUMN (65%): TABBED EVIDENCE TERMINAL & NOTES */}
-            {/* ======================================================== */}
-            <div className="lg:col-span-8 flex flex-col backdrop-blur-md bg-slate-900/60 border border-slate-800 rounded-lg shadow-lg overflow-hidden">
-              
-              {/* TERMINAL HEADER & STREAM TABS */}
-              <div className="bg-slate-950/90 border-b border-slate-800 p-2.5 flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
-                <div className="flex items-center gap-1.5">
-                  <button
-                    onClick={() => { setActiveTab('badge'); audio.click(); }}
-                    className={`px-3 py-1.5 rounded transition font-bold flex items-center gap-1.5 ${
-                      activeTab === 'badge' 
-                        ? 'bg-cyan-950 text-cyan-400 border border-cyan-700' 
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
-                    }`}
-                  >
-                    <span>💳 KEYCARD LOGS</span>
-                    <span className="text-[10px] bg-slate-900 px-1.5 rounded text-slate-400">
-                      {caseData.evidence.badgeLogs.length}
-                    </span>
-                  </button>
-
-                  <button
-                    onClick={() => { setActiveTab('chat'); audio.click(); }}
-                    className={`px-3 py-1.5 rounded transition font-bold flex items-center gap-1.5 ${
-                      activeTab === 'chat' 
-                        ? 'bg-amber-950 text-amber-400 border border-amber-700' 
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
-                    }`}
-                  >
-                    <span>💬 INTERCEPTED CHATS</span>
-                    <span className="text-[10px] bg-slate-900 px-1.5 rounded text-slate-400">
-                      {caseData.evidence.chatLogs.length}
-                    </span>
-                  </button>
-
-                  <button
-                    onClick={() => { setActiveTab('network'); audio.click(); }}
-                    className={`px-3 py-1.5 rounded transition font-bold flex items-center gap-1.5 ${
-                      activeTab === 'network' 
-                        ? 'bg-emerald-950 text-emerald-400 border border-emerald-700' 
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
-                    }`}
-                  >
-                    <span>🌐 NETWORK TRACES</span>
-                    <span className="text-[10px] bg-slate-900 px-1.5 rounded text-slate-400">
-                      {caseData.evidence.networkLogs.length}
-                    </span>
-                  </button>
-
-                  <button
-                    onClick={() => { setActiveTab('notes'); audio.click(); }}
-                    className={`px-3 py-1.5 rounded transition font-bold flex items-center gap-1.5 ${
-                      activeTab === 'notes' 
-                        ? 'bg-violet-950 text-violet-400 border border-violet-700' 
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
-                    }`}
-                  >
-                    <span>📌 PINBOARD & NOTES</span>
-                    <span className="text-[10px] bg-slate-900 px-1.5 rounded text-violet-400 font-bold">
-                      {pinnedLogIds.length}
-                    </span>
-                  </button>
-                </div>
-
-                {/* Filter and Search Box */}
-                {activeTab !== 'notes' && (
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      placeholder="Filter records..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="bg-slate-900 text-slate-200 px-2 py-1 rounded border border-slate-700 focus:outline-none focus:border-cyan-500 text-xs w-36 font-mono"
-                    />
-                    <button
-                      onClick={() => setFilterFlaggedOnly(!filterFlaggedOnly)}
-                      className={`px-2 py-1 rounded border text-[10px] font-mono transition ${
-                        filterFlaggedOnly 
-                          ? 'bg-rose-950 text-rose-300 border-rose-800 font-bold' 
-                          : 'bg-slate-900 text-slate-400 border-slate-800'
-                      }`}
-                    >
-                      {filterFlaggedOnly ? 'FLAGS ONLY' : 'ALL LOGS'}
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* TERMINAL CONTENT AREA */}
-              <div className="flex-1 p-3 overflow-y-auto max-h-[700px] font-mono text-xs">
-                
-                {/* 1. BADGE LOGS VIEW */}
-                {activeTab === 'badge' && (
-                  <div className="space-y-2">
-                    {filteredLogs.map(log => {
-                      const isExpanded = expandedLogId === log.id;
-                      const isPinned = pinnedLogIds.includes(log.id);
-                      return (
-                        <div 
-                          key={log.id}
-                          className={`p-3 rounded border transition ${
-                            log.isCulpritContradiction && log.deepScanned
-                              ? 'bg-rose-950/40 border-rose-500/80 shadow-[0_0_10px_rgba(244,63,94,0.3)]'
-                              : isExpanded 
-                              ? 'bg-slate-800/80 border-cyan-500/70' 
-                              : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
-                          }`}
-                        >
-                          <div className="flex flex-wrap items-center justify-between gap-2">
-                            <div className="flex items-center gap-2.5">
-                              <span className="text-cyan-400 font-bold">[{log.timestamp}]</span>
-                              <span className="text-white font-semibold">{log.holderName}</span>
-                              <span className="text-slate-400 text-[10px]">({log.badgeId})</span>
-                              <span className="text-slate-300">→</span>
-                              <span className={`font-semibold ${
-                                log.location === caseData.crime.restrictedRoom 
-                                  ? 'text-rose-400 font-bold' 
-                                  : 'text-slate-300'
-                              }`}>
-                                {log.location}
-                              </span>
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                              <span className={`text-[10px] px-1.5 py-0.5 rounded border uppercase ${
-                                log.action === 'ENTRY_GRANTED' 
-                                  ? 'bg-emerald-950/60 text-emerald-400 border-emerald-800' 
-                                  : 'bg-rose-950/60 text-rose-400 border-rose-800'
-                              }`}>
-                                {log.action}
-                              </span>
-
-                              {/* Deep Scan Action */}
-                              <button
-                                onClick={() => handleDeepScan(log.id, 'badgeLogs')}
-                                className={`text-[10px] px-2 py-0.5 rounded border transition font-bold ${
-                                  log.deepScanned 
-                                    ? 'bg-cyan-950 text-cyan-300 border-cyan-700' 
-                                    : 'bg-slate-900 hover:bg-cyan-950 text-cyan-400 border-slate-700'
-                                }`}
-                              >
-                                {log.deepScanned ? '✓ SCANNED' : 'DEEP SCAN (1 AP)'}
-                              </button>
-
-                              {/* Pin Button */}
-                              <button
-                                onClick={() => togglePinLog(log.id)}
-                                className={`text-[10px] px-2 py-0.5 rounded border transition ${
-                                  isPinned 
-                                    ? 'bg-violet-950 text-violet-300 border-violet-700 font-bold' 
-                                    : 'bg-slate-900 hover:bg-slate-800 text-slate-400 border-slate-700'
-                                }`}
-                              >
-                                {isPinned ? '📌 PINNED' : 'PIN'}
-                              </button>
-                            </div>
-                          </div>
-
-                          {/* Forensic Analysis Details (when deep-scanned or clicked) */}
-                          {log.deepScanned && (
-                            <div className="mt-2.5 pt-2 border-t border-slate-800 bg-slate-900/90 rounded p-2 text-[11px] text-slate-300">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="text-cyan-400 font-bold">FORENSIC TELEMETRY:</span>
-                                {log.contradiction && (
-                                  <span className="text-[10px] bg-rose-950 text-rose-300 border border-rose-800 px-1.5 rounded font-bold animate-pulse">
-                                    CONTRADICTION DETECTED!
-                                  </span>
-                                )}
-                              </div>
-                              <p className="leading-relaxed">{log.details}</p>
-                              <div className="text-[10px] text-slate-500 mt-1 flex gap-4">
-                                <span>TERMINAL_ID: #TRM-9941</span>
-                                <span>RFID_SIG: 0x884FCB19</span>
-                                <span>BIOMETRIC_CONFIDENCE: 99.8%</span>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-
-                {/* 2. CHAT LOGS VIEW */}
-                {activeTab === 'chat' && (
-                  <div className="space-y-2">
-                    {filteredLogs.map(chat => {
-                      const isPinned = pinnedLogIds.includes(chat.id);
-                      return (
-                        <div 
-                          key={chat.id}
-                          className={`p-3 rounded border transition ${
-                            chat.isCulpritContradiction && chat.deepScanned
-                              ? 'bg-rose-950/40 border-rose-500/80 shadow-[0_0_10px_rgba(244,63,94,0.3)]'
-                              : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
-                          }`}
-                        >
-                          <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
-                            <div className="flex items-center gap-2">
-                              <span className="text-amber-400 font-bold">[{chat.timestamp}]</span>
-                              <span className="text-white font-bold">{chat.sender}</span>
-                              <span className="text-slate-400">in</span>
-                              <span className="text-cyan-300 font-semibold">{chat.channel}</span>
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                              {chat.isRedacted && (
-                                <button
-                                  onClick={() => launchPacketDecryptor(chat)}
-                                  className="text-[10px] px-2 py-0.5 bg-emerald-950 hover:bg-emerald-900/60 text-emerald-300 border border-emerald-700 rounded font-bold transition flex items-center gap-1"
-                                >
-                                  <span>🔓 DECRYPT (1 AP)</span>
-                                </button>
-                              )}
-
-                              <button
-                                onClick={() => handleDeepScan(chat.id, 'chatLogs')}
-                                className={`text-[10px] px-2 py-0.5 rounded border transition font-bold ${
-                                  chat.deepScanned 
-                                    ? 'bg-cyan-950 text-cyan-300 border-cyan-700' 
-                                    : 'bg-slate-900 hover:bg-cyan-950 text-cyan-400 border-slate-700'
-                                }`}
-                              >
-                                {chat.deepScanned ? '✓ SCANNED' : 'DEEP SCAN (1 AP)'}
-                              </button>
-
-                              <button
-                                onClick={() => togglePinLog(chat.id)}
-                                className={`text-[10px] px-2 py-0.5 rounded border transition ${
-                                  isPinned 
-                                    ? 'bg-violet-950 text-violet-300 border-violet-700 font-bold' 
-                                    : 'bg-slate-900 hover:bg-slate-800 text-slate-400 border-slate-700'
-                                }`}
-                              >
-                                {isPinned ? '📌 PINNED' : 'PIN'}
-                              </button>
-                            </div>
-                          </div>
-
-                          {/* Message Body */}
-                          <div className="bg-slate-900/80 p-2.5 rounded border border-slate-800/80 text-slate-200 leading-relaxed">
-                            {chat.message}
-                          </div>
-
-                          {/* Deep Scan Info */}
-                          {chat.deepScanned && (
-                            <div className="mt-2 pt-2 border-t border-slate-800 bg-slate-900/90 rounded p-2 text-[11px] text-slate-300">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="text-cyan-400 font-bold">PACKET HEADERS:</span>
-                                {chat.contradiction && (
-                                  <span className="text-[10px] bg-rose-950 text-rose-300 border border-rose-800 px-1.5 rounded font-bold animate-pulse">
-                                    CONTRADICTION DETECTED!
-                                  </span>
-                                )}
-                              </div>
-                              <p className="leading-relaxed">{chat.details}</p>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-
-                {/* 3. NETWORK LOGS VIEW */}
-                {activeTab === 'network' && (
-                  <div className="space-y-2">
-                    {filteredLogs.map(net => {
-                      const isPinned = pinnedLogIds.includes(net.id);
-                      return (
-                        <div 
-                          key={net.id}
-                          className={`p-3 rounded border transition ${
-                            net.isCulpritContradiction && net.deepScanned
-                              ? 'bg-rose-950/40 border-rose-500/80 shadow-[0_0_10px_rgba(244,63,94,0.3)]'
-                              : 'bg-slate-950/60 border-slate-800 hover:border-slate-700'
-                          }`}
-                        >
-                          <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
-                            <div className="flex items-center gap-2.5">
-                              <span className="text-emerald-400 font-bold">[{net.timestamp}]</span>
-                              <span className="text-slate-300 font-semibold">{net.source}</span>
-                              <span className="text-slate-500">→</span>
-                              <span className="text-cyan-300 font-semibold">{net.destination}</span>
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                              <span className="text-[10px] bg-slate-900 text-slate-400 px-2 py-0.5 rounded border border-slate-800">
-                                {net.protocol}
-                              </span>
-                              <span className="text-[10px] font-bold text-amber-400">
-                                {net.volume}
-                              </span>
-
-                              <button
-                                onClick={() => handleDeepScan(net.id, 'networkLogs')}
-                                className={`text-[10px] px-2 py-0.5 rounded border transition font-bold ${
-                                  net.deepScanned 
-                                    ? 'bg-cyan-950 text-cyan-300 border-cyan-700' 
-                                    : 'bg-slate-900 hover:bg-cyan-950 text-cyan-400 border-slate-700'
-                                }`}
-                              >
-                                {net.deepScanned ? '✓ SCANNED' : 'DEEP SCAN (1 AP)'}
-                              </button>
-
-                              <button
-                                onClick={() => togglePinLog(net.id)}
-                                className={`text-[10px] px-2 py-0.5 rounded border transition ${
-                                  isPinned 
-                                    ? 'bg-violet-950 text-violet-300 border-violet-700 font-bold' 
-                                    : 'bg-slate-900 hover:bg-slate-800 text-slate-400 border-slate-700'
-                                }`}
-                              >
-                                {isPinned ? '📌 PINNED' : 'PIN'}
-                              </button>
-                            </div>
-                          </div>
-
-                          {/* Deep Scan Info */}
-                          {net.deepScanned && (
-                            <div className="mt-2 pt-2 border-t border-slate-800 bg-slate-900/90 rounded p-2 text-[11px] text-slate-300">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="text-cyan-400 font-bold">PCAP FORENSICS:</span>
-                                {net.contradiction && (
-                                  <span className="text-[10px] bg-rose-950 text-rose-300 border border-rose-800 px-1.5 rounded font-bold animate-pulse">
-                                    CONTRADICTION DETECTED!
-                                  </span>
-                                )}
-                              </div>
-                              <p className="leading-relaxed">{net.details}</p>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-
-                {/* 4. PINBOARD & CASE NOTES VIEW */}
-                {activeTab === 'notes' && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
-                    {/* Left: Pinned Clues */}
-                    <div className="flex flex-col gap-2">
-                      <div className="flex justify-between items-center pb-2 border-b border-slate-800">
-                        <span className="font-bold text-violet-400">PINNED EVIDENCE PIECES ({pinnedLogs.length})</span>
-                        <span className="text-[10px] text-slate-400">Pin items from other tabs</span>
-                      </div>
-
-                      {pinnedLogs.length === 0 ? (
-                        <div className="p-8 text-center text-slate-500 border border-dashed border-slate-800 rounded">
-                          No evidence pinned yet. Click [PIN] on any badge log, chat snippet, or network trace to organize your deduction trail!
-                        </div>
-                      ) : (
-                        <div className="space-y-2 overflow-y-auto max-h-[500px] pr-1">
-                          {pinnedLogs.map(item => (
-                            <div key={item.id} className="p-2.5 rounded bg-slate-950 border border-violet-900/40 text-xs">
-                              <div className="flex justify-between items-start mb-1">
-                                <span className="text-violet-300 font-bold">[{item.timestamp}] {item.holderName || item.sender || item.source}</span>
-                                <button 
-                                  onClick={() => togglePinLog(item.id)}
-                                  className="text-[10px] text-rose-400 hover:text-rose-200"
-                                >
-                                  [REMOVE]
-                                </button>
-                              </div>
-                              <p className="text-slate-300 text-[11px]">{item.details || item.message || item.destination}</p>
-                              {item.contradiction && (
-                                <div className="mt-1 text-[10px] text-rose-400 font-bold">
-                                  CONTRADICTION: {item.contradiction}
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Right: Freeform Detective Scratch Notepad */}
-                    <div className="flex flex-col gap-2">
-                      <div className="flex justify-between items-center pb-2 border-b border-slate-800">
-                        <span className="font-bold text-cyan-400">INVESTIGATOR'S SCRATCH NOTEPAD</span>
-                        <span className="text-[10px] text-slate-500">Auto-saved to LocalStorage</span>
-                      </div>
-                      <textarea
-                        value={playerNotes}
-                        onChange={(e) => setPlayerNotes(e.target.value)}
-                        placeholder="Jot down suspect motives, suspicious timestamps, and contradictions here..."
-                        className="flex-1 w-full bg-slate-950 border border-slate-800 rounded p-3 text-slate-200 font-mono text-xs focus:outline-none focus:border-cyan-500 min-h-[420px] resize-none"
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </main>
-
-          {/* ======================================================== */}
-          {/* MODAL 1: SIGNAL TRACKER RADAR */}
-          {/* ======================================================== */}
-          {activeGadgetModal === 'tracker' && (
-            <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-              <div className="bg-slate-900 border border-cyan-500 rounded-lg max-w-lg w-full p-5 font-mono shadow-[0_0_30px_rgba(6,182,212,0.3)]">
-                <div className="flex justify-between items-center pb-3 border-b border-slate-800 mb-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">📡</span>
-                    <span className="font-bold text-white tracking-wider">CELLULAR & RFID SIGNAL TRACKER</span>
-                  </div>
-                  <button 
-                    onClick={() => setActiveGadgetModal(null)}
-                    className="text-slate-400 hover:text-white"
-                  >
-                    [CLOSE]
-                  </button>
-                </div>
-
-                {/* Radar Grid Graphic */}
-                <div className="relative w-full h-48 bg-slate-950 border border-cyan-900/60 rounded flex items-center justify-center overflow-hidden mb-4">
-                  {/* Concentric Circles */}
-                  <div className="absolute w-40 h-40 rounded-full border border-cyan-900/40"></div>
-                  <div className="absolute w-28 h-28 rounded-full border border-cyan-800/40"></div>
-                  <div className="absolute w-14 h-14 rounded-full border border-cyan-700/40"></div>
-                  <div className="absolute w-full h-px bg-cyan-900/30"></div>
-                  <div className="absolute h-full w-px bg-cyan-900/30"></div>
-                  {/* Rotating beam */}
-                  <div className="absolute inset-0 radar-beam pointer-events-none">
-                    <div className="w-1/2 h-1/2 bg-gradient-to-br from-cyan-500/20 to-transparent"></div>
-                  </div>
-                  {/* Radar Pin */}
-                  {trackerResult && (
-                    <div className="absolute z-10 flex flex-col items-center animate-ping">
-                      <span className="w-4 h-4 rounded-full bg-rose-500"></span>
-                    </div>
-                  )}
-                  <span className="text-xs text-cyan-400/80 font-bold">
-                    {trackerResult ? "TARGET POSITION LOCKED" : "TRILATERATING CAMPUS BEACONS..."}
-                  </span>
-                </div>
-
-                {/* Result Breakdown */}
-                {trackerResult ? (
-                  <div className="space-y-3 bg-slate-950 p-3.5 rounded border border-slate-800 text-xs">
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">Target Suspect:</span>
-                      <span className="font-bold text-white">{trackerResult.suspect.name}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">Claimed Alibi Location:</span>
-                      <span className="text-cyan-400">{trackerResult.statedRoom}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-slate-400">Actual Beacon Trilateration:</span>
-                      <span className={`font-bold ${trackerResult.isMatch ? 'text-emerald-400' : 'text-rose-400'}`}>
-                        {trackerResult.actualRoom}
-                      </span>
-                    </div>
-                    <div className="pt-2 border-t border-slate-800">
-                      {trackerResult.isMatch ? (
-                        <div className="text-emerald-400 font-bold flex items-center gap-2">
-                          <span>✓ LOCATION VERIFIED:</span>
-                          <span className="font-normal text-slate-300">Target was where they claimed to be.</span>
-                        </div>
-                      ) : (
-                        <div className="text-rose-400 font-bold flex flex-col gap-1">
-                          <span className="animate-pulse">🚨 CRITICAL CONTRADICTION DETECTED!</span>
-                          <span className="font-normal text-slate-300">
-                            Beacon logs place suspect inside restricted <strong>{trackerResult.actualRoom}</strong> during the crime window!
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-xs text-center text-slate-500 py-3">
-                    Querying Wi-Fi 6 access points and Bluetooth low-energy badges...
-                  </div>
-                )}
-
-                <div className="mt-4 flex justify-end">
-                  <button
-                    onClick={() => setActiveGadgetModal(null)}
-                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded text-xs font-bold"
-                  >
-                    DISMISS RADAR
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ======================================================== */}
-          {/* MODAL 2: VOICE MODULATOR (INTERROGATION) */}
-          {/* ======================================================== */}
-          {activeGadgetModal === 'voice' && interrogatingSuspect && (
-            <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-              <div className="bg-slate-900 border border-amber-500 rounded-lg max-w-lg w-full p-5 font-mono shadow-[0_0_30px_rgba(245,158,11,0.3)]">
-                <div className="flex justify-between items-center pb-3 border-b border-slate-800 mb-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">🎙️</span>
-                    <span className="font-bold text-white tracking-wider">TACTICAL VOICE MODULATOR // INTERROGATE</span>
-                  </div>
-                  <button 
-                    onClick={() => setActiveGadgetModal(null)}
-                    className="text-slate-400 hover:text-white"
-                  >
-                    [CLOSE]
-                  </button>
-                </div>
-
-                {/* Target profile preview */}
-                <div className="flex items-center justify-between bg-slate-950 p-3 rounded border border-slate-800 mb-4 text-xs">
-                  <div>
-                    <span className="font-bold text-white text-sm">{interrogatingSuspect.name}</span>
-                    <span className="text-slate-400 block">{interrogatingSuspect.role}</span>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-[10px] text-slate-400 block">Stress Level:</span>
-                    <span className={`font-bold text-sm ${interrogatingSuspect.stressLevel > 60 ? 'text-rose-400' : 'text-amber-400'}`}>
-                      {interrogatingSuspect.stressLevel}%
-                    </span>
-                  </div>
-                </div>
-
-                {/* Dialogue response box */}
-                {interrogationDialogue ? (
-                  <div className="bg-slate-950 p-4 rounded border border-amber-900/60 mb-4 text-xs">
-                    <div className="flex items-center gap-2 mb-2 text-amber-400 font-bold">
-                      <span>SUSPECT TESTIMONY (VOICE SYNTH ANALYZED):</span>
-                    </div>
-                    <p className="text-slate-200 leading-relaxed italic bg-slate-900/80 p-3 rounded border border-slate-800">
-                      "{interrogationDialogue.text}"
-                    </p>
-                    {interrogationDialogue.revealedSlip && (
-                      <div className="mt-2 text-rose-400 font-bold text-[11px] flex items-center gap-1.5 animate-pulse">
-                        <span>⚠️ CRITICAL PSYCHOLOGICAL SLIP IDENTIFIED!</span>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="bg-slate-950/60 p-6 rounded border border-dashed border-slate-800 mb-4 text-center text-xs text-slate-400">
-                    Select a pressure vector below to interrogate target through an encrypted modulated VoIP channel.
-                  </div>
-                )}
-
-                {/* Interrogation Tactics */}
-                <div className="space-y-2">
-                  <span className="text-[11px] text-slate-400 block">CHOOSE PRESSURE VECTOR (-1 AP):</span>
-                  <div className="grid grid-cols-1 gap-2 text-xs">
-                    <button
-                      onClick={() => executeInterrogationVector('ALIBI')}
-                      className="p-2.5 bg-slate-950 hover:bg-amber-950/50 border border-slate-800 hover:border-amber-500 rounded text-left transition"
-                    >
-                      <strong className="text-amber-400 block">1. Confront with Alibi & Room Inconsistencies</strong>
-                      <span className="text-[10px] text-slate-400">Force suspect to account for every minute of the incident window.</span>
-                    </button>
-                    <button
-                      onClick={() => executeInterrogationVector('MOTIVE')}
-                      className="p-2.5 bg-slate-950 hover:bg-amber-950/50 border border-slate-800 hover:border-amber-500 rounded text-left transition"
-                    >
-                      <strong className="text-amber-400 block">2. Inquire on Financial & Career Frustrations</strong>
-                      <span className="text-[10px] text-slate-400">Pressure regarding external debts, salary disputes, or rival offers.</span>
-                    </button>
-                    <button
-                      onClick={() => executeInterrogationVector('TECH')}
-                      className="p-2.5 bg-slate-950 hover:bg-amber-950/50 border border-slate-800 hover:border-amber-500 rounded text-left transition"
-                    >
-                      <strong className="text-amber-400 block">3. Cross-Examine Cryptographic Tokens & IPs</strong>
-                      <span className="text-[10px] text-slate-400">Challenge them with hardware serials and unauthorized network traces.</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div className="mt-4 flex justify-end">
-                  <button
-                    onClick={() => setActiveGadgetModal(null)}
-                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded text-xs font-bold"
-                  >
-                    END INTERROGATION
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ======================================================== */}
-          {/* MODAL 3: PACKET DECRYPTOR */}
-          {/* ======================================================== */}
-          {activeGadgetModal === 'decrypt' && decryptingLog && (
-            <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
-              <div className="bg-slate-900 border border-emerald-500 rounded-lg max-w-lg w-full p-5 font-mono shadow-[0_0_30px_rgba(16,185,129,0.3)]">
-                <div className="flex justify-between items-center pb-3 border-b border-slate-800 mb-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">🔓</span>
-                    <span className="font-bold text-white tracking-wider">RETRO-TECH PACKET DECRYPTOR</span>
-                  </div>
-                  <button 
-                    onClick={() => setActiveGadgetModal(null)}
-                    className="text-slate-400 hover:text-white"
-                  >
-                    [CLOSE]
-                  </button>
-                </div>
-
-                {/* Decryption Matrix Simulation */}
-                <div className="bg-slate-950 p-4 rounded border border-emerald-950 mb-4 text-xs space-y-2">
-                  <div className="flex justify-between text-slate-400 text-[10px]">
-                    <span>CIPHER: AES-256-GCM / RSA-4096</span>
-                    <span>KEY DERIVATION: {decryptStep >= 3 ? '100% SOLVED' : `${decryptStep * 33}%`}</span>
-                  </div>
-
-                  <div className="w-full bg-slate-900 h-2 rounded overflow-hidden">
-                    <div 
-                      className="bg-emerald-500 h-full transition-all duration-500"
-                      style={{ width: `${Math.min(100, (decryptStep + 1) * 25)}%` }}
-                    />
-                  </div>
-
-                  <div className="bg-slate-900/90 p-3 rounded border border-slate-800 font-mono text-emerald-400 text-[11px] min-h-[90px] flex items-center justify-center text-center">
-                    {decryptStep === 0 && "EXTRACTING INITIALIZATION VECTOR (IV)..."}
-                    {decryptStep === 1 && "BRUTE-FORCING PRIVATE ENTROPY POOL: 0x8F4A... 0x1B2C..."}
-                    {decryptStep === 2 && "UNSCRAMBLING PACKET PAYLOAD BUFFERS..."}
-                    {decryptStep >= 3 && (
-                      <div className="text-white matrix-reveal">
-                        <strong className="text-emerald-400 block mb-1">DECRYPTED PAYLOAD REVEALED:</strong>
-                        <span className="text-slate-200">{decryptingLog.revealedMessage || decryptingLog.message}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex justify-end">
-                  <button
-                    onClick={() => setActiveGadgetModal(null)}
-                    className="px-4 py-2 bg-emerald-900/60 hover:bg-emerald-800 text-white rounded text-xs font-bold border border-emerald-600"
-                  >
-                    CONFIRM & CLOSE
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ======================================================== */}
-          {/* MODAL 4: SURPRISE LIVE LEAK (PLOT TWIST POPUP) */}
-          {/* ======================================================== */}
-          {liveLeakModal && (
-            <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
-              <div className="bg-slate-900 border border-rose-500 alert-glow rounded-lg max-w-lg w-full p-6 font-mono shadow-[0_0_40px_rgba(244,63,94,0.6)]">
-                <div className="flex items-center gap-3 text-rose-400 text-lg font-bold mb-3 pb-2 border-b border-rose-950">
-                  <span className="text-2xl animate-spin">⚠️</span>
-                  <span>{liveLeakModal.title}</span>
-                </div>
-
-                <p className="text-slate-200 text-xs leading-relaxed mb-5 bg-slate-950 p-4 rounded border border-slate-800">
-                  {liveLeakModal.text}
-                </p>
-
-                <div className="flex justify-end gap-3 text-xs">
-                  <button
-                    onClick={() => {
-                      setLiveLeakModal(null);
-                      audio.click();
-                      showToast("Live leak event bypassed.");
-                    }}
-                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded font-bold"
-                  >
-                    IGNORE / LET IT BURN (0 AP)
-                  </button>
-
-                  <button
-                    onClick={liveLeakModal.onAction}
-                    className="px-5 py-2 bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white rounded font-bold shadow-lg"
-                  >
-                    {liveLeakModal.actionText}
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ======================================================== */}
-          {/* MODAL 5: ACCUSATION SHOWDOWN & VERIFICATION */}
-          {/* ======================================================== */}
-          {accusationModalOpen && (
-            <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
-              <div className="bg-slate-900 border border-slate-700 rounded-lg max-w-xl w-full p-6 font-mono shadow-2xl">
-                
-                {/* When verdict is decided */}
-                {verdictData ? (
-                  <div>
-                    <div className={`p-4 rounded-lg border mb-4 text-center ${
-                      verdictData.isSuccess 
-                        ? 'bg-emerald-950/60 border-emerald-500 text-emerald-400' 
-                        : 'bg-rose-950/60 border-rose-500 text-rose-400'
-                    }`}>
-                      <div className="text-3xl mb-1">{verdictData.isSuccess ? '🏆' : '❌'}</div>
-                      <h2 className="text-lg font-bold tracking-wider">{verdictData.title}</h2>
-                    </div>
-
-                    <p className="text-xs text-slate-200 leading-relaxed mb-4 bg-slate-950 p-3.5 rounded border border-slate-800">
-                      {verdictData.summary}
-                    </p>
-
-                    <div className="space-y-2 mb-5 bg-slate-950 p-3.5 rounded border border-slate-800 text-xs">
-                      <strong className="text-slate-400 block mb-1">CASE FORENSIC BREAKDOWN:</strong>
-                      {verdictData.breakdown.map((item, i) => (
-                        <div key={i} className="text-slate-300 text-[11px] flex gap-2">
-                          <span className="text-cyan-400 font-bold">•</span>
-                          <span>{item}</span>
+                          <span className="text-xs font-retro text-cyan-400">[INSPECT]</span>
                         </div>
                       ))}
                     </div>
 
-                    <div className="flex justify-between items-center bg-slate-950/80 p-3 rounded border border-slate-800 text-xs mb-5">
-                      <div>
-                        <span className="text-slate-400 block text-[10px]">REWARDS GAINED:</span>
-                        <span className="text-cyan-400 font-bold">+{verdictData.xpGained} XP</span>
-                        <span className="text-amber-400 font-bold ml-3">+${verdictData.credsGained} Creds</span>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-slate-400 block text-[10px]">CURRENT STREAK:</span>
-                        <span className="font-bold text-white text-sm">🔥 {verdictData.streak}</span>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-end gap-3 text-xs">
-                      <button
-                        onClick={() => startNewCase()}
-                        className="w-full py-3 bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold rounded-lg shadow-lg transition tracking-wider"
-                      >
-                        NEXT PROCEDURAL CASE ➔
-                      </button>
-                    </div>
+                    {/* Accusation Trigger */}
+                    <button
+                      onClick={() => setAccusationModalOpen(true)}
+                      className="mt-3 w-full py-2.5 bg-gradient-to-r from-rose-700 to-amber-700 hover:from-rose-600 hover:to-amber-600 text-white font-bold text-xs rounded border border-rose-400 shadow-lg tracking-wider"
+                    >
+                      ⚖️ LOCK IN ACCUSATION
+                    </button>
                   </div>
-                ) : verifyingStage > 0 ? (
-                  /* Dramatic Multi-stage Indictment Verification */
-                  <div className="text-center py-8 space-y-4">
-                    <div className="w-12 h-12 rounded-full border-2 border-cyan-500 border-t-transparent animate-spin mx-auto mb-4"></div>
-                    <h3 className="text-sm font-bold text-cyan-400 tracking-wider">
-                      VERIFYING INDICTMENT TELEMETRY WITH INTERNAL AUDIT...
-                    </h3>
-                    <div className="space-y-2 text-xs text-slate-400 max-w-sm mx-auto text-left">
-                      <div className={verifyingStage >= 1 ? 'text-emerald-400' : 'opacity-30'}>
-                        [STAGE 1] Cross-referencing biometric identity hashes...
+                </div>
+              </div>
+            ) : (
+              /* VIEW 2: FULL FORENSIC LOG TERMINAL */
+              <div className="flex-1 bg-[#161B22] border-2 border-[#30363D] rounded-lg p-4 flex flex-col shadow-2xl">
+                <div className="flex items-center gap-2 pb-3 border-b border-[#30363D] mb-3 text-xs font-bold">
+                  <button
+                    onClick={() => setActiveTab('badge')}
+                    className={`px-3 py-1.5 rounded ${activeTab === 'badge' ? 'bg-cyan-600 text-white' : 'bg-[#0D1117] text-slate-400'}`}
+                  >
+                    💳 BADGE LOGS ({caseData.evidence.badgeLogs.length})
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('chat')}
+                    className={`px-3 py-1.5 rounded ${activeTab === 'chat' ? 'bg-amber-600 text-white' : 'bg-[#0D1117] text-slate-400'}`}
+                  >
+                    💬 CHAT SNIPPETS ({caseData.evidence.chatLogs.length})
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('network')}
+                    className={`px-3 py-1.5 rounded ${activeTab === 'network' ? 'bg-emerald-600 text-white' : 'bg-[#0D1117] text-slate-400'}`}
+                  >
+                    🌐 NETWORK TRACES ({caseData.evidence.networkLogs.length})
+                  </button>
+                </div>
+
+                <div className="flex-1 overflow-y-auto space-y-2 text-xs">
+                  {caseData.evidence[`${activeTab}Logs`].map(item => (
+                    <div key={item.id} className="p-3 bg-[#0D1117] border border-[#30363D] rounded">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-cyan-400 font-bold">[{item.timestamp}] {item.holderName || item.sender || item.source}</span>
+                        <span className="text-slate-400">{item.location || item.channel || item.protocol}</span>
                       </div>
-                      <div className={verifyingStage >= 2 ? 'text-emerald-400' : 'opacity-30'}>
-                        [STAGE 2] Evaluating alibi location contradictions...
-                      </div>
-                      <div className={verifyingStage >= 3 ? 'text-emerald-400' : 'opacity-30'}>
-                        [STAGE 3] Auditing cryptographic signatures and exfil payloads...
-                      </div>
-                      <div className={verifyingStage >= 4 ? 'text-cyan-400 font-bold' : 'opacity-30'}>
-                        [STAGE 4] Finalizing indictment ruling...
-                      </div>
+                      <p className="text-slate-300 text-[11px]">{item.details || item.message}</p>
+                      {item.contradiction && (
+                        <div className="mt-1 text-rose-400 font-bold text-[10px]">CONTRADICTION: {item.contradiction}</div>
+                      )}
                     </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </main>
+
+          {/* ======================================================== */}
+          {/* SUSPECT DOSSIER & INTERROGATION MODAL */}
+          {/* ======================================================== */}
+          {activeSuspectModal && (
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+              <div className="bg-[#161B22] border-2 border-cyan-400 rounded-lg max-w-lg w-full p-5 font-mono shadow-2xl">
+                <div className="flex justify-between items-center pb-2 border-b border-[#30363D] mb-3">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-white text-sm">{activeSuspectModal.name}</span>
+                    <span className="text-xs text-slate-400">({activeSuspectModal.badgeId})</span>
+                  </div>
+                  <button onClick={() => setActiveSuspectModal(null)} className="text-slate-400 hover:text-white">[CLOSE]</button>
+                </div>
+
+                <div className="space-y-3 text-xs mb-4">
+                  <div className="bg-[#0D1117] p-3 rounded border border-[#30363D]">
+                    <span className="text-slate-400 block text-[10px]">ROLE & DEPT:</span>
+                    <span className="text-cyan-400 font-bold">{activeSuspectModal.role} ({activeSuspectModal.dept})</span>
+                  </div>
+
+                  <div className="bg-[#0D1117] p-3 rounded border border-[#30363D]">
+                    <span className="text-amber-400 block text-[10px] font-bold">STATED ALIBI:</span>
+                    <p className="text-slate-200 mt-1">{activeSuspectModal.statedAlibi}</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <button
+                    onClick={() => triggerSignalTracker(activeSuspectModal)}
+                    className="p-2.5 bg-cyan-950 hover:bg-cyan-900 border border-cyan-500 text-cyan-300 rounded font-bold"
+                  >
+                    📡 SIGNAL TRACKER (1 AP)
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      if (!spendAP(1, "Interrogate")) return;
+                      const response = activeSuspectModal.isCulprit 
+                        ? caseData.crime.alibiSlipDialogue 
+                        : "I was in my office reviewing tickets. Check the commit logs!";
+                      showToast(`🎙️ "${response}"`);
+                      audio.voiceBeep(450);
+                    }}
+                    className="p-2.5 bg-amber-950 hover:bg-amber-900 border border-amber-500 text-amber-300 rounded font-bold"
+                  >
+                    🎙️ INTERROGATE (1 AP)
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ======================================================== */}
+          {/* ACCUSATION SHOWDOWN MODAL */}
+          {/* ======================================================== */}
+          {accusationModalOpen && (
+            <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+              <div className="bg-[#161B22] border-2 border-rose-500 rounded-lg max-w-lg w-full p-6 font-mono shadow-2xl">
+                {verdictData ? (
+                  <div>
+                    <h2 className="text-lg font-bold text-center mb-2 text-white">
+                      {verdictData.isSuccess ? '🏆 GUILTY VERDICT CONFIRMED!' : '❌ WRONGFUL ACCUSATION!'}
+                    </h2>
+                    <p className="text-xs text-slate-300 mb-4 bg-[#0D1117] p-3 rounded border border-[#30363D]">
+                      {verdictData.summary}
+                    </p>
+                    <button
+                      onClick={() => { setAccusationModalOpen(false); startNewCase(); }}
+                      className="w-full py-2.5 bg-cyan-600 hover:bg-cyan-500 text-black font-bold rounded"
+                    >
+                      NEXT CASE ➔
+                    </button>
                   </div>
                 ) : (
-                  /* Accusation Form */
                   <div>
-                    <div className="flex justify-between items-center pb-3 border-b border-slate-800 mb-4">
-                      <div className="flex items-center gap-2">
-                        <span className="text-rose-500 text-lg">⚖️</span>
-                        <h2 className="text-sm font-bold text-white tracking-wider">
-                          LOCK IN FORMAL INDICTMENT
-                        </h2>
-                      </div>
-                      <button 
-                        onClick={() => setAccusationModalOpen(false)}
-                        className="text-slate-400 hover:text-white text-xs"
-                      >
-                        [CANCEL]
-                      </button>
-                    </div>
-
-                    <p className="text-xs text-slate-300 mb-4">
-                      Select the prime suspect and corroborate with the key contradictions you discovered during the investigation.
-                    </p>
-
-                    <div className="space-y-3.5 mb-6 text-xs">
-                      {/* Step 1: Suspect Selection */}
+                    <h2 className="text-sm font-bold text-white mb-3">LOCK IN ACCUSATION SHOWDOWN</h2>
+                    <div className="space-y-3 mb-4 text-xs">
                       <div>
-                        <label className="block text-slate-400 font-bold mb-1">
-                          1. ACCUSED PRIME SUSPECT:
-                        </label>
+                        <label className="block text-slate-400 mb-1">SELECT ACCUSED PRIME SUSPECT:</label>
                         <select
                           value={selectedAccusedSuspectId}
                           onChange={(e) => setSelectedAccusedSuspectId(e.target.value)}
-                          className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-slate-200 focus:outline-none focus:border-cyan-500 font-mono"
+                          className="w-full bg-[#0D1117] border border-[#30363D] rounded p-2 text-white"
                         >
-                          <option value="">-- Choose suspect to indict --</option>
+                          <option value="">-- Choose suspect --</option>
                           {caseData.suspects.map(s => (
-                            <option key={s.id} value={s.id}>
-                              {s.name} ({s.role} - {s.dept})
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      {/* Step 2: Linked Evidence 1 */}
-                      <div>
-                        <label className="block text-slate-400 font-bold mb-1">
-                          2. PRIMARY CONTRADICTION (BADGE / LOCATION):
-                        </label>
-                        <select
-                          value={selectedEvidence1}
-                          onChange={(e) => setSelectedEvidence1(e.target.value)}
-                          className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-slate-200 focus:outline-none focus:border-cyan-500 font-mono text-[11px]"
-                        >
-                          <option value="">-- Select primary evidence --</option>
-                          {allDiscoveredContradictions.map(item => (
-                            <option key={item.id} value={item.id}>
-                              {item.label}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      {/* Step 3: Linked Evidence 2 */}
-                      <div>
-                        <label className="block text-slate-400 font-bold mb-1">
-                          3. SECONDARY CONTRADICTION (CHAT / NETWORK TOKEN):
-                        </label>
-                        <select
-                          value={selectedEvidence2}
-                          onChange={(e) => setSelectedEvidence2(e.target.value)}
-                          className="w-full bg-slate-950 border border-slate-700 rounded p-2 text-slate-200 focus:outline-none focus:border-cyan-500 font-mono text-[11px]"
-                        >
-                          <option value="">-- Select secondary evidence --</option>
-                          {allDiscoveredContradictions.map(item => (
-                            <option key={item.id} value={item.id}>
-                              {item.label}
-                            </option>
+                            <option key={s.id} value={s.id}>{s.name} ({s.role})</option>
                           ))}
                         </select>
                       </div>
                     </div>
 
-                    <div className="flex justify-end gap-3 text-xs">
-                      <button
-                        onClick={() => setAccusationModalOpen(false)}
-                        className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded font-bold"
-                      >
-                        KEEP INVESTIGATING
+                    <div className="flex justify-end gap-2 text-xs">
+                      <button onClick={() => setAccusationModalOpen(false)} className="px-3 py-1.5 bg-[#0D1117] text-slate-300 rounded">
+                        CANCEL
                       </button>
-
                       <button
-                        onClick={handleExecuteIndictment}
-                        className="px-5 py-2 bg-rose-600 hover:bg-rose-500 text-white rounded font-bold tracking-wider shadow-lg"
+                        onClick={() => {
+                          const accused = caseData.suspects.find(s => s.id === selectedAccusedSuspectId);
+                          if (!accused) { showToast("Select a suspect!"); return; }
+                          if (accused.isCulprit) {
+                            audio.success();
+                            setVerdictData({
+                              isSuccess: true,
+                              summary: `Conclusive proof gathered! ${accused.name} was arrested attempting to exfiltrate ${caseData.crime.compromisedAsset}. Motive: ${accused.motive}`
+                            });
+                            setCareer(prev => ({ ...prev, streak: prev.streak + 1, xp: prev.xp + 500 }));
+                          } else {
+                            audio.failure();
+                            setVerdictData({
+                              isSuccess: false,
+                              summary: `Wrongful accusation! ${accused.name} had an airtight alibi. The real culprit was ${caseData.culpritName}!`
+                            });
+                            setCareer(prev => ({ ...prev, streak: 0 }));
+                          }
+                        }}
+                        className="px-4 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded"
                       >
-                        EXECUTE INDICTMENT ➔
+                        INDICT TARGET ➔
                       </button>
                     </div>
                   </div>
@@ -2572,206 +1608,15 @@
             </div>
           )}
 
-          {/* ======================================================== */}
-          {/* MODAL 6: TECH LAB UPGRADE SHOP */}
-          {/* ======================================================== */}
-          {techLabOpen && (
-            <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
-              <div className="bg-slate-900 border border-amber-500 rounded-lg max-w-lg w-full p-5 font-mono shadow-2xl">
-                <div className="flex justify-between items-center pb-3 border-b border-slate-800 mb-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">🛠️</span>
-                    <span className="font-bold text-white tracking-wider">RETRO-TECH LAB // GADGET UPGRADES</span>
-                  </div>
-                  <button 
-                    onClick={() => setTechLabOpen(false)}
-                    className="text-slate-400 hover:text-white text-xs"
-                  >
-                    [CLOSE]
-                  </button>
-                </div>
-
-                <div className="flex justify-between items-center bg-slate-950 p-3 rounded border border-slate-800 mb-4 text-xs">
-                  <span className="text-slate-400">AVAILABLE CREDITS:</span>
-                  <span className="text-amber-400 font-bold text-sm">${career.creds} CREDS</span>
-                </div>
-
-                <div className="space-y-3 mb-5 text-xs">
-                  {/* Upgrade 1: Overclocked AP Battery */}
-                  <div className="p-3 bg-slate-950 rounded border border-slate-800 flex justify-between items-center">
-                    <div>
-                      <strong className="text-white block">Overclocked AP Battery</strong>
-                      <span className="text-slate-400 text-[11px]">Starts every case with 10 AP instead of 8.</span>
-                    </div>
-                    {career.upgrades.extraApBattery ? (
-                      <span className="text-emerald-400 text-[11px] font-bold">✓ INSTALLED</span>
-                    ) : (
-                      <button
-                        onClick={() => buyUpgrade('extraApBattery', 200)}
-                        className="px-3 py-1 bg-amber-950 hover:bg-amber-900 text-amber-300 border border-amber-700 rounded font-bold"
-                      >
-                        BUY ($200)
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Upgrade 2: Quantum Decryptor */}
-                  <div className="p-3 bg-slate-950 rounded border border-slate-800 flex justify-between items-center">
-                    <div>
-                      <strong className="text-white block">Quantum Decryption Subroutine</strong>
-                      <span className="text-slate-400 text-[11px]">Reduces Packet Decryptor runtime and unlocks double speed.</span>
-                    </div>
-                    {career.upgrades.quantumDecryptor ? (
-                      <span className="text-emerald-400 text-[11px] font-bold">✓ INSTALLED</span>
-                    ) : (
-                      <button
-                        onClick={() => buyUpgrade('quantumDecryptor', 150)}
-                        className="px-3 py-1 bg-amber-950 hover:bg-amber-900 text-amber-300 border border-amber-700 rounded font-bold"
-                      >
-                        BUY ($150)
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Upgrade 3: Forensic Cache */}
-                  <div className="p-3 bg-slate-950 rounded border border-slate-800 flex justify-between items-center">
-                    <div>
-                      <strong className="text-white block">Forensic RAM Cache</strong>
-                      <span className="text-slate-400 text-[11px]">Displays high-probability anomalies on first load.</span>
-                    </div>
-                    {career.upgrades.forensicCache ? (
-                      <span className="text-emerald-400 text-[11px] font-bold">✓ INSTALLED</span>
-                    ) : (
-                      <button
-                        onClick={() => buyUpgrade('forensicCache', 250)}
-                        className="px-3 py-1 bg-amber-950 hover:bg-amber-900 text-amber-300 border border-amber-700 rounded font-bold"
-                      >
-                        BUY ($250)
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex justify-end">
-                  <button
-                    onClick={() => setTechLabOpen(false)}
-                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded text-xs font-bold"
-                  >
-                    RETURN TO CONSOLE
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* ======================================================== */}
-          {/* MODAL 7: CASE #001 ONBOARDING TUTORIAL */}
-          {/* ======================================================== */}
-          {tutorialActive && (
-            <div className="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
-              <div className="bg-slate-900 border border-cyan-500 rounded-lg max-w-lg w-full p-6 font-mono shadow-2xl">
-                <div className="flex justify-between items-center pb-3 border-b border-slate-800 mb-4">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl">📁</span>
-                    <span className="font-bold text-cyan-400 tracking-wider">
-                      CASE PROTOCOL 101 // OPERATOR BRIEFING
-                    </span>
-                  </div>
-                  <span className="text-xs text-slate-500">STEP {tutorialStep + 1} OF 4</span>
-                </div>
-
-                <div className="space-y-3 mb-6 text-xs text-slate-200 leading-relaxed">
-                  {tutorialStep === 0 && (
-                    <div>
-                      <h4 className="font-bold text-white text-sm mb-1.5">1. WELCOME TO THE COLD FILE</h4>
-                      <p>You are an internal SecOps threat analyst. A serious corporate crime just occurred in the building during the specified incident window.</p>
-                      <p className="mt-2 text-cyan-300">This game is <strong>100% turn-based</strong> with zero real-time timers. Nothing happens until you take an action.</p>
-                    </div>
-                  )}
-
-                  {tutorialStep === 1 && (
-                    <div>
-                      <h4 className="font-bold text-white text-sm mb-1.5">2. SUSPECTS & THE CONTRADICTION ENGINE</h4>
-                      <p>Inspect the 4 suspect dossiers on the left. Each suspect claims a specific alibi.</p>
-                      <p className="mt-2 text-amber-300">The actual culprit <strong>MUST have 2 subtle contradictions</strong> between their stated Alibi and the Evidence Streams (Keycards, Chats, Network Transfers).</p>
-                    </div>
-                  )}
-
-                  {tutorialStep === 2 && (
-                    <div>
-                      <h4 className="font-bold text-white text-sm mb-1.5">3. ACTION POINTS & TACTICAL GADGETS</h4>
-                      <p>You start with 8 AP compute bandwidth. Reviewing profiles is free, but deep-scanning logs or deploying gadgets costs 1 AP:</p>
-                      <ul className="mt-2 space-y-1 text-slate-300">
-                        <li>• <strong>Signal Tracker:</strong> Pinpoint suspect's actual room location.</li>
-                        <li>• <strong>Voice Modulator:</strong> Pressure suspects to catch verbal slips.</li>
-                        <li>• <strong>Packet Decryptor:</strong> Unscramble redacted hashes.</li>
-                      </ul>
-                    </div>
-                  )}
-
-                  {tutorialStep === 3 && (
-                    <div>
-                      <h4 className="font-bold text-white text-sm mb-1.5">4. THE BOSS KEY & ACCUSATION</h4>
-                      <p>If someone walks behind your desk, press <strong>[Escape]</strong> or click <strong>[SYS_MODE]</strong> to instantly swap to a realistic, boring Kubernetes Grafana dashboard!</p>
-                      <p className="mt-2 text-emerald-400">When you're ready, click <strong>LOCK IN ACCUSATION</strong> to convict the conspirator and earn Detective XP and Creds!</p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="flex justify-between items-center text-xs">
-                  <button
-                    onClick={() => setTutorialActive(false)}
-                    className="text-slate-500 hover:text-slate-300"
-                  >
-                    Skip Tutorial
-                  </button>
-
-                  <div className="flex gap-2">
-                    {tutorialStep > 0 && (
-                      <button
-                        onClick={() => setTutorialStep(prev => prev - 1)}
-                        className="px-3 py-1.5 bg-slate-800 text-slate-300 rounded font-bold"
-                      >
-                        Back
-                      </button>
-                    )}
-                    {tutorialStep < 3 ? (
-                      <button
-                        onClick={() => setTutorialStep(prev => prev + 1)}
-                        className="px-4 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-slate-950 rounded font-bold"
-                      >
-                        Next Step ➔
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => setTutorialActive(false)}
-                        className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-bold"
-                      >
-                        Begin Investigation! ➔
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* FOOTER BAR */}
-          <footer className="bg-slate-950/90 border-t border-slate-800/80 px-5 py-2 flex items-center justify-between text-[11px] font-mono text-slate-500">
-            <div>
-              <span>KRONOS LOG INVESTIGATION PLATFORM // SEC-OPS CONSOLE</span>
-              <span className="mx-2">•</span>
-              <span>PRESS [ESC] FOR STEALTH BOSS MODE</span>
-            </div>
-            <div>
-              <span>ALL EVIDENCE IS AUTO-SAVED IN LOCALSTORAGE</span>
-            </div>
+          {/* FOOTER */}
+          <footer className="bg-[#161B22] border-t border-[#30363D] px-4 py-2 flex items-center justify-between text-[11px] text-slate-400">
+            <span>THE COLD FILE // 2D PIXEL EDITION</span>
+            <span>PRESS [ESC] FOR STEALTH BOSS MODE</span>
           </footer>
         </div>
       );
     }
 
-    // Render the React application
     ReactDOM.createRoot(document.getElementById('root')).render(<App />);
   </script>
 </body>
