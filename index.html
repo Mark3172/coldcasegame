@@ -14,14 +14,15 @@
       theme: {
         extend: {
           colors: {
-            pixelDark: '#0D1117',
-            pixelSurface: '#161B22',
-            pixelBorder: '#30363D',
-            pixelGreen: '#2EA043',
-            pixelCyan: '#58A6FF',
-            pixelAmber: '#D29922',
-            pixelRose: '#F85149',
-            pixelGold: '#E3B341'
+            pixelDark: '#070B10',
+            pixelSurface: '#0F1621',
+            pixelBorder: '#233044',
+            pixelCyan: '#38BDF8',
+            pixelEmerald: '#10B981',
+            pixelAmber: '#F59E0B',
+            pixelRose: '#F43F5E',
+            pixelGold: '#FBBF24',
+            pixelPurple: '#818CF8'
           },
           fontFamily: {
             pixel: ['"Courier New"', 'Courier', 'monospace'],
@@ -35,7 +36,7 @@
   <!-- Google Fonts for retro pixel feel -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
   <!-- React 18 & ReactDOM -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -45,8 +46,8 @@
 
   <style>
     body {
-      background-color: #090D13;
-      color: #E6EDF3;
+      background-color: #070B10;
+      color: #E2E8F0;
       font-family: 'JetBrains Mono', monospace;
       overflow-x: hidden;
       user-select: none;
@@ -69,10 +70,20 @@
     .scanlines {
       background: linear-gradient(
         rgba(18, 16, 16, 0) 50%, 
-        rgba(0, 0, 0, 0.2) 50%
+        rgba(0, 0, 0, 0.25) 50%
       );
       background-size: 100% 4px;
       pointer-events: none;
+    }
+
+    /* Cyberpunk Glowing Borders */
+    .cyber-card {
+      background: rgba(15, 22, 33, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(56, 189, 248, 0.03);
+    }
+    .cyber-card:hover {
+      border-color: rgba(56, 189, 248, 0.5);
     }
 
     /* Custom scrollbars */
@@ -81,14 +92,14 @@
       height: 6px;
     }
     ::-webkit-scrollbar-track {
-      background: #0D1117;
+      background: #070B10;
     }
     ::-webkit-scrollbar-thumb {
-      background: #30363D;
+      background: #233044;
       border-radius: 2px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: #58A6FF;
+      background: #38BDF8;
     }
 
     /* Screen Shake */
@@ -108,27 +119,32 @@
     .shake-effect {
       animation: screenShake 0.4s ease-in-out;
     }
+
+    /* Detective Lens Overlay */
+    .lens-active {
+      filter: contrast(115%) saturate(85%) hue-rotate(185deg);
+    }
   </style>
 
-  <!-- Global Diagnostic Fallback (Prevents any black screen) -->
+  <!-- Global Diagnostic Fallback -->
   <script>
     window.onerror = function(msg, url, line) {
-      console.error("Global captured error:", msg, "at line:", line);
+      console.error("Diagnostic error:", msg, "line:", line);
       var root = document.getElementById('root');
       if (root && root.children.length === 0) {
-        root.innerHTML = '<div style="padding:40px;background:#090D13;color:#F85149;font-family:monospace;text-align:center;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;">' +
-          '<h2 style="font-size:22px;margin-bottom:12px;">⚠️ LOADING DIAGNOSTIC DETECTED</h2>' +
-          '<p style="color:#E6EDF3;max-width:550px;margin-bottom:24px;font-size:13px;">Error: ' + msg + '</p>' +
-          '<button onclick="localStorage.clear();location.reload();" style="padding:12px 24px;background:#238636;color:#FFF;border:none;border-radius:6px;font-weight:bold;cursor:pointer;font-size:14px;">🔄 RESET DATA & RELOAD</button>' +
+        root.innerHTML = '<div style="padding:40px;background:#070B10;color:#F43F5E;font-family:monospace;text-align:center;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;">' +
+          '<h2 style="font-size:22px;margin-bottom:12px;">⚠️ INVESTIGATION SYSTEM RECOVERY</h2>' +
+          '<p style="color:#E2E8F0;max-width:550px;margin-bottom:24px;font-size:13px;">Error: ' + msg + '</p>' +
+          '<button onclick="localStorage.clear();location.reload();" style="padding:12px 24px;background:#10B981;color:#FFF;border:none;border-radius:6px;font-weight:bold;cursor:pointer;font-size:14px;">🔄 RESET DATA & RELOAD</button>' +
           '</div>';
       }
     };
   </script>
 </head>
-<body class="bg-[#090D13] text-slate-200 antialiased min-h-screen">
+<body class="bg-[#070B10] text-slate-200 antialiased min-h-screen">
   <div id="root"></div>
 
-  <!-- MAIN SCRIPT (REACT + SMOOTH 2D PIXEL ENGINE) -->
+  <!-- MAIN SCRIPT (REACT + CYBER-NOIR ATMOSPHERE ENGINE) -->
   <script type="text/babel">
     const { useState, useEffect, useRef, useMemo, Component } = React;
 
@@ -144,8 +160,8 @@
       render() {
         if (this.state.hasError) {
           return (
-            <div className="min-h-screen bg-[#090D13] text-rose-400 font-mono flex flex-col items-center justify-center p-6 text-center">
-              <h2 className="text-xl font-bold mb-3">⚠️ INVESTIGATION CACHE CONFLICT</h2>
+            <div className="min-h-screen bg-[#070B10] text-rose-400 font-mono flex flex-col items-center justify-center p-6 text-center">
+              <h2 className="text-xl font-bold mb-3">⚠️ CACHE CONFLICT DETECTED</h2>
               <p className="text-slate-300 text-xs max-w-md mb-6">
                 Click below to clear obsolete browser cache and reload smoothly:
               </p>
@@ -163,12 +179,14 @@
     }
 
     // ==========================================
-    // 1. SOUND SYNTHESIZER WITH PITCH VARIATION
+    // 1. SOUND & AMBIENT LO-FI SYNTH BGM ENGINE
     // ==========================================
     class SoundEngine {
       constructor() {
         this.ctx = null;
         this.muted = false;
+        this.bgmEnabled = false;
+        this.bgmNodes = [];
         this.lastStepTime = 0;
       }
 
@@ -202,15 +220,32 @@
 
       step() {
         const now = Date.now();
-        if (now - this.lastStepTime < 180) return; // rate limit footsteps
+        if (now - this.lastStepTime < 180) return;
         this.lastStepTime = now;
-        // Organic pitch variation between 165Hz and 205Hz
         const p = 165 + Math.random() * 40;
         this.playTone(p, 'triangle', 0.035, 0.02);
       }
 
       interact() { this.playTone(920, 'square', 0.06, 0.03); }
       click() { this.playTone(1800, 'triangle', 0.03, 0.03); }
+      lensToggle() {
+        this.init();
+        if (!this.ctx || this.muted) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(300, this.ctx.currentTime + 0.2);
+          gain.gain.setValueAtTime(0.04, this.ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.2);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.21);
+        } catch (e) {}
+      }
+
       scan() {
         if (this.muted) return;
         this.init();
@@ -229,6 +264,7 @@
           osc.stop(this.ctx.currentTime + 0.29);
         } catch (e) {}
       }
+
       alert() {
         if (this.muted) return;
         this.init();
@@ -249,6 +285,7 @@
           });
         } catch (e) {}
       }
+
       success() {
         if (this.muted) return;
         this.init();
@@ -269,6 +306,7 @@
           });
         } catch (e) {}
       }
+
       failure() {
         if (this.muted) return;
         this.init();
@@ -289,7 +327,70 @@
           });
         } catch (e) {}
       }
+
       voiceBeep(pitch = 500) { this.playTone(pitch, 'sawtooth', 0.04, 0.025); }
+
+      // Cyber-Noir Generative Lo-Fi Ambient Chord Engine
+      startBGM() {
+        if (this.bgmEnabled) return;
+        this.init();
+        if (!this.ctx) return;
+        this.bgmEnabled = true;
+
+        const chordProg = [
+          [130.81, 164.81, 196.00], // C minor
+          [110.00, 130.81, 164.81], // A minor
+          [146.83, 174.61, 220.00], // D minor
+          [98.00, 123.47, 146.83]   // G
+        ];
+        let chordIdx = 0;
+
+        const playNextChord = () => {
+          if (!this.bgmEnabled || !this.ctx) return;
+          const freqs = chordProg[chordIdx % chordProg.length];
+          chordIdx++;
+
+          const now = this.ctx.currentTime;
+          const duration = 6.0;
+
+          freqs.forEach((freq, i) => {
+            try {
+              const osc = this.ctx.createOscillator();
+              const gain = this.ctx.createGain();
+              const filter = this.ctx.createBiquadFilter();
+
+              osc.type = 'sawtooth';
+              osc.frequency.setValueAtTime(freq, now);
+
+              // Lowpass warm vinyl filter
+              filter.type = 'lowpass';
+              filter.frequency.setValueAtTime(450, now);
+              filter.frequency.exponentialRampToValueAtTime(700, now + duration / 2);
+              filter.frequency.exponentialRampToValueAtTime(400, now + duration);
+
+              gain.gain.setValueAtTime(0.0001, now);
+              gain.gain.linearRampToValueAtTime(0.012, now + 1.2);
+              gain.gain.linearRampToValueAtTime(0.0001, now + duration - 0.2);
+
+              osc.connect(filter);
+              filter.connect(gain);
+              gain.connect(this.ctx.destination);
+
+              osc.start(now);
+              osc.stop(now + duration);
+            } catch (e) {}
+          });
+
+          this.bgmTimer = setTimeout(playNextChord, (duration - 0.8) * 1000);
+        };
+
+        playNextChord();
+      }
+
+      stopBGM() {
+        this.bgmEnabled = false;
+        if (this.bgmTimer) clearTimeout(this.bgmTimer);
+      }
     }
 
     const audio = new SoundEngine();
@@ -537,9 +638,75 @@
     }
 
     // ==========================================
-    // 3. FLUID 4-PHASE CHIBI SPRITE RENDERER
-    // (Matches Reference Image 1)
+    // 3. HIGH-RES CHIBI PORTRAIT RENDERER
+    // (Large Dialogue Bust matching Reference 1)
     // ==========================================
+    function drawChibiDialoguePortrait(ctx, theme) {
+      if (!ctx) return;
+      const t = theme || SPRITE_THEMES[0];
+      ctx.clearRect(0, 0, 80, 100);
+
+      const p = (px, py, w, h, color) => {
+        ctx.fillStyle = color || "#FFF";
+        ctx.fillRect(px, py, w, h);
+      };
+
+      // 1. Shoulders & Vest
+      p(16, 68, 48, 32, t.shirt);
+      p(22, 70, 36, 30, t.vest);
+      p(22, 85, 36, 15, t.vestShadow);
+      // Gold Buttons
+      p(38, 76, 4, 3, t.cuffGold);
+      p(38, 86, 4, 3, t.cuffGold);
+      // Sleeves & Cuffs
+      p(8, 72, 10, 28, t.shirt);
+      p(62, 72, 10, 28, t.shirt);
+      p(10, 92, 8, 4, t.cuffGold);
+      p(62, 92, 8, 4, t.cuffGold);
+
+      // 2. Neck & Face
+      p(34, 58, 12, 12, t.skinShadow);
+      p(20, 30, 40, 32, t.skin);
+      p(16, 36, 4, 16, t.skin); // Ears
+      p(60, 36, 4, 16, t.skin);
+
+      // Expressive Eyes (Large pixel eyes with specular shine!)
+      p(26, 38, 8, 10, t.eye);
+      p(26, 38, 4, 4, "#FFFFFF"); // Big highlight
+      p(30, 44, 2, 2, "#FFFFFF");
+
+      p(46, 38, 8, 10, t.eye);
+      p(46, 38, 4, 4, "#FFFFFF");
+      p(50, 44, 2, 2, "#FFFFFF");
+
+      // Soft Blush
+      p(24, 48, 6, 3, "#F472B6");
+      p(50, 48, 6, 3, "#F472B6");
+
+      // 3. Voluminous Fluffy Anime Hair (From Reference 1!)
+      p(12, 12, 56, 24, t.hair);
+      p(8, 20, 8, 28, t.hair);
+      p(64, 20, 8, 28, t.hair);
+
+      // Angled side tufts (Signature chibi shape)
+      p(4, 26, 8, 14, t.hair);
+      p(2, 36, 6, 12, t.hairShadow);
+      p(68, 26, 8, 14, t.hair);
+      p(72, 36, 6, 12, t.hairShadow);
+
+      // Bangs
+      p(18, 18, 44, 14, t.hair);
+      p(22, 28, 10, 10, t.hair);
+      p(36, 28, 8, 8, t.hair);
+      p(48, 28, 10, 10, t.hair);
+
+      // Highlights
+      p(26, 14, 28, 4, "#FFFFFF");
+      p(14, 30, 4, 8, t.hairShadow);
+      p(62, 30, 4, 8, t.hairShadow);
+    }
+
+    // In-game 24x32 Sprite Renderer
     function drawPixelChibiCharacter(ctx, x, y, theme, facing = 'down', walkCycle = 0, isWalking = false) {
       if (!ctx) return;
       const t = theme || SPRITE_THEMES[0] || DETECTIVE_THEME;
@@ -549,13 +716,12 @@
       ctx.save();
       ctx.translate(drawX, drawY);
 
-      // Smooth sine bobbing and leg stride cycle (4 phases: 0, 1, 2, 3)
       const phase = Math.floor(walkCycle) % 4;
       const bobY = isWalking ? (phase % 2 === 0 ? -1.5 : 0) : Math.sin(Date.now() / 360) * 0.8;
       const legStride = isWalking ? (phase === 0 ? 3 : phase === 2 ? -3 : 0) : 0;
       const armStride = isWalking ? (phase === 0 ? -2 : phase === 2 ? 2 : 0) : 0;
 
-      // Drop shadow with smooth breathing width
+      // Drop shadow
       ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
       ctx.beginPath();
       ctx.ellipse(12, 29, isWalking ? 8 : 9, 3.5, 0, 0, Math.PI * 2);
@@ -566,7 +732,7 @@
         ctx.fillRect(px, py + bobY, w, h);
       };
 
-      // 1. BOOTS & LEGS (Fold-over cuffs with gold buttons)
+      // 1. BOOTS & LEGS
       p(6 - legStride, 20, 4, 7, t.pants);
       p(5 - legStride, 22, 5, 6, t.boots);
       p(5 - legStride, 21, 5, 2, t.bootCuffs);
@@ -577,7 +743,7 @@
       p(14 + legStride, 21, 5, 2, t.bootCuffs);
       p(15 + legStride, 24, 1, 2, t.cuffGold);
 
-      // 2. TORSO, WAISTCOAT & PUFFY SLEEVES
+      // 2. TORSO & VEST
       p(7, 13, 10, 8, t.shirt);
       p(8, 14, 8, 7, t.vest);
       p(8, 17, 8, 4, t.vestShadow);
@@ -585,12 +751,11 @@
       p(11, 17, 2, 1, t.cuffGold);
       p(11, 19, 2, 1, t.cuffGold);
 
-      // Left Arm with stride
+      // Arms
       p(4, 14 + armStride, 3, 5, t.shirt);
       p(4, 18 + armStride, 3, 3, t.gloves);
       p(4, 17 + armStride, 3, 1, t.cuffGold);
 
-      // Right Arm with opposite stride
       p(17, 14 - armStride, 3, 5, t.shirt);
       p(17, 18 - armStride, 3, 3, t.gloves);
       p(17, 17 - armStride, 3, 1, t.cuffGold);
@@ -613,7 +778,7 @@
         p(16 + eyeOffset, 10, 1, 1, "#F472B6");
       }
 
-      // 4. BIG FLUFFY ANIME HAIR (Layered locks from reference 1)
+      // 4. BIG FLUFFY ANIME HAIR
       p(4, 3, 16, 5, t.hair);
       p(3, 5, 2, 5, t.hair);
       p(19, 5, 2, 5, t.hair);
@@ -636,7 +801,7 @@
     }
 
     // ==========================================
-    // 4. 2D TILEMAP & WORLD ENGINE
+    // 4. 2D TILEMAP & LIGHTING ENGINE
     // ==========================================
     const MAP_WIDTH = 30;
     const MAP_HEIGHT = 22;
@@ -649,7 +814,7 @@
       { id: "node_crime_tape", name: "Breached Vault Safe", tileX: 7, tileY: 4, type: "crime_scene", label: "[E] CRIME SCENE", icon: "🚨" }
     ];
 
-    function drawWorldTilemap(ctx, width, height, time) {
+    function drawWorldTilemap(ctx, width, height, time, lensActive) {
       if (!ctx) return;
       for (let y = 0; y < MAP_HEIGHT; y++) {
         for (let x = 0; x < MAP_WIDTH; x++) {
@@ -657,40 +822,46 @@
           const py = y * TILE_SIZE;
 
           if (x === 0 || y === 0 || x === MAP_WIDTH - 1 || y === MAP_HEIGHT - 1) {
-            ctx.fillStyle = "#161B22";
+            ctx.fillStyle = "#111722";
             ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
-            ctx.strokeStyle = "#30363D";
+            ctx.strokeStyle = "#1E293B";
             ctx.strokeRect(px, py, TILE_SIZE, TILE_SIZE);
             continue;
           }
 
           if (x < 13 && y < 10) {
-            ctx.fillStyle = (x + y) % 2 === 0 ? "#0D1117" : "#161B22";
+            // Server Vault
+            ctx.fillStyle = (x + y) % 2 === 0 ? "#070E1A" : "#0C1524";
             ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
-            if (x === 12 || y === 9) {
-              ctx.fillStyle = "#991B1B";
-              ctx.fillRect(px, py, TILE_SIZE, 3);
+            // Glowing cyan conduit floor tracks
+            if (x === 6 || y === 6) {
+              ctx.fillStyle = "rgba(56, 189, 248, 0.25)";
+              ctx.fillRect(px + 10, py, 4, TILE_SIZE);
             }
           } else if (x > 17 && y < 10) {
-            ctx.fillStyle = (x + y) % 2 === 0 ? "#1C2430" : "#242E3D";
+            // Conference Room
+            ctx.fillStyle = (x + y) % 2 === 0 ? "#17202E" : "#1E293B";
             ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
           } else if (x < 13 && y > 12) {
-            ctx.fillStyle = (x + y) % 2 === 0 ? "#13233A" : "#1B2A4A";
+            // Cafeteria
+            ctx.fillStyle = (x + y) % 2 === 0 ? "#0F2137" : "#172A45";
             ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
           } else if (x > 17 && y > 12) {
-            ctx.fillStyle = (x + y) % 2 === 0 ? "#2B1724" : "#381E2F";
+            // Executive Lounge
+            ctx.fillStyle = (x + y) % 2 === 0 ? "#2D1524" : "#381C2E";
             ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
           } else {
-            ctx.fillStyle = "#111827";
+            // Central Hallway
+            ctx.fillStyle = "#0D131C";
             ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
-            ctx.strokeStyle = "#1F2937";
+            ctx.strokeStyle = "#16202E";
             ctx.strokeRect(px, py, TILE_SIZE, TILE_SIZE);
           }
         }
       }
 
       // Walls
-      ctx.fillStyle = "#30363D";
+      ctx.fillStyle = "#1E293B";
       ctx.fillRect(13 * TILE_SIZE, 1 * TILE_SIZE, 4, 8 * TILE_SIZE);
       ctx.fillRect(17 * TILE_SIZE, 1 * TILE_SIZE, 4, 8 * TILE_SIZE);
       ctx.fillRect(13 * TILE_SIZE, 13 * TILE_SIZE, 4, 8 * TILE_SIZE);
@@ -700,57 +871,110 @@
       ctx.fillRect(1 * TILE_SIZE, 13 * TILE_SIZE, 12 * TILE_SIZE, 4);
       ctx.fillRect(18 * TILE_SIZE, 13 * TILE_SIZE, 11 * TILE_SIZE, 4);
 
+      // Conference Skyline Window (Neon rain outside!)
+      ctx.fillStyle = "#040810";
+      ctx.fillRect(20 * TILE_SIZE, 1 * TILE_SIZE + 2, 7 * TILE_SIZE, 14);
+      // Neon rain streaks
+      ctx.fillStyle = "rgba(56, 189, 248, 0.6)";
+      for (let w = 0; w < 6; w++) {
+        const rx = 20 * TILE_SIZE + ((time / 20 + w * 28) % (7 * TILE_SIZE));
+        ctx.fillRect(rx, 1 * TILE_SIZE + 2 + ((time / 10 + w * 5) % 12), 1, 4);
+      }
+
       // Conference Table
       ctx.fillStyle = "#78350F";
       ctx.fillRect(20 * TILE_SIZE, 4 * TILE_SIZE, 7 * TILE_SIZE, 3 * TILE_SIZE);
       ctx.fillStyle = "#92400E";
       ctx.fillRect(20 * TILE_SIZE + 2, 4 * TILE_SIZE + 2, 7 * TILE_SIZE - 4, 3 * TILE_SIZE - 4);
-      ctx.fillStyle = "#94A3B8";
+      ctx.fillStyle = "#38BDF8";
       ctx.fillRect(21 * TILE_SIZE, 5 * TILE_SIZE, 12, 10);
       ctx.fillRect(24 * TILE_SIZE, 5 * TILE_SIZE, 12, 10);
 
-      // Animated Blinking Server Racks (Chaser LEDs)
+      // Server Racks with pulsating LEDs
       for (let r = 0; r < 4; r++) {
         const rx = (3 + r * 2.5) * TILE_SIZE;
         const ry = 3 * TILE_SIZE;
-        ctx.fillStyle = "#0F172A";
+        ctx.fillStyle = "#0A101D";
         ctx.fillRect(rx, ry, 36, 60);
-        ctx.strokeStyle = "#334155";
+        ctx.strokeStyle = "#1E293B";
         ctx.strokeRect(rx, ry, 36, 60);
+
         const blink1 = Math.floor(time / 160 + r) % 2 === 0;
-        const blink2 = Math.floor(time / 240 + r * 2) % 3 === 0;
-        ctx.fillStyle = blink1 ? "#22C55E" : "#15803D";
+        ctx.fillStyle = blink1 ? "#10B981" : "#065F46";
         ctx.fillRect(rx + 6, ry + 10, 4, 4);
-        ctx.fillStyle = blink2 ? "#EF4444" : "#991B1B";
+        ctx.fillStyle = "#F43F5E";
         ctx.fillRect(rx + 14, ry + 10, 4, 4);
         ctx.fillStyle = "#38BDF8";
         ctx.fillRect(rx + 22, ry + 10, 4, 4);
       }
 
-      // Animated Crime Tape (gentle wave)
+      // Crime Tape
       const wave = Math.sin(time / 400) * 1.5;
-      ctx.fillStyle = "#EAB308";
+      ctx.fillStyle = "#FBBF24";
       ctx.fillRect(10 * TILE_SIZE, 9 * TILE_SIZE - 2 + wave, 3 * TILE_SIZE, 4);
 
-      // Animated Water Cooler Bubble
-      const bubbleY = 15 * TILE_SIZE + 18 - ((time / 30) % 14);
-      ctx.fillStyle = "rgba(56, 189, 248, 0.7)";
-      ctx.fillRect(2 * TILE_SIZE + 8, bubbleY, 3, 3);
-
       // Labels
-      ctx.font = "bold 9px 'Press Start 2P', monospace";
-      ctx.fillStyle = "#EF4444";
+      ctx.font = "bold 8px 'Press Start 2P', monospace";
+      ctx.fillStyle = "#F43F5E";
       ctx.fillText("RESTRICTED SERVER VAULT", 2 * TILE_SIZE, 2.2 * TILE_SIZE);
       ctx.fillStyle = "#38BDF8";
       ctx.fillText("CONFERENCE ROOM 4A", 19 * TILE_SIZE, 2.2 * TILE_SIZE);
       ctx.fillStyle = "#10B981";
       ctx.fillText("CAFETERIA & BREAKROOM", 2 * TILE_SIZE, 13.8 * TILE_SIZE);
-      ctx.fillStyle = "#F43F5E";
+      ctx.fillStyle = "#818CF8";
       ctx.fillText("EXECUTIVE LOUNGE", 19 * TILE_SIZE, 13.8 * TILE_SIZE);
     }
 
+    // Dynamic Lighting & Atmosphere Mask
+    function drawAtmosphericLighting(ctx, width, height, playerX, playerY, time, lensActive) {
+      ctx.save();
+
+      // If Detective Lens is active, cool blue cyber scanline mode
+      if (lensActive) {
+        ctx.fillStyle = "rgba(6, 182, 212, 0.12)";
+        ctx.fillRect(0, 0, width, height);
+
+        // Scanline grid
+        ctx.strokeStyle = "rgba(6, 182, 212, 0.15)";
+        ctx.lineWidth = 1;
+        for (let l = 0; l < height; l += 8) {
+          ctx.beginPath();
+          ctx.moveTo(0, l);
+          ctx.lineTo(width, l);
+          ctx.stroke();
+        }
+        ctx.restore();
+        return;
+      }
+
+      // Normal Neo-Noir Vignette + Flashlight Cone
+      const grad = ctx.createRadialGradient(
+        playerX + 12, playerY + 12, 20,
+        playerX + 12, playerY + 12, 160
+      );
+      grad.addColorStop(0, "rgba(7, 11, 16, 0.0)");
+      grad.addColorStop(0.5, "rgba(7, 11, 16, 0.25)");
+      grad.addColorStop(1, "rgba(7, 11, 16, 0.65)");
+
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, width, height);
+
+      // Red Emergency Alarm Pulse in Server Vault
+      const alarmPulse = (Math.sin(time / 280) + 1) * 0.12;
+      const vaultGrad = ctx.createRadialGradient(
+        7 * TILE_SIZE, 5 * TILE_SIZE, 10,
+        7 * TILE_SIZE, 5 * TILE_SIZE, 110
+      );
+      vaultGrad.addColorStop(0, `rgba(244, 63, 94, ${alarmPulse + 0.1})`);
+      vaultGrad.addColorStop(1, "rgba(244, 63, 94, 0.0)");
+      ctx.fillStyle = vaultGrad;
+      ctx.fillRect(1 * TILE_SIZE, 1 * TILE_SIZE, 12 * TILE_SIZE, 9 * TILE_SIZE);
+
+      ctx.restore();
+    }
+
     // ==========================================
-    // 5. MAIN REACT APP (SMOOTH MOVEMENT & KINEMATICS)
+    // 5. MAIN REACT APP (SMOOTH & COOL DESIGN)
     // ==========================================
     function App() {
       const [caseData, setCaseData] = useState(() => {
@@ -772,7 +996,13 @@
       const [activeTab, setActiveTab] = useState('badge');
       const [pinnedLogIds, setPinnedLogIds] = useState([]);
 
-      // BUTTERY SMOOTH KINEMATICS STATE (Using ref for 60fps physics)
+      // Detective Focus Lens Mode
+      const [lensActive, setLensActive] = useState(false);
+
+      // Audio BGM State
+      const [bgmActive, setBgmActive] = useState(false);
+
+      // Smooth Kinematics Ref
       const playerRef = useRef({
         x: 15 * TILE_SIZE,
         y: 10 * TILE_SIZE,
@@ -780,15 +1010,13 @@
         targetY: null,
         facing: 'down',
         walkCycle: 0,
-        isWalking: false,
-        lastStepSound: 0
+        isWalking: false
       });
 
-      // Dust particles array
+      // Atmospheric Particles Ref
       const dustParticlesRef = useRef([]);
-
-      // Click-to-move target cursor ripple
-      const targetCursorRef = useRef(null); // { x, y, spawnTime }
+      const fogParticlesRef = useRef([]);
+      const targetCursorRef = useRef(null);
 
       const [interactTarget, setInteractTarget] = useState(null);
       const [radarBeacon, setRadarBeacon] = useState(null);
@@ -807,6 +1035,7 @@
       const [toastMsg, setToastMsg] = useState(null);
 
       const canvasRef = useRef(null);
+      const portraitCanvasRef = useRef(null);
       const keysPressedRef = useRef(new Set());
 
       const showToast = (msg) => {
@@ -814,7 +1043,7 @@
         setTimeout(() => setToastMsg(null), 3500);
       };
 
-      // Auto-save with V2 key
+      // Auto-save
       useEffect(() => {
         if (!caseData) return;
         try {
@@ -824,11 +1053,39 @@
         } catch (e) {}
       }, [caseData, ap, maxAp, pinnedLogIds, career]);
 
-      // KEYBOARD INPUT LISTENER (CONTINUOUS SMOOTH TRACKING)
+      // Toggle Lens
+      const toggleDetectiveLens = () => {
+        audio.lensToggle();
+        setLensActive(prev => {
+          const next = !prev;
+          showToast(next ? "🔍 DETECTIVE LENS: UV Footprints & Clues Revealed" : "Normal Vision Restored");
+          return next;
+        });
+      };
+
+      // Toggle BGM
+      const toggleBGM = () => {
+        if (bgmActive) {
+          audio.stopBGM();
+          setBgmActive(false);
+          showToast("🎵 Cyber-Noir BGM Paused");
+        } else {
+          audio.startBGM();
+          setBgmActive(true);
+          showToast("🎵 Cyber-Noir Ambient BGM Playing");
+        }
+      };
+
+      // Keyboard Controls
       useEffect(() => {
         const handleKeyDown = (e) => {
           if (e.key === 'Escape') {
             setBossMode(prev => !prev);
+            return;
+          }
+          if (e.key === 'Tab') {
+            e.preventDefault();
+            toggleDetectiveLens();
             return;
           }
           if (activeSuspectModal || activeNodeModal || accusationModalOpen) return;
@@ -837,7 +1094,6 @@
           if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
             e.preventDefault();
             keysPressedRef.current.add(key);
-            // Keyboard immediately overrides click destination
             playerRef.current.targetX = null;
             playerRef.current.targetY = null;
             targetCursorRef.current = null;
@@ -887,15 +1143,21 @@
         return true;
       };
 
-      // ==========================================
-      // BUTTERY SMOOTH 60FPS PHYSICS & RENDER LOOP
-      // ==========================================
+      // Draw Dialogue Portrait when suspect modal opens
+      useEffect(() => {
+        if (activeSuspectModal && portraitCanvasRef.current) {
+          const ctx = portraitCanvasRef.current.getContext('2d');
+          drawChibiDialoguePortrait(ctx, activeSuspectModal.spriteTheme);
+        }
+      }, [activeSuspectModal]);
+
+      // 60FPS Physics & Atmospheric Render Loop
       useEffect(() => {
         let animId;
         let lastTime = performance.now();
 
         const gameLoop = (currentTime) => {
-          const dt = Math.min(0.06, (currentTime - lastTime) / 1000); // capped delta time
+          const dt = Math.min(0.06, (currentTime - lastTime) / 1000);
           lastTime = currentTime;
 
           try {
@@ -903,26 +1165,22 @@
             const p = playerRef.current;
             const keys = keysPressedRef.current;
 
-            // 1. UPDATE KINEMATICS & VELOCITY
-            let moveX = 0;
-            let moveY = 0;
-
+            // 1. KINEMATICS
+            let moveX = 0, moveY = 0;
             if (keys.has('w') || keys.has('arrowup')) { moveY -= 1; p.facing = 'up'; }
             if (keys.has('s') || keys.has('arrowdown')) { moveY += 1; p.facing = 'down'; }
             if (keys.has('a') || keys.has('arrowleft')) { moveX -= 1; p.facing = 'left'; }
             if (keys.has('d') || keys.has('arrowright')) { moveX += 1; p.facing = 'right'; }
 
-            const speed = 140; // Pixels per second (responsive fluid walk)
+            const speed = 140;
 
             if (moveX !== 0 || moveY !== 0) {
-              // Diagonal vector normalization
               const len = Math.hypot(moveX, moveY);
               p.x += (moveX / len) * speed * dt;
               p.y += (moveY / len) * speed * dt;
               p.isWalking = true;
-              p.walkCycle += dt * 8; // Smooth 8 steps/second cycle
+              p.walkCycle += dt * 8;
 
-              // Spawn footstep dust particles
               if (Math.random() < 0.25) {
                 dustParticlesRef.current.push({
                   x: p.x + 12 + (Math.random() * 4 - 2),
@@ -932,11 +1190,8 @@
                   life: 1.0
                 });
               }
-
-              // Play soft footstep tone
               audio.step();
             } else if (p.targetX !== null && p.targetY !== null) {
-              // Click-to-move smooth pathing
               const dx = p.targetX - p.x;
               const dy = p.targetY - p.y;
               const dist = Math.hypot(dx, dy);
@@ -968,11 +1223,10 @@
               p.isWalking = false;
             }
 
-            // Boundary collision
             p.x = Math.max(TILE_SIZE, Math.min((MAP_WIDTH - 2) * TILE_SIZE, p.x));
             p.y = Math.max(TILE_SIZE, Math.min((MAP_HEIGHT - 2) * TILE_SIZE, p.y));
 
-            // Update dust particles
+            // Particles update
             dustParticlesRef.current = dustParticlesRef.current.filter(part => {
               part.x += part.vx * dt;
               part.y += part.vy * dt;
@@ -980,7 +1234,25 @@
               return part.life > 0;
             });
 
-            // Proximity Detection for Interaction
+            // Nitrogen cold fog puff in vault
+            if (Math.random() < 0.08) {
+              fogParticlesRef.current.push({
+                x: 7 * TILE_SIZE + Math.random() * 20,
+                y: 5 * TILE_SIZE + Math.random() * 10,
+                vx: (Math.random() - 0.5) * 6,
+                vy: (Math.random() - 0.5) * 6,
+                size: 8 + Math.random() * 10,
+                life: 1.0
+              });
+            }
+            fogParticlesRef.current = fogParticlesRef.current.filter(f => {
+              f.x += f.vx * dt;
+              f.y += f.vy * dt;
+              f.life -= dt * 0.8;
+              return f.life > 0;
+            });
+
+            // Proximity
             if (caseData && caseData.suspects) {
               const playerTileX = p.x / TILE_SIZE;
               const playerTileY = p.y / TILE_SIZE;
@@ -1011,34 +1283,57 @@
               const ctx = canvas.getContext('2d');
               ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-              // Draw Tilemap
-              drawWorldTilemap(ctx, canvas.width, canvas.height, currentTime);
+              // Tilemap
+              drawWorldTilemap(ctx, canvas.width, canvas.height, currentTime, lensActive);
 
-              // Draw Target Cursor (Click-to-move golden ripple)
+              // Glowing UV Footprints (When Detective Lens is active!)
+              if (lensActive && caseData.culpritId) {
+                const culprit = caseData.suspects.find(s => s.isCulprit);
+                if (culprit) {
+                  ctx.fillStyle = "rgba(56, 189, 248, 0.45)";
+                  for (let fp = 0; fp < 7; fp++) {
+                    const fx = 7 * TILE_SIZE + (culprit.mapX * TILE_SIZE - 7 * TILE_SIZE) * (fp / 6);
+                    const fy = 5 * TILE_SIZE + (culprit.mapY * TILE_SIZE - 5 * TILE_SIZE) * (fp / 6);
+                    ctx.beginPath();
+                    ctx.arc(fx + 12, fy + 12, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                  }
+                }
+              }
+
+              // Click-to-move Ripple Cursor
               if (targetCursorRef.current) {
                 const tc = targetCursorRef.current;
                 const age = (currentTime - tc.spawnTime) / 1000;
                 const ringSize = (age * 16) % 18 + 4;
-                ctx.strokeStyle = "rgba(227, 179, 65, 0.8)";
+                ctx.strokeStyle = "rgba(251, 191, 36, 0.85)";
                 ctx.lineWidth = 1.5;
                 ctx.beginPath();
                 ctx.arc(tc.x + 12, tc.y + 12, ringSize, 0, Math.PI * 2);
                 ctx.stroke();
               }
 
-              // Draw Dust Particles under feet
+              // Nitrogen fog in vault
+              fogParticlesRef.current.forEach(f => {
+                ctx.fillStyle = `rgba(186, 230, 253, ${f.life * 0.25})`;
+                ctx.beginPath();
+                ctx.arc(f.x, f.y, f.size, 0, Math.PI * 2);
+                ctx.fill();
+              });
+
+              // Dust Particles
               dustParticlesRef.current.forEach(part => {
                 ctx.fillStyle = `rgba(203, 213, 225, ${part.life * 0.4})`;
                 ctx.fillRect(Math.floor(part.x), Math.floor(part.y), 3, 3);
               });
 
-              // Interactive Nodes with smooth pulsing rings
+              // Interactive Nodes
               INTERACTIVE_NODES.forEach(node => {
                 const nx = node.tileX * TILE_SIZE;
                 const ny = node.tileY * TILE_SIZE;
                 const pulse = Math.sin(currentTime / 300) * 3 + 12;
 
-                ctx.fillStyle = "rgba(88, 166, 255, 0.2)";
+                ctx.fillStyle = "rgba(56, 189, 248, 0.22)";
                 ctx.beginPath();
                 ctx.arc(nx + 12, ny + 12, pulse, 0, Math.PI * 2);
                 ctx.fill();
@@ -1047,7 +1342,7 @@
                 ctx.fillText(node.icon, nx + 4, ny + 16);
               });
 
-              // Draw Suspect NPCs (With subtle breathing and floating indicators)
+              // Suspect NPCs
               if (caseData.suspects) {
                 caseData.suspects.forEach((s, idx) => {
                   const sx = (s.mapX !== undefined ? s.mapX : 10) * TILE_SIZE;
@@ -1055,14 +1350,13 @@
                   const theme = s.spriteTheme || SPRITE_THEMES[idx % SPRITE_THEMES.length];
                   drawPixelChibiCharacter(ctx, sx, sy, theme, 'down', 0, false);
 
-                  // Name Tag
                   ctx.font = "bold 8px monospace";
                   ctx.fillStyle = "#FFFFFF";
                   ctx.fillText(s.name.split(" ")[0], sx - 2, sy - 4);
                 });
               }
 
-              // Draw Radar Beacon Ping if active
+              // Radar Beacon Ping
               if (radarBeacon) {
                 const rx = radarBeacon.x * TILE_SIZE + 12;
                 const ry = radarBeacon.y * TILE_SIZE + 12;
@@ -1073,12 +1367,12 @@
                 ctx.arc(rx, ry, pulse, 0, Math.PI * 2);
                 ctx.stroke();
 
-                ctx.fillStyle = "#EF4444";
+                ctx.fillStyle = "#F43F5E";
                 ctx.font = "bold 9px 'Press Start 2P', monospace";
                 ctx.fillText("BEACON DETECTED!", rx - 60, ry - 22);
               }
 
-              // Draw Player Detective (With fluid 4-phase walk cycle!)
+              // Detective Player
               drawPixelChibiCharacter(
                 ctx,
                 p.x,
@@ -1089,23 +1383,26 @@
                 p.isWalking
               );
 
-              // Floating Interactive Dialogue Indicator (Smooth springy bob)
+              // Floating Interactive Dialogue Indicator
               if (interactTarget) {
                 const ix = p.x + 12;
                 const bob = Math.sin(currentTime / 220) * 3;
                 const iy = p.y - 14 + bob;
 
-                ctx.fillStyle = "rgba(13, 17, 23, 0.9)";
-                ctx.strokeStyle = "#E3B341";
+                ctx.fillStyle = "rgba(7, 11, 16, 0.92)";
+                ctx.strokeStyle = "#FBBF24";
                 ctx.lineWidth = 1;
                 const text = interactTarget.label;
                 ctx.font = "bold 9px monospace";
                 const tw = ctx.measureText(text).width;
                 ctx.fillRect(ix - tw / 2 - 4, iy - 16, tw + 8, 15);
                 ctx.strokeRect(ix - tw / 2 - 4, iy - 16, tw + 8, 15);
-                ctx.fillStyle = "#58A6FF";
+                ctx.fillStyle = "#38BDF8";
                 ctx.fillText(text, ix - tw / 2, iy - 5);
               }
+
+              // Atmospheric Lighting Pass
+              drawAtmosphericLighting(ctx, canvas.width, canvas.height, p.x, p.y, currentTime, lensActive);
             }
           } catch (err) {
             console.error("Game loop caught:", err);
@@ -1116,9 +1413,8 @@
 
         animId = requestAnimationFrame(gameLoop);
         return () => cancelAnimationFrame(animId);
-      }, [caseData, radarBeacon]);
+      }, [caseData, radarBeacon, lensActive]);
 
-      // SMOOTH CLICK-TO-MOVE (Walks towards clicked target instead of snapping!)
       const handleCanvasClick = (e) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -1126,17 +1422,14 @@
         const clickX = ((e.clientX - rect.left) / rect.width) * (MAP_WIDTH * TILE_SIZE);
         const clickY = ((e.clientY - rect.top) / rect.height) * (MAP_HEIGHT * TILE_SIZE);
 
-        // Set target destination
         playerRef.current.targetX = clickX - 12;
         playerRef.current.targetY = clickY - 14;
 
-        // Spawn target cursor ripple
         targetCursorRef.current = {
           x: clickX - 12,
           y: clickY - 14,
           spawnTime: performance.now()
         };
-
         audio.click();
       };
 
@@ -1161,123 +1454,166 @@
           <div className="fixed inset-0 scanlines z-40 pointer-events-none opacity-25"></div>
 
           {toastMsg && (
-            <div className="fixed top-4 right-4 z-50 bg-[#161B22] border-2 border-cyan-400 text-cyan-300 px-4 py-2 rounded shadow-2xl text-xs">
-              {toastMsg}
+            <div className="fixed top-4 right-4 z-50 bg-[#0F1621] border-2 border-cyan-400 text-cyan-300 px-4 py-2 rounded shadow-2xl text-xs flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+              <span>{toastMsg}</span>
             </div>
           )}
 
-          {/* HEADER */}
-          <header className="bg-[#161B22] border-b-2 border-[#30363D] px-4 py-2 flex items-center justify-between text-xs sticky top-0 z-30">
+          {/* COOL RETRO HEADER */}
+          <header className="bg-[#0F1621] border-b border-[#233044] px-4 py-2.5 flex items-center justify-between text-xs sticky top-0 z-30 shadow-lg">
             <div className="flex items-center gap-3">
-              <span className="text-lg">🕵️</span>
-              <span className="font-bold text-white text-sm">THE COLD FILE // 2D DETECTIVE</span>
-              <span className="bg-[#0D1117] text-cyan-400 px-2 py-0.5 rounded border border-[#30363D]">
-                {caseData.caseId}
-              </span>
+              <span className="text-xl">🕵️</span>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-white text-sm tracking-wider">THE COLD FILE</span>
+                  <span className="text-[10px] bg-cyan-950/60 text-cyan-300 border border-cyan-800/60 px-1.5 py-0.2 rounded font-mono">
+                    2D NEO-NOIR
+                  </span>
+                </div>
+                <div className="text-[10px] text-slate-400 font-mono">
+                  CASE: <strong className="text-cyan-400">{caseData.caseId}</strong>
+                </div>
+              </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className="flex border border-[#30363D] rounded overflow-hidden">
+            <div className="flex items-center gap-2.5">
+              {/* Detective Lens Quick Action */}
+              <button
+                onClick={toggleDetectiveLens}
+                className={`px-3 py-1.5 rounded font-bold text-xs transition border flex items-center gap-1.5 ${
+                  lensActive 
+                    ? 'bg-cyan-500 text-black border-cyan-300 shadow-[0_0_12px_rgba(56,189,248,0.7)]' 
+                    : 'bg-[#070B10] text-cyan-400 border-[#233044] hover:border-cyan-500'
+                }`}
+                title="Toggle Detective Focus Lens [Tab]"
+              >
+                <span>🔍 LENS</span>
+                <span className="text-[9px] opacity-75">[TAB]</span>
+              </button>
+
+              {/* View Mode Toggle */}
+              <div className="flex border border-[#233044] rounded overflow-hidden">
                 <button
                   onClick={() => { setViewMode('map'); audio.click(); }}
-                  className={`px-3 py-1 font-bold text-xs transition ${viewMode === 'map' ? 'bg-cyan-600 text-white' : 'bg-[#0D1117] text-slate-400'}`}
+                  className={`px-3 py-1.5 font-bold text-xs transition ${viewMode === 'map' ? 'bg-cyan-600 text-white' : 'bg-[#070B10] text-slate-400'}`}
                 >
-                  🎮 2D MAP
+                  🎮 MAP
                 </button>
                 <button
                   onClick={() => { setViewMode('terminal'); audio.click(); }}
-                  className={`px-3 py-1 font-bold text-xs transition ${viewMode === 'terminal' ? 'bg-cyan-600 text-white' : 'bg-[#0D1117] text-slate-400'}`}
+                  className={`px-3 py-1.5 font-bold text-xs transition ${viewMode === 'terminal' ? 'bg-cyan-600 text-white' : 'bg-[#070B10] text-slate-400'}`}
                 >
                   🖥️ LOGS
                 </button>
               </div>
 
+              {/* Ambient Lo-Fi BGM Toggle */}
+              <button
+                onClick={toggleBGM}
+                className={`px-2.5 py-1.5 border rounded text-xs transition ${
+                  bgmActive 
+                    ? 'bg-emerald-950 text-emerald-400 border-emerald-600 font-bold' 
+                    : 'bg-[#070B10] text-slate-400 border-[#233044]'
+                }`}
+                title="Toggle Cyber-Noir Generative BGM"
+              >
+                {bgmActive ? '🎵 BGM: ON' : '🎵 BGM: OFF'}
+              </button>
+
+              {/* SFX Toggle */}
               <button
                 onClick={() => { const next = !soundMuted; setSoundMuted(next); audio.muted = next; }}
-                className="px-2 py-1 bg-[#0D1117] border border-[#30363D] rounded text-slate-300"
+                className="px-2 py-1.5 bg-[#070B10] border border-[#233044] rounded text-slate-300"
               >
                 {soundMuted ? '🔇' : '🔊'}
               </button>
 
-              <button
-                onClick={() => { localStorage.clear(); window.location.reload(); }}
-                className="px-2 py-1 bg-[#0D1117] hover:bg-rose-950 text-rose-400 border border-[#30363D] rounded text-[11px]"
-                title="Reset Game Cache"
-              >
-                RESET
-              </button>
-
+              {/* Boss Key */}
               <button
                 onClick={() => setBossMode(true)}
-                className="px-2.5 py-1 bg-slate-800 text-slate-200 rounded border border-slate-600 text-xs"
+                className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded border border-slate-600 text-xs"
               >
-                [SYS_MODE] (ESC)
+                [SYS] (ESC)
               </button>
             </div>
           </header>
 
-          {/* BRIEFING */}
-          <div className="bg-[#0D1117] border-b border-[#30363D] px-4 py-1.5 flex items-center justify-between text-xs">
-            <div className="truncate">
-              <strong className="text-rose-400">CRIME:</strong> <span className="text-white">{caseData.crime.title}</span>
+          {/* CASE BRIEFING TICKER */}
+          <div className="bg-[#070B10] border-b border-[#233044] px-4 py-1.5 flex items-center justify-between text-xs">
+            <div className="flex items-center gap-3 truncate">
+              <span className="text-rose-400 font-bold shrink-0">[INCIDENT]: {caseData.crime.title}</span>
+              <span className="text-slate-400 hidden md:inline truncate">{caseData.crime.summary}</span>
             </div>
-            <div className="text-amber-400 font-bold shrink-0">AP: {ap}/{maxAp}</div>
+            <div className="text-amber-400 font-bold shrink-0 flex items-center gap-2">
+              <span>WINDOW: {caseData.crime.criticalWindow}</span>
+              <span className="bg-[#0F1621] px-2 py-0.5 rounded border border-amber-500/40 text-amber-300">
+                AP: {ap}/{maxAp}
+              </span>
+            </div>
           </div>
 
-          {/* MAIN */}
+          {/* MAIN GAME VIEW */}
           <main className="flex-1 flex flex-col lg:flex-row p-3 gap-3 max-w-[1700px] w-full mx-auto">
             {viewMode === 'map' ? (
               <div className="flex-1 flex flex-col lg:flex-row gap-3">
-                <div className="flex-1 bg-[#0D1117] border-2 border-[#30363D] rounded-lg p-2 flex flex-col items-center justify-center relative shadow-2xl">
-                  <div className="w-full flex justify-between items-center text-xs text-slate-400 px-2 py-1 border-b border-[#30363D] mb-2 font-retro text-[9px]">
-                    <span className="text-cyan-400">SMOOTH MOVE: HOLD [WASD] or CLICK ANYWHERE TO WALK</span>
-                    <span className="text-amber-400">ACTION: [E] or [SPACE]</span>
+                {/* 2D Map Container */}
+                <div className="flex-1 cyber-card rounded-lg p-2.5 flex flex-col items-center justify-center relative shadow-2xl overflow-hidden">
+                  <div className="w-full flex justify-between items-center text-xs text-slate-400 px-2 py-1 border-b border-[#233044] mb-2 font-retro text-[9px]">
+                    <span className="text-cyan-400">MOVE: [WASD] or CLICK FLOOR</span>
+                    <span className="text-amber-400">LENS: [TAB] | TALK: [E]</span>
                   </div>
+
                   <canvas
                     ref={canvasRef}
                     width={MAP_WIDTH * TILE_SIZE}
                     height={MAP_HEIGHT * TILE_SIZE}
                     onClick={handleCanvasClick}
-                    className="border border-[#30363D] rounded bg-black cursor-pointer max-w-full h-auto"
+                    className="border border-[#233044] rounded bg-black cursor-pointer max-w-full h-auto shadow-inner"
                     style={{ maxHeight: '660px' }}
                   />
                 </div>
 
-                {/* Sidebar */}
+                {/* Right Tactical Sidebar */}
                 <div className="w-full lg:w-80 flex flex-col gap-3">
-                  <div className="bg-[#161B22] border-2 border-[#30363D] rounded-lg p-3">
+                  {/* AP Gauge & Progress */}
+                  <div className="cyber-card rounded-lg p-3">
                     <div className="flex justify-between items-center text-xs mb-2">
-                      <span className="font-bold text-cyan-400">ACTION POINTS</span>
-                      <span className="text-amber-400 font-bold">Streak: {career.streak}</span>
+                      <span className="font-bold text-cyan-400">COMPUTE AP</span>
+                      <span className="text-amber-400 font-bold">🔥 Streak: {career.streak}</span>
                     </div>
-                    <div className="grid grid-cols-8 gap-1">
+                    <div className="grid grid-cols-8 gap-1.5 mb-2">
                       {Array.from({ length: maxAp }).map((_, i) => (
-                        <div key={i} className={`h-3 rounded-sm border ${i < ap ? 'bg-cyan-400 border-cyan-200' : 'bg-black border-[#30363D] opacity-30'}`} />
+                        <div key={i} className={`h-3.5 rounded-sm border ${i < ap ? 'bg-cyan-400 border-cyan-200 shadow-[0_0_8px_rgba(56,189,248,0.8)]' : 'bg-black border-[#233044] opacity-25'}`} />
                       ))}
                     </div>
                   </div>
 
-                  <div className="bg-[#161B22] border-2 border-[#30363D] rounded-lg p-3 flex-1 flex flex-col">
-                    <span className="text-xs font-bold text-white mb-2 block">CAMPUS SUSPECTS</span>
+                  {/* Campus Suspects */}
+                  <div className="cyber-card rounded-lg p-3 flex-1 flex flex-col">
+                    <div className="flex justify-between items-center mb-2.5">
+                      <span className="text-xs font-bold text-white tracking-wider">CAMPUS SUSPECTS (4)</span>
+                      <span className="text-[10px] text-slate-400">CLICK TO TARGET</span>
+                    </div>
                     <div className="space-y-2 flex-1 overflow-y-auto max-h-[380px]">
                       {caseData.suspects.map(s => (
                         <div
                           key={s.id}
                           onClick={() => { setActiveSuspectModal(s); audio.click(); }}
-                          className="p-2 bg-[#0D1117] border border-[#30363D] hover:border-cyan-400 rounded cursor-pointer transition flex items-center justify-between"
+                          className="p-2.5 bg-[#070B10] border border-[#233044] hover:border-cyan-400 rounded cursor-pointer transition flex items-center justify-between group"
                         >
                           <div>
-                            <div className="font-bold text-white text-xs">{s.name}</div>
+                            <div className="font-bold text-white text-xs group-hover:text-cyan-300 transition">{s.name}</div>
                             <div className="text-[10px] text-slate-400">{s.statedRoom}</div>
                           </div>
-                          <span className="text-xs font-retro text-cyan-400">[INSPECT]</span>
+                          <span className="text-xs font-retro text-cyan-400 group-hover:scale-105 transition">[INSPECT]</span>
                         </div>
                       ))}
                     </div>
 
                     <button
                       onClick={() => setAccusationModalOpen(true)}
-                      className="mt-3 w-full py-2.5 bg-gradient-to-r from-rose-700 to-amber-700 hover:from-rose-600 hover:to-amber-600 text-white font-bold text-xs rounded border border-rose-400 shadow-lg tracking-wider"
+                      className="mt-3.5 w-full py-3 bg-gradient-to-r from-rose-700 via-red-600 to-amber-700 hover:from-rose-600 hover:to-amber-600 text-white font-bold text-xs rounded border border-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.4)] tracking-wider"
                     >
                       ⚖️ LOCK IN ACCUSATION
                     </button>
@@ -1285,22 +1621,23 @@
                 </div>
               </div>
             ) : (
-              <div className="flex-1 bg-[#161B22] border-2 border-[#30363D] rounded-lg p-4 flex flex-col shadow-2xl">
-                <div className="flex items-center gap-2 pb-3 border-b border-[#30363D] mb-3 text-xs font-bold">
-                  <button onClick={() => setActiveTab('badge')} className={`px-3 py-1.5 rounded ${activeTab === 'badge' ? 'bg-cyan-600 text-white' : 'bg-[#0D1117] text-slate-400'}`}>
+              /* LOG TERMINAL VIEW */
+              <div className="flex-1 cyber-card rounded-lg p-4 flex flex-col shadow-2xl">
+                <div className="flex items-center gap-2 pb-3 border-b border-[#233044] mb-3 text-xs font-bold">
+                  <button onClick={() => setActiveTab('badge')} className={`px-3 py-1.5 rounded ${activeTab === 'badge' ? 'bg-cyan-600 text-white' : 'bg-[#070B10] text-slate-400'}`}>
                     💳 KEYCARDS ({caseData.evidence.badgeLogs.length})
                   </button>
-                  <button onClick={() => setActiveTab('chat')} className={`px-3 py-1.5 rounded ${activeTab === 'chat' ? 'bg-amber-600 text-white' : 'bg-[#0D1117] text-slate-400'}`}>
+                  <button onClick={() => setActiveTab('chat')} className={`px-3 py-1.5 rounded ${activeTab === 'chat' ? 'bg-amber-600 text-white' : 'bg-[#070B10] text-slate-400'}`}>
                     💬 CHATS ({caseData.evidence.chatLogs.length})
                   </button>
-                  <button onClick={() => setActiveTab('network')} className={`px-3 py-1.5 rounded ${activeTab === 'network' ? 'bg-emerald-600 text-white' : 'bg-[#0D1117] text-slate-400'}`}>
+                  <button onClick={() => setActiveTab('network')} className={`px-3 py-1.5 rounded ${activeTab === 'network' ? 'bg-emerald-600 text-white' : 'bg-[#070B10] text-slate-400'}`}>
                     🌐 NETWORK ({caseData.evidence.networkLogs.length})
                   </button>
                 </div>
 
                 <div className="flex-1 overflow-y-auto space-y-2 text-xs">
                   {caseData.evidence[`${activeTab}Logs`].map(item => (
-                    <div key={item.id} className="p-3 bg-[#0D1117] border border-[#30363D] rounded">
+                    <div key={item.id} className="p-3 bg-[#070B10] border border-[#233044] rounded">
                       <div className="flex justify-between items-center mb-1">
                         <span className="text-cyan-400 font-bold">[{item.timestamp}] {item.holderName || item.sender || item.source}</span>
                         <span className="text-slate-400">{item.location || item.channel || item.protocol}</span>
@@ -1316,19 +1653,38 @@
             )}
           </main>
 
-          {/* SUSPECT MODAL */}
+          {/* COOL DIALOGUE & INTERROGATION BUST MODAL */}
           {activeSuspectModal && (
-            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-              <div className="bg-[#161B22] border-2 border-cyan-400 rounded-lg max-w-lg w-full p-5 shadow-2xl">
-                <div className="flex justify-between items-center pb-2 border-b border-[#30363D] mb-3">
-                  <span className="font-bold text-white text-sm">{activeSuspectModal.name}</span>
-                  <button onClick={() => setActiveSuspectModal(null)} className="text-slate-400 hover:text-white">[CLOSE]</button>
+            <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
+              <div className="cyber-card border-2 border-cyan-400 rounded-lg max-w-xl w-full p-5 shadow-2xl">
+                <div className="flex justify-between items-center pb-2.5 border-b border-[#233044] mb-4">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-white text-base">{activeSuspectModal.name}</span>
+                    <span className="text-xs text-slate-400">({activeSuspectModal.badgeId})</span>
+                  </div>
+                  <button onClick={() => setActiveSuspectModal(null)} className="text-slate-400 hover:text-white text-xs">[CLOSE]</button>
                 </div>
-                <div className="bg-[#0D1117] p-3 rounded border border-[#30363D] text-xs mb-4">
-                  <span className="text-amber-400 block font-bold mb-1">STATED ALIBI:</span>
-                  <p className="text-slate-200">{activeSuspectModal.statedAlibi}</p>
+
+                {/* Chibi Anime Portrait & Bio Card */}
+                <div className="flex gap-4 mb-4">
+                  <div className="w-20 h-24 bg-black border-2 border-cyan-500 rounded flex items-center justify-center shrink-0 shadow-lg">
+                    <canvas ref={portraitCanvasRef} width={80} height={100} className="w-full h-full" />
+                  </div>
+
+                  <div className="flex-1 space-y-2 text-xs">
+                    <div className="bg-[#070B10] p-2.5 rounded border border-[#233044]">
+                      <span className="text-slate-400 block text-[10px]">ROLE & DEPT:</span>
+                      <span className="text-cyan-400 font-bold">{activeSuspectModal.role} ({activeSuspectModal.dept})</span>
+                    </div>
+
+                    <div className="bg-[#070B10] p-2.5 rounded border border-[#233044]">
+                      <span className="text-amber-400 block text-[10px] font-bold">STATED ALIBI:</span>
+                      <p className="text-slate-200 mt-0.5 text-[11px] leading-relaxed">{activeSuspectModal.statedAlibi}</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="grid grid-cols-2 gap-2 text-xs">
+
+                <div className="grid grid-cols-2 gap-3 text-xs">
                   <button
                     onClick={() => {
                       if (!spendAP(1)) return;
@@ -1339,7 +1695,7 @@
                       setRadarBeacon(target);
                       showToast(isMatch ? `✓ SIGNAL: Confirmed in ${activeSuspectModal.statedRoom}` : `🚨 CONTRADICTION: Signal detected in ${RESTRICTED_ROOM.name}!`);
                     }}
-                    className="p-2.5 bg-cyan-950 hover:bg-cyan-900 border border-cyan-500 text-cyan-300 rounded font-bold"
+                    className="p-3 bg-cyan-950/70 hover:bg-cyan-900 border border-cyan-500 text-cyan-300 rounded font-bold shadow-lg"
                   >
                     📡 SIGNAL TRACKER (1 AP)
                   </button>
@@ -1350,7 +1706,7 @@
                       showToast(`🎙️ "${resp}"`);
                       audio.voiceBeep(450);
                     }}
-                    className="p-2.5 bg-amber-950 hover:bg-amber-900 border border-amber-500 text-amber-300 rounded font-bold"
+                    className="p-3 bg-amber-950/70 hover:bg-amber-900 border border-amber-500 text-amber-300 rounded font-bold shadow-lg"
                   >
                     🎙️ INTERROGATE (1 AP)
                   </button>
@@ -1359,16 +1715,16 @@
             </div>
           )}
 
-          {/* ACCUSATION MODAL */}
+          {/* ACCUSATION SHOWDOWN MODAL */}
           {accusationModalOpen && (
             <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
-              <div className="bg-[#161B22] border-2 border-rose-500 rounded-lg max-w-lg w-full p-6 shadow-2xl">
+              <div className="cyber-card border-2 border-rose-500 rounded-lg max-w-lg w-full p-6 shadow-2xl">
                 {verdictData ? (
                   <div>
                     <h2 className="text-lg font-bold text-center mb-2 text-white">
                       {verdictData.isSuccess ? '🏆 GUILTY VERDICT CONFIRMED!' : '❌ WRONGFUL ACCUSATION!'}
                     </h2>
-                    <p className="text-xs text-slate-300 mb-4 bg-[#0D1117] p-3 rounded border border-[#30363D]">
+                    <p className="text-xs text-slate-300 mb-4 bg-[#070B10] p-3 rounded border border-[#233044]">
                       {verdictData.summary}
                     </p>
                     <button
@@ -1384,7 +1740,7 @@
                     <select
                       value={selectedAccusedSuspectId}
                       onChange={(e) => setSelectedAccusedSuspectId(e.target.value)}
-                      className="w-full bg-[#0D1117] border border-[#30363D] rounded p-2 text-white text-xs mb-4"
+                      className="w-full bg-[#070B10] border border-[#233044] rounded p-2 text-white text-xs mb-4"
                     >
                       <option value="">-- Choose suspect to indict --</option>
                       {caseData.suspects.map(s => (
@@ -1393,7 +1749,7 @@
                     </select>
 
                     <div className="flex justify-end gap-2 text-xs">
-                      <button onClick={() => setAccusationModalOpen(false)} className="px-3 py-1.5 bg-[#0D1117] text-slate-300 rounded">
+                      <button onClick={() => setAccusationModalOpen(false)} className="px-3 py-1.5 bg-[#070B10] text-slate-300 rounded">
                         CANCEL
                       </button>
                       <button
@@ -1421,9 +1777,9 @@
             </div>
           )}
 
-          <footer className="bg-[#161B22] border-t border-[#30363D] px-4 py-2 flex items-center justify-between text-[11px] text-slate-400">
-            <span>THE COLD FILE // 2D PIXEL EDITION</span>
-            <span>PRESS [ESC] FOR STEALTH BOSS MODE</span>
+          <footer className="bg-[#0F1621] border-t border-[#233044] px-4 py-2 flex items-center justify-between text-[11px] text-slate-400">
+            <span>THE COLD FILE // CYBER-NOIR PIXEL EDITION</span>
+            <span>PRESS [TAB] FOR DETECTIVE LENS • [ESC] FOR STEALTH BOSS MODE</span>
           </footer>
         </div>
       );
