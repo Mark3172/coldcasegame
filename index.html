@@ -108,23 +108,62 @@
     .shake-effect {
       animation: screenShake 0.4s ease-in-out;
     }
-
-    /* Alert Pulse */
-    @keyframes alertGlow {
-      0%, 100% { box-shadow: 0 0 10px rgba(248, 81, 73, 0.4); border-color: rgba(248, 81, 73, 0.8); }
-      50% { box-shadow: 0 0 24px rgba(248, 81, 73, 0.8); border-color: rgba(248, 81, 73, 1); }
-    }
-    .alert-glow {
-      animation: alertGlow 1.2s infinite ease-in-out;
-    }
   </style>
+
+  <!-- Global Diagnostic Fallback (Prevents any black screen) -->
+  <script>
+    window.onerror = function(msg, url, line) {
+      console.error("Global captured error:", msg, "at line:", line);
+      var root = document.getElementById('root');
+      if (root && root.children.length === 0) {
+        root.innerHTML = '<div style="padding:40px;background:#090D13;color:#F85149;font-family:monospace;text-align:center;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;">' +
+          '<h2 style="font-size:22px;margin-bottom:12px;">⚠️ LOADING DIAGNOSTIC DETECTED</h2>' +
+          '<p style="color:#E6EDF3;max-width:550px;margin-bottom:24px;font-size:13px;">Obsolete save data or script conflict detected.<br>Error: ' + msg + '</p>' +
+          '<button onclick="localStorage.clear();location.reload();" style="padding:12px 24px;background:#238636;color:#FFF;border:none;border-radius:6px;font-weight:bold;cursor:pointer;font-size:14px;">🔄 RESET DATA & RELOAD GAME</button>' +
+          '</div>';
+      }
+    };
+  </script>
 </head>
 <body class="bg-[#090D13] text-slate-200 antialiased min-h-screen">
   <div id="root"></div>
 
   <!-- MAIN SCRIPT (REACT + 2D PIXEL ENGINE) -->
   <script type="text/babel">
-    const { useState, useEffect, useRef, useMemo } = React;
+    const { useState, useEffect, useRef, useMemo, Component } = React;
+
+    // React Error Boundary Component
+    class ErrorBoundary extends Component {
+      constructor(props) {
+        super(props);
+        this.state = { hasError: false, error: null };
+      }
+      static getDerivedStateFromError(error) {
+        return { hasError: true, error };
+      }
+      componentDidCatch(error, info) {
+        console.error("ErrorBoundary caught:", error, info);
+      }
+      render() {
+        if (this.state.hasError) {
+          return (
+            <div className="min-h-screen bg-[#090D13] text-rose-400 font-mono flex flex-col items-center justify-center p-6 text-center">
+              <h2 className="text-xl font-bold mb-3">⚠️ INVESTIGATION CACHE CONFLICT</h2>
+              <p className="text-slate-300 text-xs max-w-md mb-6 leading-relaxed">
+                An obsolete browser save from a previous version was detected. Click below to clear outdated cache and launch the 2D world:
+              </p>
+              <button
+                onClick={() => { localStorage.clear(); window.location.reload(); }}
+                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded shadow-lg text-sm"
+              >
+                🔄 CLEAR OBSOLETE CACHE & LAUNCH
+              </button>
+            </div>
+          );
+        }
+        return this.props.children;
+      }
+    }
 
     // ==========================================
     // 1. SOUND SYNTHESIZER (WEB AUDIO API)
@@ -165,18 +204,9 @@
         } catch (e) {}
       }
 
-      step() {
-        this.playTone(180, 'triangle', 0.03, 0.015);
-      }
-
-      interact() {
-        this.playTone(920, 'square', 0.06, 0.03);
-      }
-
-      click() {
-        this.playTone(1800, 'triangle', 0.03, 0.03);
-      }
-
+      step() { this.playTone(180, 'triangle', 0.03, 0.015); }
+      interact() { this.playTone(920, 'square', 0.06, 0.03); }
+      click() { this.playTone(1800, 'triangle', 0.03, 0.03); }
       scan() {
         if (this.muted) return;
         this.init();
@@ -195,28 +225,6 @@
           osc.stop(this.ctx.currentTime + 0.29);
         } catch (e) {}
       }
-
-      decrypt() {
-        if (this.muted) return;
-        this.init();
-        if (!this.ctx) return;
-        try {
-          const now = this.ctx.currentTime;
-          [750, 1150, 1450, 950, 1650].forEach((freq, idx) => {
-            const osc = this.ctx.createOscillator();
-            const gain = this.ctx.createGain();
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(freq, now + idx * 0.04);
-            gain.gain.setValueAtTime(0.02, now + idx * 0.04);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.04 + 0.035);
-            osc.connect(gain);
-            gain.connect(this.ctx.destination);
-            osc.start(now + idx * 0.04);
-            osc.stop(now + idx * 0.04 + 0.04);
-          });
-        } catch (e) {}
-      }
-
       alert() {
         if (this.muted) return;
         this.init();
@@ -237,7 +245,6 @@
           });
         } catch (e) {}
       }
-
       success() {
         if (this.muted) return;
         this.init();
@@ -258,7 +265,6 @@
           });
         } catch (e) {}
       }
-
       failure() {
         if (this.muted) return;
         this.init();
@@ -279,112 +285,62 @@
           });
         } catch (e) {}
       }
-
-      voiceBeep(pitch = 500) {
-        this.playTone(pitch, 'sawtooth', 0.04, 0.025);
-      }
+      voiceBeep(pitch = 500) { this.playTone(pitch, 'sawtooth', 0.04, 0.025); }
     }
 
     const audio = new SoundEngine();
 
     // ==========================================
-    // 2. PROCEDURAL DATA & CHARACTERS
+    // 2. CHARACTER THEMES & ROOMS
     // ==========================================
-    const FIRST_NAMES = ["Elena", "Marcus", "Priya", "Devon", "Alistair", "Samantha", "Victor", "Naomi", "Julian", "Kiran", "Reese", "Daphne"];
-    const LAST_NAMES = ["Vance", "Thorne", "Sharma", "Cruz", "Sterling", "Kowalski", "Chen", "Sinclair", "Mercer", "Patel", "Blackwood", "Frost"];
+    const FIRST_NAMES = ["Elena", "Marcus", "Priya", "Devon", "Alistair", "Samantha", "Victor", "Naomi"];
+    const LAST_NAMES = ["Vance", "Thorne", "Sharma", "Cruz", "Sterling", "Kowalski", "Chen", "Sinclair"];
 
-    // Character Sprite Palettes (Directly inspired by Reference Image 1)
     const SPRITE_THEMES = [
       {
         id: "theme_white", // Matches reference image 1 directly!
-        name: "White Fluffy Anime Hair",
-        hair: "#F0F4F8",
-        hairShadow: "#CBD5E1",
-        hairOutline: "#1E293B",
-        skin: "#FFE5D0",
-        skinShadow: "#FDBA74",
-        eye: "#1E293B",
-        vest: "#64748B",
-        vestShadow: "#475569",
-        shirt: "#FFFFFF",
-        cuffGold: "#F59E0B",
-        gloves: "#334155",
-        pants: "#334155",
-        boots: "#1E293B",
-        bootCuffs: "#64748B"
+        name: "White Fluffy Hair / Slate Vest",
+        hair: "#F0F4F8", hairShadow: "#CBD5E1", hairOutline: "#1E293B",
+        skin: "#FFE5D0", skinShadow: "#FDBA74", eye: "#1E293B",
+        vest: "#64748B", vestShadow: "#475569", shirt: "#FFFFFF",
+        cuffGold: "#F59E0B", gloves: "#334155", pants: "#334155",
+        boots: "#1E293B", bootCuffs: "#64748B"
       },
       {
         id: "theme_dark",
-        name: "Raven Black Tailored",
-        hair: "#1E293B",
-        hairShadow: "#0F172A",
-        hairOutline: "#020617",
-        skin: "#FFE5D0",
-        skinShadow: "#FDBA74",
-        eye: "#0F172A",
-        vest: "#1E3A8A",
-        vestShadow: "#172554",
-        shirt: "#F8FAFC",
-        cuffGold: "#38BDF8",
-        gloves: "#0F172A",
-        pants: "#1E293B",
-        boots: "#0F172A",
-        bootCuffs: "#334155"
+        name: "Raven Black / Navy Suit",
+        hair: "#1E293B", hairShadow: "#0F172A", hairOutline: "#020617",
+        skin: "#FFE5D0", skinShadow: "#FDBA74", eye: "#0F172A",
+        vest: "#1E3A8A", vestShadow: "#172554", shirt: "#F8FAFC",
+        cuffGold: "#38BDF8", gloves: "#0F172A", pants: "#1E293B",
+        boots: "#0F172A", bootCuffs: "#334155"
       },
       {
         id: "theme_amber",
         name: "Amber Braid / Tech Vest",
-        hair: "#D97706",
-        hairShadow: "#B45309",
-        hairOutline: "#451A03",
-        skin: "#FFEDD5",
-        skinShadow: "#FED7AA",
-        eye: "#451A03",
-        vest: "#047857",
-        vestShadow: "#064E3B",
-        shirt: "#ECFDF5",
-        cuffGold: "#F59E0B",
-        gloves: "#064E3B",
-        pants: "#1E293B",
-        boots: "#064E3B",
-        bootCuffs: "#047857"
+        hair: "#D97706", hairShadow: "#B45309", hairOutline: "#451A03",
+        skin: "#FFEDD5", skinShadow: "#FED7AA", eye: "#451A03",
+        vest: "#047857", vestShadow: "#064E3B", shirt: "#ECFDF5",
+        cuffGold: "#F59E0B", gloves: "#064E3B", pants: "#1E293B",
+        boots: "#064E3B", bootCuffs: "#047857"
       },
       {
         id: "theme_crimson",
-        name: "Copper Tousled / SecOps Coat",
-        hair: "#EA580C",
-        hairShadow: "#C2410C",
-        hairOutline: "#431407",
-        skin: "#FFE5D0",
-        skinShadow: "#FDBA74",
-        eye: "#1E293B",
-        vest: "#991B1B",
-        vestShadow: "#7F1D1D",
-        shirt: "#FEF2F2",
-        cuffGold: "#F59E0B",
-        gloves: "#1F2937",
-        pants: "#1E293B",
-        boots: "#18181B",
-        bootCuffs: "#7F1D1D"
+        name: "Copper Tousled / Crimson Coat",
+        hair: "#EA580C", hairShadow: "#C2410C", hairOutline: "#431407",
+        skin: "#FFE5D0", skinShadow: "#FDBA74", eye: "#1E293B",
+        vest: "#991B1B", vestShadow: "#7F1D1D", shirt: "#FEF2F2",
+        cuffGold: "#F59E0B", gloves: "#1F2937", pants: "#1E293B",
+        boots: "#18181B", bootCuffs: "#7F1D1D"
       }
     ];
 
-    // Detective Player Theme
     const DETECTIVE_THEME = {
-      hair: "#475569",
-      hairShadow: "#334155",
-      hairOutline: "#0F172A",
-      skin: "#FFE5D0",
-      skinShadow: "#FDBA74",
-      eye: "#0F172A",
-      vest: "#3B82F6",
-      vestShadow: "#1D4ED8",
-      shirt: "#FFFFFF",
-      cuffGold: "#EAB308",
-      gloves: "#1E293B",
-      pants: "#1E293B",
-      boots: "#0F172A",
-      bootCuffs: "#3B82F6"
+      hair: "#475569", hairShadow: "#334155", hairOutline: "#0F172A",
+      skin: "#FFE5D0", skinShadow: "#FDBA74", eye: "#0F172A",
+      vest: "#2563EB", vestShadow: "#1D4ED8", shirt: "#FFFFFF",
+      cuffGold: "#EAB308", gloves: "#1E293B", pants: "#1E293B",
+      boots: "#0F172A", bootCuffs: "#2563EB"
     };
 
     const ROOM_LOCATIONS = [
@@ -433,31 +389,12 @@
         decryptedChatPayload: "SWIFT release payload injected into queue. Settlement will finalize in Zurich before morning audit opens.",
         culpritMotive: "Facing massive margin call liquidation on unauthorized leveraged crypto positions; needed urgent capital flight.",
         alibiSlipDialogue: "The Cayman routing wasn't supposed to show up in the clearing queue! I was only reviewing monthly reconciliations!"
-      },
-      {
-        typeId: "CRIME_SABOTAGE",
-        title: "SERVER ROOM 4B // LIQUID COOLING SABOTAGE",
-        incidentType: "INFRASTRUCTURE_SABOTAGE",
-        incidentTime: "22:24",
-        criticalWindow: "22:10 - 22:40",
-        restrictedRoom: RESTRICTED_ROOM.name,
-        compromisedAsset: "Primary Liquid Cooling Subsystem",
-        suspiciousProtocol: "MODBUS-SCADA :502",
-        redactionMarker: "[REDACTED_VALVE_OVERRIDE]",
-        redactionDecrypted: "VALVE_OVERRIDE_TOKEN: CR-9941-BYPASS",
-        summary: "At 22:24, the secondary cryogenic valve in Data Center Beta was physically overridden via manual pneumatic bypass, forcing emergency failover across 24 enterprise racks.",
-        decryptedChatPayload: "Pneumatic valve tripped. Coolant pressure dropping to zero. System will halt within 10 minutes. Place the short options now.",
-        culpritMotive: "Holding heavy short positions on company stock ahead of tomorrow's flagship product reveal; intended to cause massive reputational loss.",
-        alibiSlipDialogue: "The coolant pressure sensors should have been disabled! I never left the cafeteria, I swear!"
       }
     ];
 
-    // ==========================================
-    // 3. CASE GENERATION ENGINE
-    // ==========================================
+    // Case generator
     function generateCaseData(caseNumber = 1) {
       const crime = CRIMES_DATABASE[(caseNumber - 1) % CRIMES_DATABASE.length];
-
       const shuffledFirst = [...FIRST_NAMES].sort(() => Math.random() - 0.5);
       const shuffledLast = [...LAST_NAMES].sort(() => Math.random() - 0.5);
 
@@ -504,7 +441,7 @@
       culprit.motive = crime.culpritMotive;
       culprit.statedAlibi = `Maintains they were stationed in ${culprit.statedRoom} drafting the Q3 governance audit from 21:30 to 22:45, never going anywhere near ${RESTRICTED_ROOM.name}.`;
 
-      // 1 Red Herring Innocent
+      // 1 Red Herring
       const innocentIndices = [0, 1, 2, 3].filter(idx => idx !== culpritIndex);
       const redHerringIndex = innocentIndices[0];
       const redHerring = suspects[redHerringIndex];
@@ -516,7 +453,6 @@
       const chatLogs = [];
       const networkLogs = [];
 
-      // 1. Badge Logs
       innocentIndices.forEach((idx, i) => {
         const s = suspects[idx];
         badgeLogs.push({
@@ -528,28 +464,11 @@
           action: "ENTRY_GRANTED",
           status: "VERIFIED",
           details: `Biometric sensor check passed. Confirmed entry to ${s.statedRoom}.`,
-          contradiction: null,
-          deepScanned: false
+          contradiction: null
         });
-
-        if (idx === redHerringIndex) {
-          badgeLogs.push({
-            id: `badge_red_herring_entry`,
-            timestamp: `21:49:15`,
-            badgeId: s.badgeId,
-            holderName: s.name,
-            location: "Sublevel 1 - Hardware Utility Corridor",
-            action: "ENTRY_GRANTED",
-            status: "FLAGGED",
-            details: "FORENSIC SCAN: Authorized Facilities Ticket #FAC-8812 verified. Replaced backup UPS surge protector. Did not access restricted room.",
-            contradiction: null,
-            deepScanned: false,
-            isRedHerring: true
-          });
-        }
       });
 
-      // Culprit's Keycard Smoking Gun (CONTRADICTION 1)
+      // Culprit Keycard Contradiction
       badgeLogs.push({
         id: `badge_culprit_contradiction`,
         timestamp: `${crime.incidentTime}:08`,
@@ -560,11 +479,10 @@
         status: "ANOMALOUS",
         details: `CONTRADICTION: Physical RFID badge swipe registers ${culprit.name} entering restricted ${RESTRICTED_ROOM.name} at ${crime.incidentTime}:08, directly disproving their alibi of being in ${culprit.statedRoom}!`,
         contradiction: `Badge Swipe into ${RESTRICTED_ROOM.name} at ${crime.incidentTime}:08`,
-        deepScanned: false,
         isCulpritContradiction: true
       });
 
-      // 2. Chat Logs
+      // Chat Stream
       chatLogs.push({
         id: `chat_innocent_01`,
         timestamp: `21:42:12`,
@@ -572,12 +490,9 @@
         channel: "#infrastructure-alerts",
         message: "Automated cron finished db snapshot without warning flags.",
         status: "ROUTINE",
-        details: "Deep Scan confirms: Sent from desktop terminal in designated workspace.",
-        contradiction: null,
-        deepScanned: false
+        details: "Deep Scan confirms: Sent from desktop terminal in designated workspace."
       });
 
-      // Culprit Chat Smoking Gun (CONTRADICTION 2A)
       chatLogs.push({
         id: `chat_culprit_contradiction`,
         timestamp: `${crime.incidentTime}:32`,
@@ -588,12 +503,10 @@
         status: "HIGH_RISK",
         details: `CONTRADICTION: Encrypted socket opened by ${culprit.name} at ${crime.incidentTime}:32 communicating with external buyer while claiming to be reading offline documents!`,
         contradiction: `Encrypted Relay Chat coordinating transfer at ${crime.incidentTime}:32`,
-        isRedacted: true,
-        deepScanned: false,
         isCulpritContradiction: true
       });
 
-      // 3. Network Logs (CONTRADICTION 2B)
+      // Network Stream
       networkLogs.push({
         id: `net_culprit_contradiction`,
         timestamp: `${crime.incidentTime}:22`,
@@ -603,8 +516,7 @@
         volume: "4.2 GB",
         status: "CRITICAL_THREAT",
         details: `CONTRADICTION: High-bandwidth transmission authenticated with ${culprit.name}'s biometric RSA token directly during the incident window!`,
-        contradiction: `Anomalous ${crime.suspiciousProtocol} transmission authenticated by ${culprit.name}'s hardware token at ${crime.incidentTime}:22`,
-        deepScanned: false,
+        contradiction: `Anomalous ${crime.suspiciousProtocol} transmission authenticated by ${culprit.name}'s token at ${crime.incidentTime}:22`,
         isCulpritContradiction: true
       });
 
@@ -624,138 +536,120 @@
     }
 
     // ==========================================
-    // 4. PROCEDURAL 2D PIXEL SPRITE RENDERER
-    // (Directly implements the chibi pixel style of user's reference)
+    // 3. DEFENSIVE PIXEL CHIBI SPRITE RENDERER
+    // (Matches Reference Image 1)
     // ==========================================
     function drawPixelChibiCharacter(ctx, x, y, theme, facing = 'down', frame = 0, isWalking = false) {
+      if (!ctx) return;
+      const t = theme || SPRITE_THEMES[0] || DETECTIVE_THEME;
+      const drawX = isNaN(x) ? 100 : Math.floor(x);
+      const drawY = isNaN(y) ? 100 : Math.floor(y);
+
       ctx.save();
-      ctx.translate(Math.floor(x), Math.floor(y));
+      ctx.translate(drawX, drawY);
 
       const bobY = isWalking ? (frame % 2 === 0 ? -1 : 1) : Math.sin(Date.now() / 320) * 0.8;
       const legOffset = isWalking ? (frame % 2 === 0 ? 2 : -2) : 0;
 
-      // Draw drop shadow
-      ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
+      // Drop shadow
+      ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
       ctx.beginPath();
       ctx.ellipse(12, 29, 9, 3.5, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      // Outline helper
       const p = (px, py, w, h, color) => {
-        ctx.fillStyle = color;
+        ctx.fillStyle = color || "#FFF";
         ctx.fillRect(px, py + bobY, w, h);
       };
 
-      // 1. LEGS & BOOTS (Styled fold-over boots with gold button like reference 1)
-      // Left Leg
-      p(6 - legOffset, 20, 4, 7, theme.pants);
-      p(5 - legOffset, 22, 5, 6, theme.boots);
-      p(5 - legOffset, 21, 5, 2, theme.bootCuffs); // Fold-over boot cuff
-      p(6 - legOffset, 24, 1, 2, theme.cuffGold); // Gold boot button!
+      // 1. BOOTS & LEGS (Fold-over cuffs with gold buttons)
+      p(6 - legOffset, 20, 4, 7, t.pants);
+      p(5 - legOffset, 22, 5, 6, t.boots);
+      p(5 - legOffset, 21, 5, 2, t.bootCuffs);
+      p(6 - legOffset, 24, 1, 2, t.cuffGold);
 
-      // Right Leg
-      p(14 + legOffset, 20, 4, 7, theme.pants);
-      p(14 + legOffset, 22, 5, 6, theme.boots);
-      p(14 + legOffset, 21, 5, 2, theme.bootCuffs);
-      p(15 + legOffset, 24, 1, 2, theme.cuffGold);
+      p(14 + legOffset, 20, 4, 7, t.pants);
+      p(14 + legOffset, 22, 5, 6, t.boots);
+      p(14 + legOffset, 21, 5, 2, t.bootCuffs);
+      p(15 + legOffset, 24, 1, 2, t.cuffGold);
 
-      // 2. TORSO, WAISTCOAT & WHITE PUFFY SLEEVES (Matching Reference 1)
-      // White shirt under-layer
-      p(7, 13, 10, 8, theme.shirt);
+      // 2. TORSO, WAISTCOAT & PUFFY SLEEVES
+      p(7, 13, 10, 8, t.shirt);
+      p(8, 14, 8, 7, t.vest);
+      p(8, 17, 8, 4, t.vestShadow);
+      p(11, 15, 2, 1, t.cuffGold);
+      p(11, 17, 2, 1, t.cuffGold);
+      p(11, 19, 2, 1, t.cuffGold);
 
-      // Tailored Vest / Waistcoat
-      p(8, 14, 8, 7, theme.vest);
-      p(8, 17, 8, 4, theme.vestShadow);
-      // Gold Vest Buttons down the center
-      p(11, 15, 2, 1, theme.cuffGold);
-      p(11, 17, 2, 1, theme.cuffGold);
-      p(11, 19, 2, 1, theme.cuffGold);
+      p(4, 14, 3, 5, t.shirt);
+      p(4, 18, 3, 3, t.gloves);
+      p(4, 17, 3, 1, t.cuffGold);
 
-      // Sleeves & Dark Gloves
-      // Left arm
-      p(4, 14, 3, 5, theme.shirt);
-      p(4, 18, 3, 3, theme.gloves);
-      p(4, 17, 3, 1, theme.cuffGold); // Gold cuff rim
-
-      // Right arm
-      p(17, 14, 3, 5, theme.shirt);
-      p(17, 18, 3, 3, theme.gloves);
-      p(17, 17, 3, 1, theme.cuffGold);
+      p(17, 14, 3, 5, t.shirt);
+      p(17, 18, 3, 3, t.gloves);
+      p(17, 17, 3, 1, t.cuffGold);
 
       // 3. HEAD & FACE
-      // Neck
-      p(10, 11, 4, 2, theme.skinShadow);
-      // Face base
-      p(6, 6, 12, 6, theme.skin);
-      p(5, 7, 1, 4, theme.skin); // Ears
-      p(18, 7, 1, 4, theme.skin);
+      p(10, 11, 4, 2, t.skinShadow);
+      p(6, 6, 12, 6, t.skin);
+      p(5, 7, 1, 4, t.skin);
+      p(18, 7, 1, 4, t.skin);
 
-      // Cute Eyes (2x3 pixel with white shine highlight, like reference 1!)
       if (facing !== 'up') {
         const eyeOffset = facing === 'left' ? -1 : facing === 'right' ? 1 : 0;
-        // Left Eye
-        p(8 + eyeOffset, 8, 2, 3, theme.eye);
-        p(8 + eyeOffset, 8, 1, 1, "#FFFFFF"); // White shine pupil
+        p(8 + eyeOffset, 8, 2, 3, t.eye);
+        p(8 + eyeOffset, 8, 1, 1, "#FFFFFF");
 
-        // Right Eye
-        p(14 + eyeOffset, 8, 2, 3, theme.eye);
+        p(14 + eyeOffset, 8, 2, 3, t.eye);
         p(14 + eyeOffset, 8, 1, 1, "#FFFFFF");
 
-        // Soft blush
         p(7 + eyeOffset, 10, 1, 1, "#F472B6");
         p(16 + eyeOffset, 10, 1, 1, "#F472B6");
       }
 
-      // 4. BIG FLUFFY ANIME HAIR (Layered bangs and side tufts from reference 1)
-      // Hair Back volume
-      p(4, 3, 16, 5, theme.hair);
-      p(3, 5, 2, 5, theme.hair);
-      p(19, 5, 2, 5, theme.hair);
+      // 4. BIG FLUFFY ANIME HAIR (Layered locks from reference 1)
+      p(4, 3, 16, 5, t.hair);
+      p(3, 5, 2, 5, t.hair);
+      p(19, 5, 2, 5, t.hair);
 
-      // Front Bangs & Side Tufts
-      p(5, 4, 14, 3, theme.hair);
-      p(6, 7, 3, 2, theme.hair);
-      p(11, 7, 2, 2, theme.hair);
-      p(15, 7, 3, 2, theme.hair);
+      p(5, 4, 14, 3, t.hair);
+      p(6, 7, 3, 2, t.hair);
+      p(11, 7, 2, 2, t.hair);
+      p(15, 7, 3, 2, t.hair);
 
-      // Side tufts angled outward (Signature chibi anime silhouette from Reference 1)
-      p(2, 6, 3, 3, theme.hair);
-      p(1, 8, 2, 3, theme.hairShadow);
-      p(19, 6, 3, 3, theme.hair);
-      p(21, 8, 2, 3, theme.hairShadow);
+      p(2, 6, 3, 3, t.hair);
+      p(1, 8, 2, 3, t.hairShadow);
+      p(19, 6, 3, 3, t.hair);
+      p(21, 8, 2, 3, t.hairShadow);
 
-      // Hair shading & highlights
       p(7, 3, 10, 1, "#FFFFFF");
-      p(4, 7, 2, 2, theme.hairShadow);
-      p(18, 7, 2, 2, theme.hairShadow);
+      p(4, 7, 2, 2, t.hairShadow);
+      p(18, 7, 2, 2, t.hairShadow);
 
       ctx.restore();
     }
 
     // ==========================================
-    // 5. 2D TILEMAP & WORLD ENGINE
+    // 4. 2D TILEMAP & WORLD ENGINE
     // ==========================================
     const MAP_WIDTH = 30;
     const MAP_HEIGHT = 22;
     const TILE_SIZE = 24;
 
-    // Interactive Terminals on the map
     const INTERACTIVE_NODES = [
       { id: "node_badge", name: "Keycard Security Gate", tileX: 15, tileY: 5, type: "badge", label: "[E] SWIPE LOGS", icon: "💳" },
       { id: "node_chat", name: "SecOps Chat Terminal", tileX: 13, tileY: 15, type: "chat", label: "[E] CHAT RELAY", icon: "💬" },
       { id: "node_net", name: "Core Network Rack", tileX: 17, tileY: 15, type: "network", label: "[E] PCAP TRACE", icon: "🌐" },
-      { id: "node_pinboard", name: "Deduction Whiteboard", tileX: 15, tileY: 18, type: "notes", label: "[E] CASE NOTES", icon: "📌" },
       { id: "node_crime_tape", name: "Breached Vault Safe", tileX: 7, tileY: 4, type: "crime_scene", label: "[E] CRIME SCENE", icon: "🚨" }
     ];
 
     function drawWorldTilemap(ctx, width, height, time) {
-      // 1. Base floor tiles (Dark corporate grid / pastel office tiles)
+      if (!ctx) return;
       for (let y = 0; y < MAP_HEIGHT; y++) {
         for (let x = 0; x < MAP_WIDTH; x++) {
           const px = x * TILE_SIZE;
           const py = y * TILE_SIZE;
 
-          // Outer walls
           if (x === 0 || y === 0 || x === MAP_WIDTH - 1 || y === MAP_HEIGHT - 1) {
             ctx.fillStyle = "#161B22";
             ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
@@ -764,36 +658,23 @@
             continue;
           }
 
-          // Interior Rooms
-          // Top Left: Restricted Server Vault (Crime Scene!)
           if (x < 13 && y < 10) {
             ctx.fillStyle = (x + y) % 2 === 0 ? "#0D1117" : "#161B22";
             ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
-            // Red danger floor line
             if (x === 12 || y === 9) {
               ctx.fillStyle = "#991B1B";
               ctx.fillRect(px, py, TILE_SIZE, 3);
             }
-          }
-          // Top Right: Conference Room 4A
-          else if (x > 17 && y < 10) {
-            ctx.fillStyle = (x + y) % 2 === 0 ? "#1C2430" : "#242E3D"; // Polished parquet
+          } else if (x > 17 && y < 10) {
+            ctx.fillStyle = (x + y) % 2 === 0 ? "#1C2430" : "#242E3D";
             ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
-            ctx.strokeStyle = "#2E3B4E";
-            ctx.strokeRect(px, py, TILE_SIZE, TILE_SIZE);
-          }
-          // Bottom Left: Cafeteria & Breakroom
-          else if (x < 13 && y > 12) {
-            ctx.fillStyle = (x + y) % 2 === 0 ? "#13233A" : "#1B2A4A"; // Checkerboard
+          } else if (x < 13 && y > 12) {
+            ctx.fillStyle = (x + y) % 2 === 0 ? "#13233A" : "#1B2A4A";
             ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
-          }
-          // Bottom Right: Executive 7th Floor Lounge
-          else if (x > 17 && y > 12) {
-            ctx.fillStyle = (x + y) % 2 === 0 ? "#2B1724" : "#381E2F"; // Velvet burgundy
+          } else if (x > 17 && y > 12) {
+            ctx.fillStyle = (x + y) % 2 === 0 ? "#2B1724" : "#381E2F";
             ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
-          }
-          // Central Hallways & Security Corridor
-          else {
+          } else {
             ctx.fillStyle = "#111827";
             ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
             ctx.strokeStyle = "#1F2937";
@@ -802,33 +683,27 @@
         }
       }
 
-      // 2. Interior Walls & Glass Partitions
+      // Walls
       ctx.fillStyle = "#30363D";
-      // Vertical divider top
       ctx.fillRect(13 * TILE_SIZE, 1 * TILE_SIZE, 4, 8 * TILE_SIZE);
       ctx.fillRect(17 * TILE_SIZE, 1 * TILE_SIZE, 4, 8 * TILE_SIZE);
-      // Vertical divider bottom
       ctx.fillRect(13 * TILE_SIZE, 13 * TILE_SIZE, 4, 8 * TILE_SIZE);
       ctx.fillRect(17 * TILE_SIZE, 13 * TILE_SIZE, 4, 8 * TILE_SIZE);
-      // Horizontal dividers
       ctx.fillRect(1 * TILE_SIZE, 9 * TILE_SIZE, 12 * TILE_SIZE, 4);
       ctx.fillRect(18 * TILE_SIZE, 9 * TILE_SIZE, 11 * TILE_SIZE, 4);
       ctx.fillRect(1 * TILE_SIZE, 13 * TILE_SIZE, 12 * TILE_SIZE, 4);
       ctx.fillRect(18 * TILE_SIZE, 13 * TILE_SIZE, 11 * TILE_SIZE, 4);
 
-      // 3. Furniture & Props (Sprout Lands inspired corporate style)
-      // A) Conference Room 4A Table
+      // Conference Table
       ctx.fillStyle = "#78350F";
       ctx.fillRect(20 * TILE_SIZE, 4 * TILE_SIZE, 7 * TILE_SIZE, 3 * TILE_SIZE);
       ctx.fillStyle = "#92400E";
       ctx.fillRect(20 * TILE_SIZE + 2, 4 * TILE_SIZE + 2, 7 * TILE_SIZE - 4, 3 * TILE_SIZE - 4);
-      // Laptops on table
       ctx.fillStyle = "#94A3B8";
       ctx.fillRect(21 * TILE_SIZE, 5 * TILE_SIZE, 12, 10);
       ctx.fillRect(24 * TILE_SIZE, 5 * TILE_SIZE, 12, 10);
-      ctx.fillRect(26 * TILE_SIZE, 5 * TILE_SIZE, 12, 10);
 
-      // B) Server Vault Racks (Blinking LEDs)
+      // Blinking Server Racks
       for (let r = 0; r < 4; r++) {
         const rx = (3 + r * 2.5) * TILE_SIZE;
         const ry = 3 * TILE_SIZE;
@@ -836,50 +711,18 @@
         ctx.fillRect(rx, ry, 36, 60);
         ctx.strokeStyle = "#334155";
         ctx.strokeRect(rx, ry, 36, 60);
-        // Blinking LEDs
         const blink1 = Math.floor(time / 200 + r) % 2 === 0;
-        const blink2 = Math.floor(time / 350 + r) % 2 === 0;
         ctx.fillStyle = blink1 ? "#22C55E" : "#15803D";
         ctx.fillRect(rx + 6, ry + 10, 4, 4);
-        ctx.fillStyle = blink2 ? "#EF4444" : "#991B1B";
+        ctx.fillStyle = "#EF4444";
         ctx.fillRect(rx + 14, ry + 10, 4, 4);
-        ctx.fillStyle = "#38BDF8";
-        ctx.fillRect(rx + 22, ry + 10, 4, 4);
       }
 
-      // Yellow Crime Scene Tape at Vault entrance
+      // Crime Tape
       ctx.fillStyle = "#EAB308";
       ctx.fillRect(10 * TILE_SIZE, 9 * TILE_SIZE - 2, 3 * TILE_SIZE, 4);
-      ctx.fillStyle = "#000000";
-      for (let s = 0; s < 5; s++) {
-        ctx.fillRect(10 * TILE_SIZE + s * 14, 9 * TILE_SIZE - 2, 6, 4);
-      }
 
-      // C) Cafeteria Tables & Coffee Machine
-      ctx.fillStyle = "#334155";
-      ctx.fillRect(4 * TILE_SIZE, 15 * TILE_SIZE, 4 * TILE_SIZE, 2 * TILE_SIZE);
-      ctx.fillRect(4 * TILE_SIZE, 18 * TILE_SIZE, 4 * TILE_SIZE, 2 * TILE_SIZE);
-      // Vending Machine
-      ctx.fillStyle = "#1E293B";
-      ctx.fillRect(2 * TILE_SIZE, 14 * TILE_SIZE, 24, 40);
-      ctx.fillStyle = "#06B6D4";
-      ctx.fillRect(2 * TILE_SIZE + 4, 14 * TILE_SIZE + 6, 16, 18);
-
-      // D) Executive Lounge Couches & Ficus Plants
-      ctx.fillStyle = "#991B1B";
-      ctx.fillRect(20 * TILE_SIZE, 15 * TILE_SIZE, 6 * TILE_SIZE, 20);
-      ctx.fillRect(20 * TILE_SIZE, 18 * TILE_SIZE, 6 * TILE_SIZE, 20);
-      // Potted plants (Sprout Lands style)
-      [ {x: 19, y: 14}, {x: 27, y: 14}, {x: 19, y: 19}, {x: 27, y: 19} ].forEach(p => {
-        ctx.fillStyle = "#78350F";
-        ctx.fillRect(p.x * TILE_SIZE + 4, p.y * TILE_SIZE + 10, 16, 14);
-        ctx.fillStyle = "#22C55E";
-        ctx.beginPath();
-        ctx.arc(p.x * TILE_SIZE + 12, p.y * TILE_SIZE + 8, 10, 0, Math.PI * 2);
-        ctx.fill();
-      });
-
-      // 4. Room Label Banners
+      // Labels
       ctx.font = "bold 9px 'Press Start 2P', monospace";
       ctx.fillStyle = "#EF4444";
       ctx.fillText("RESTRICTED SERVER VAULT", 2 * TILE_SIZE, 2.2 * TILE_SIZE);
@@ -889,117 +732,81 @@
       ctx.fillText("CAFETERIA & BREAKROOM", 2 * TILE_SIZE, 13.8 * TILE_SIZE);
       ctx.fillStyle = "#F43F5E";
       ctx.fillText("EXECUTIVE LOUNGE", 19 * TILE_SIZE, 13.8 * TILE_SIZE);
-      ctx.fillStyle = "#A78BFA";
-      ctx.fillText("CENTRAL SECURITY CORRIDOR", 8 * TILE_SIZE, 11 * TILE_SIZE);
     }
 
     // ==========================================
-    // 6. MAIN APPLICATION COMPONENT
+    // 5. MAIN REACT APP COMPONENT
     // ==========================================
     function App() {
-      // Game State
-      const [caseData, setCaseData] = useState(null);
+      // Synchronous safe state initialization (clears any old incompatible data)
+      const [caseData, setCaseData] = useState(() => {
+        try {
+          const saved = localStorage.getItem('THE_COLD_FILE_STATE_V2');
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            if (parsed.caseData && parsed.caseData.suspects && parsed.caseData.suspects[0]?.spriteTheme) {
+              return parsed.caseData;
+            }
+          }
+        } catch (e) {}
+        return generateCaseData(1);
+      });
+
       const [ap, setAp] = useState(8);
       const [maxAp, setMaxAp] = useState(8);
-      const [viewMode, setViewMode] = useState('map'); // 'map' (2D pixel view) or 'terminal' (forensic console)
+      const [viewMode, setViewMode] = useState('map');
       const [activeTab, setActiveTab] = useState('badge');
       const [pinnedLogIds, setPinnedLogIds] = useState([]);
-      const [playerNotes, setPlayerNotes] = useState('');
-
-      // Player Position on 2D Tilemap
       const [playerPos, setPlayerPos] = useState({ x: 15, y: 10, facing: 'down', isWalking: false });
-      const [interactTarget, setInteractTarget] = useState(null); // active NPC or Node near player
-
-      // Radar Gadget visual ping on 2D map
-      const [radarBeacon, setRadarBeacon] = useState(null); // { x, y, roomName, color }
+      const [interactTarget, setInteractTarget] = useState(null);
+      const [radarBeacon, setRadarBeacon] = useState(null);
 
       // Modals
       const [activeSuspectModal, setActiveSuspectModal] = useState(null);
       const [activeNodeModal, setActiveNodeModal] = useState(null);
-      const [activeGadgetModal, setActiveGadgetModal] = useState(null);
-      const [trackerResult, setTrackerResult] = useState(null);
-      const [interrogationDialogue, setInterrogationDialogue] = useState(null);
-      const [decryptingLog, setDecryptingLog] = useState(null);
-      const [decryptStep, setDecryptStep] = useState(0);
-
-      // Live Leaks & Accusation
       const [liveLeakModal, setLiveLeakModal] = useState(null);
-      const [apSpentCounter, setApSpentCounter] = useState(0);
-      const [shakeScreen, setShakeScreen] = useState(false);
       const [accusationModalOpen, setAccusationModalOpen] = useState(false);
       const [selectedAccusedSuspectId, setSelectedAccusedSuspectId] = useState('');
-      const [selectedEvidence1, setSelectedEvidence1] = useState('');
-      const [selectedEvidence2, setSelectedEvidence2] = useState('');
       const [verdictData, setVerdictData] = useState(null);
-      const [verifyingStage, setVerifyingStage] = useState(0);
+      const [shakeScreen, setShakeScreen] = useState(false);
 
-      // Career Stats & Tech Lab
-      const [career, setCareer] = useState({
-        xp: 150,
-        level: 1,
-        rankTitle: "Junior Forensic Analyst",
-        creds: 250,
-        casesSolved: 0,
-        streak: 0,
-        upgrades: { extraApBattery: false, quantumDecryptor: false, forensicCache: false }
-      });
-      const [techLabOpen, setTechLabOpen] = useState(false);
-
-      // Meta & Boss Key
+      const [career, setCareer] = useState({ xp: 150, streak: 0 });
       const [bossMode, setBossMode] = useState(false);
       const [soundMuted, setSoundMuted] = useState(false);
-      const [tutorialActive, setTutorialActive] = useState(false);
       const [toastMsg, setToastMsg] = useState(null);
 
       const canvasRef = useRef(null);
 
-      // ==========================================
-      // INITIALIZATION
-      // ==========================================
-      useEffect(() => {
-        const saved = localStorage.getItem('THE_COLD_FILE_STATE_V1');
-        if (saved) {
-          try {
-            const parsed = JSON.parse(saved);
-            setCaseData(parsed.caseData);
-            setAp(parsed.ap !== undefined ? parsed.ap : 8);
-            setMaxAp(parsed.maxAp || 8);
-            setPinnedLogIds(parsed.pinnedLogIds || []);
-            setPlayerNotes(parsed.playerNotes || '');
-            setCareer(parsed.career || career);
-            setSoundMuted(!!parsed.soundMuted);
-            audio.muted = !!parsed.soundMuted;
-          } catch (e) {
-            startNewCase(1);
-          }
-        } else {
-          startNewCase(1);
-          setTutorialActive(true);
-        }
+      const showToast = (msg) => {
+        setToastMsg(msg);
+        setTimeout(() => setToastMsg(null), 3500);
+      };
 
-        // Global Boss Key (Escape) & WASD Movement
+      // Auto-save with V2 key
+      useEffect(() => {
+        if (!caseData) return;
+        try {
+          localStorage.setItem('THE_COLD_FILE_STATE_V2', JSON.stringify({
+            caseData, ap, maxAp, pinnedLogIds, career
+          }));
+        } catch (e) {}
+      }, [caseData, ap, maxAp, pinnedLogIds, career]);
+
+      // Controls
+      useEffect(() => {
         const handleKeyDown = (e) => {
           if (e.key === 'Escape') {
             setBossMode(prev => !prev);
             return;
           }
+          if (activeSuspectModal || activeNodeModal || liveLeakModal || accusationModalOpen) return;
 
-          // If a modal is open, don't move
-          if (activeSuspectModal || activeNodeModal || activeGadgetModal || liveLeakModal || accusationModalOpen || techLabOpen || tutorialActive) {
-            return;
-          }
-
-          // WASD / Arrow Movement
-          let dx = 0;
-          let dy = 0;
-          let newFacing = playerPos.facing;
-
-          if (e.key === 'w' || e.key === 'W' || e.key === 'ArrowUp') { dy = -1; newFacing = 'up'; }
-          else if (e.key === 's' || e.key === 'S' || e.key === 'ArrowDown') { dy = 1; newFacing = 'down'; }
-          else if (e.key === 'a' || e.key === 'A' || e.key === 'ArrowLeft') { dx = -1; newFacing = 'left'; }
-          else if (e.key === 'd' || e.key === 'D' || e.key === 'ArrowRight') { dx = 1; newFacing = 'right'; }
+          let dx = 0, dy = 0, facing = playerPos.facing;
+          if (e.key === 'w' || e.key === 'W' || e.key === 'ArrowUp') { dy = -1; facing = 'up'; }
+          else if (e.key === 's' || e.key === 'S' || e.key === 'ArrowDown') { dy = 1; facing = 'down'; }
+          else if (e.key === 'a' || e.key === 'A' || e.key === 'ArrowLeft') { dx = -1; facing = 'left'; }
+          else if (e.key === 'd' || e.key === 'D' || e.key === 'ArrowRight') { dx = 1; facing = 'right'; }
           else if (e.key === 'e' || e.key === 'E' || e.key === ' ') {
-            // Trigger interaction
             triggerNearbyInteraction();
             return;
           }
@@ -1010,7 +817,7 @@
               const nx = Math.max(1, Math.min(MAP_WIDTH - 2, prev.x + dx));
               const ny = Math.max(1, Math.min(MAP_HEIGHT - 2, prev.y + dy));
               audio.step();
-              return { x: nx, y: ny, facing: newFacing, isWalking: true };
+              return { x: nx, y: ny, facing, isWalking: true };
             });
             setTimeout(() => setPlayerPos(prev => ({ ...prev, isWalking: false })), 160);
           }
@@ -1018,12 +825,11 @@
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-      }, [activeSuspectModal, activeNodeModal, activeGadgetModal, liveLeakModal, accusationModalOpen, techLabOpen, tutorialActive, playerPos]);
+      }, [activeSuspectModal, activeNodeModal, liveLeakModal, accusationModalOpen, playerPos]);
 
-      // Check proximity to suspects & nodes whenever player moves
+      // Proximity check
       useEffect(() => {
-        if (!caseData) return;
-        // Check suspects
+        if (!caseData || !caseData.suspects) return;
         let found = null;
         for (const s of caseData.suspects) {
           const dist = Math.hypot(s.mapX - playerPos.x, s.mapY - playerPos.y);
@@ -1033,7 +839,6 @@
           }
         }
         if (!found) {
-          // Check interactive nodes
           for (const node of INTERACTIVE_NODES) {
             const dist = Math.hypot(node.tileX - playerPos.x, node.tileY - playerPos.y);
             if (dist <= 2.2) {
@@ -1045,84 +850,15 @@
         setInteractTarget(found);
       }, [playerPos, caseData]);
 
-      // Auto-save
-      useEffect(() => {
-        if (!caseData) return;
-        localStorage.setItem('THE_COLD_FILE_STATE_V1', JSON.stringify({
-          caseData, ap, maxAp, pinnedLogIds, playerNotes, career, soundMuted
-        }));
-      }, [caseData, ap, maxAp, pinnedLogIds, playerNotes, career, soundMuted]);
-
-      const showToast = (msg) => {
-        setToastMsg(msg);
-        setTimeout(() => setToastMsg(null), 3500);
-      };
-
-      const startNewCase = (caseNum) => {
-        const fresh = generateCaseData(caseNum || (caseData ? caseData.caseNumber + 1 : 1));
-        const initialMaxAp = career.upgrades.extraApBattery ? 10 : 8;
-        setCaseData(fresh);
-        setAp(initialMaxAp);
-        setMaxAp(initialMaxAp);
-        setPinnedLogIds([]);
-        setPlayerNotes(`CASE FILE: ${fresh.caseId}\nCRIME: ${fresh.crime.title}\nINCIDENT WINDOW: ${fresh.crime.criticalWindow}\nASSET: ${fresh.crime.compromisedAsset}\n---\n`);
-        setPlayerPos({ x: 15, y: 10, facing: 'down', isWalking: false });
-        setVerdictData(null);
-        setRadarBeacon(null);
-        audio.scan();
-        showToast(`📁 ${fresh.caseId} LOADED // MAP DEPLOYED`);
-      };
-
-      const spendAP = (cost, actionName) => {
-        if (ap < cost) {
-          audio.alert();
-          showToast(`⚠️ INSUFFICIENT AP! (${cost} required, ${ap} remaining)`);
-          return false;
-        }
-        const newAp = ap - cost;
-        setAp(newAp);
-        audio.click();
-
-        const nextSpent = apSpentCounter + cost;
-        setApSpentCounter(nextSpent);
-        if (nextSpent >= 2) {
-          triggerLiveLeak();
-          setApSpentCounter(0);
-        }
-        return true;
-      };
-
-      const triggerLiveLeak = () => {
-        setShakeScreen(true);
-        audio.alert();
-        setTimeout(() => setShakeScreen(false), 450);
-
-        setLiveLeakModal({
-          title: "⚠️ SURPRISE INTERCEPT // LOG PURGE DETECTED",
-          text: `Hostile shell script 'shred_vault_audit.sh' detected on Node 4! Suspect attempting to destroy evidence for ${caseData.crime.incidentTime}. Spend 1 AP to intercept and salvage the raw buffer, or let it burn?`,
-          actionText: "INTERCEPT BUFFER (-1 AP)",
-          onAction: () => {
-            if (ap >= 1) {
-              setAp(prev => prev - 1);
-              showToast(`🚨 RECOVERED SMOKING GUN: Badge Swipe to ${RESTRICTED_ROOM.name}!`);
-              setLiveLeakModal(null);
-              setActiveTab('badge');
-              audio.success();
-            }
-          }
-        });
-      };
-
       const triggerNearbyInteraction = () => {
         if (!interactTarget) return;
         audio.interact();
-
         if (interactTarget.type === 'suspect') {
           setActiveSuspectModal(interactTarget.data);
         } else if (interactTarget.type === 'node') {
           const node = interactTarget.data;
           if (node.type === 'crime_scene') {
-            showToast("🚨 CRIME SCENE: Severe physical breach detected. Access restricted!");
+            showToast("🚨 CRIME SCENE: Physical security breach detected in vault!");
             audio.alert();
           } else {
             setActiveTab(node.type);
@@ -1131,103 +867,104 @@
         }
       };
 
-      // ==========================================
-      // CANVAS RENDERING LOOP
-      // ==========================================
+      const spendAP = (cost) => {
+        if (ap < cost) {
+          audio.alert();
+          showToast(`⚠️ INSUFFICIENT AP! (${cost} required, ${ap} left)`);
+          return false;
+        }
+        setAp(prev => prev - 1);
+        audio.click();
+        return true;
+      };
+
+      // 60FPS Canvas Render Loop (Defensively guarded)
       useEffect(() => {
-        let animationFrameId;
+        let animId;
         const render = () => {
-          const canvas = canvasRef.current;
-          if (canvas && caseData) {
-            const ctx = canvas.getContext('2d');
-            const now = Date.now();
+          try {
+            const canvas = canvasRef.current;
+            if (canvas && caseData) {
+              const ctx = canvas.getContext('2d');
+              const now = Date.now();
+              ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Clear Canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+              drawWorldTilemap(ctx, canvas.width, canvas.height, now);
 
-            // Draw Tilemap
-            drawWorldTilemap(ctx, canvas.width, canvas.height, now);
+              // Interactive Nodes
+              INTERACTIVE_NODES.forEach(node => {
+                const nx = node.tileX * TILE_SIZE;
+                const ny = node.tileY * TILE_SIZE;
+                ctx.fillStyle = "rgba(88, 166, 255, 0.25)";
+                ctx.beginPath();
+                ctx.arc(nx + 12, ny + 12, 14, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.font = "14px monospace";
+                ctx.fillText(node.icon, nx + 4, ny + 16);
+              });
 
-            // Draw Interactive Node Icons & Labels
-            INTERACTIVE_NODES.forEach(node => {
-              const nx = node.tileX * TILE_SIZE;
-              const ny = node.tileY * TILE_SIZE;
-              ctx.fillStyle = "rgba(88, 166, 255, 0.2)";
-              ctx.beginPath();
-              ctx.arc(nx + 12, ny + 12, 14, 0, Math.PI * 2);
-              ctx.fill();
+              // Suspect NPCs
+              if (caseData.suspects) {
+                caseData.suspects.forEach((s, idx) => {
+                  const sx = (s.mapX !== undefined ? s.mapX : 10) * TILE_SIZE;
+                  const sy = (s.mapY !== undefined ? s.mapY : 10) * TILE_SIZE;
+                  const theme = s.spriteTheme || SPRITE_THEMES[idx % SPRITE_THEMES.length];
+                  drawPixelChibiCharacter(ctx, sx, sy, theme, 'down', 0, false);
 
-              ctx.font = "14px 'JetBrains Mono', monospace";
-              ctx.fillText(node.icon, nx + 4, ny + 16);
-            });
+                  ctx.font = "bold 8px monospace";
+                  ctx.fillStyle = "#FFFFFF";
+                  ctx.fillText(s.name.split(" ")[0], sx - 2, sy - 4);
+                });
+              }
 
-            // Draw Suspect NPCs (Chibi Pixel Characters matching Reference 1)
-            caseData.suspects.forEach(s => {
-              const sx = s.mapX * TILE_SIZE;
-              const sy = s.mapY * TILE_SIZE;
-              drawPixelChibiCharacter(ctx, sx, sy, s.spriteTheme, 'down', 0, false);
+              // Radar Beacon
+              if (radarBeacon) {
+                const rx = radarBeacon.x * TILE_SIZE + 12;
+                const ry = radarBeacon.y * TILE_SIZE + 12;
+                const pulse = (Math.sin(now / 150) + 1) * 12 + 10;
+                ctx.strokeStyle = "#F43F5E";
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(rx, ry, pulse, 0, Math.PI * 2);
+                ctx.stroke();
+              }
 
-              // Name Tag
-              ctx.font = "bold 8px 'JetBrains Mono', monospace";
-              ctx.fillStyle = "#FFFFFF";
-              ctx.fillText(s.name.split(" ")[0], sx - 2, sy - 4);
-            });
+              // Detective Player
+              drawPixelChibiCharacter(
+                ctx,
+                playerPos.x * TILE_SIZE,
+                playerPos.y * TILE_SIZE,
+                DETECTIVE_THEME,
+                playerPos.facing,
+                Math.floor(now / 120),
+                playerPos.isWalking
+              );
 
-            // Draw Radar Beacon Ping if active
-            if (radarBeacon) {
-              const rx = radarBeacon.x * TILE_SIZE + 12;
-              const ry = radarBeacon.y * TILE_SIZE + 12;
-              const pulse = (Math.sin(now / 150) + 1) * 12 + 10;
-              ctx.strokeStyle = "#F43F5E";
-              ctx.lineWidth = 2;
-              ctx.beginPath();
-              ctx.arc(rx, ry, pulse, 0, Math.PI * 2);
-              ctx.stroke();
-
-              ctx.fillStyle = "#EF4444";
-              ctx.font = "bold 9px 'Press Start 2P', monospace";
-              ctx.fillText("BEACON DETECTED!", rx - 60, ry - 20);
+              // Interact indicator
+              if (interactTarget) {
+                const ix = playerPos.x * TILE_SIZE + 12;
+                const iy = playerPos.y * TILE_SIZE - 12;
+                ctx.fillStyle = "rgba(13, 17, 23, 0.9)";
+                ctx.strokeStyle = "#E3B341";
+                ctx.lineWidth = 1;
+                const text = interactTarget.label;
+                ctx.font = "bold 9px monospace";
+                const tw = ctx.measureText(text).width;
+                ctx.fillRect(ix - tw / 2 - 4, iy - 16, tw + 8, 14);
+                ctx.strokeRect(ix - tw / 2 - 4, iy - 16, tw + 8, 14);
+                ctx.fillStyle = "#58A6FF";
+                ctx.fillText(text, ix - tw / 2, iy - 6);
+              }
             }
-
-            // Draw Player Detective (Chibi Pixel Character)
-            drawPixelChibiCharacter(
-              ctx,
-              playerPos.x * TILE_SIZE,
-              playerPos.y * TILE_SIZE,
-              DETECTIVE_THEME,
-              playerPos.facing,
-              Math.floor(now / 120),
-              playerPos.isWalking
-            );
-
-            // Draw Interaction Indicator above Player when near target
-            if (interactTarget) {
-              const ix = playerPos.x * TILE_SIZE + 12;
-              const iy = playerPos.y * TILE_SIZE - 14;
-              ctx.fillStyle = "#E3B341";
-              ctx.font = "bold 8px 'Press Start 2P', monospace";
-              ctx.fillText("!", ix - 3, iy - 2);
-
-              // Floating interaction pill
-              ctx.fillStyle = "rgba(13, 17, 23, 0.9)";
-              ctx.strokeStyle = "#E3B341";
-              ctx.lineWidth = 1;
-              const text = interactTarget.label;
-              ctx.font = "bold 9px 'JetBrains Mono', monospace";
-              const tw = ctx.measureText(text).width;
-              ctx.fillRect(ix - tw / 2 - 4, iy - 16, tw + 8, 14);
-              ctx.strokeRect(ix - tw / 2 - 4, iy - 16, tw + 8, 14);
-              ctx.fillStyle = "#58A6FF";
-              ctx.fillText(text, ix - tw / 2, iy - 6);
-            }
+          } catch (err) {
+            console.error("Render loop caught:", err);
           }
-          animationFrameId = requestAnimationFrame(render);
+          animId = requestAnimationFrame(render);
         };
         render();
-        return () => cancelAnimationFrame(animationFrameId);
+        return () => cancelAnimationFrame(animId);
       }, [caseData, playerPos, interactTarget, radarBeacon]);
 
-      // Canvas click to move
       const handleCanvasClick = (e) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -1243,176 +980,125 @@
         setTimeout(() => setPlayerPos(prev => ({ ...prev, isWalking: false })), 200);
       };
 
-      // ==========================================
-      // GADGET 1: SIGNAL TRACKER (RADAR DROP)
-      // ==========================================
-      const triggerSignalTracker = (suspect) => {
-        if (!spendAP(1, "Signal Tracker")) return;
-        audio.scan();
-        setRadarBeacon(null);
-        setActiveSuspectModal(null);
-
-        showToast(`📡 TRILATERATING RFID SIGNAL FOR ${suspect.name.toUpperCase()}...`);
-
-        setTimeout(() => {
-          audio.success();
-          // Drop beacon on their ACTUAL room
-          const isMatch = suspect.actualRoom === suspect.statedRoom;
-          const targetCoords = isMatch ? { x: suspect.mapX, y: suspect.mapY } : { x: RESTRICTED_ROOM.tileX, y: RESTRICTED_ROOM.tileY };
-          setRadarBeacon({ x: targetCoords.x, y: targetCoords.y, room: suspect.actualRoom });
-
-          if (!isMatch) {
-            showToast(`🚨 SIGNAL TRACKER CONTRADICTION: Located in ${RESTRICTED_ROOM.name}!`);
-          } else {
-            showToast(`✓ SIGNAL TRACKER: Confirmed in ${suspect.statedRoom}.`);
-          }
-        }, 1200);
-      };
-
-      // ==========================================
-      // BOSS MODE VIEW
-      // ==========================================
       if (bossMode) {
         return (
           <div className="min-h-screen bg-[#111827] text-slate-300 font-sans p-6 select-text">
             <div className="flex items-center justify-between pb-4 border-b border-slate-700 mb-6">
-              <div className="flex items-center gap-3">
-                <div className="w-3.5 h-3.5 rounded bg-emerald-500 animate-pulse"></div>
-                <span className="font-bold text-white text-base">Grafana Cloud // Enterprise Production Observability</span>
-                <span className="text-xs bg-slate-800 text-slate-400 px-2 py-0.5 rounded border border-slate-700">cluster-us-east-prod-04</span>
-              </div>
-              <button onClick={() => setBossMode(false)} className="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1 rounded text-xs border border-slate-600">
-                [Esc] Return to Debug
+              <span className="font-bold text-white text-base">Grafana Cloud // Cluster Ingress Latency (p99: 14.2ms)</span>
+              <button onClick={() => setBossMode(false)} className="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1 rounded text-xs">
+                [Esc] Return
               </button>
             </div>
-            <div className="bg-slate-900 border border-slate-800 rounded p-4 mb-4">
-              <h3 className="text-sm font-semibold mb-2">Ingress Gateway P99 Latency (14.2ms)</h3>
-              <div className="h-36 bg-slate-950 rounded flex items-center justify-center text-xs text-slate-500 font-mono">
-                [REALTIME LATENCY TELEMETRY PLOT: ALL 64 NODES HEALTHY]
-              </div>
+            <div className="h-44 bg-slate-950 rounded flex items-center justify-center text-xs text-slate-500 font-mono">
+              [ALL 64 CLUSTER PODS OPERATIONAL]
             </div>
-            <div className="text-center text-xs text-slate-500 mt-4">Press [Escape] to return to terminal</div>
           </div>
         );
       }
 
-      if (!caseData) return <div className="p-8 text-center font-retro text-cyan-400">INITIALIZING 2D WORLD...</div>;
-
       return (
         <div className={`min-h-screen flex flex-col font-mono ${shakeScreen ? 'shake-effect' : ''}`}>
-          <div className="fixed inset-0 scanlines z-40 pointer-events-none opacity-30"></div>
+          <div className="fixed inset-0 scanlines z-40 pointer-events-none opacity-25"></div>
 
-          {/* Toast */}
           {toastMsg && (
-            <div className="fixed top-4 right-4 z-50 bg-[#161B22] border-2 border-cyan-400 text-cyan-300 px-4 py-2 rounded shadow-2xl font-mono text-xs flex items-center gap-2 animate-bounce">
-              <span>{toastMsg}</span>
+            <div className="fixed top-4 right-4 z-50 bg-[#161B22] border-2 border-cyan-400 text-cyan-300 px-4 py-2 rounded shadow-2xl text-xs">
+              {toastMsg}
             </div>
           )}
 
-          {/* TOP RETRO COMMAND BAR */}
-          <header className="bg-[#161B22] border-b-2 border-[#30363D] px-4 py-2 flex items-center justify-between text-xs font-mono sticky top-0 z-30">
-            <div className="flex items-center gap-4">
+          {/* HEADER */}
+          <header className="bg-[#161B22] border-b-2 border-[#30363D] px-4 py-2 flex items-center justify-between text-xs sticky top-0 z-30">
+            <div className="flex items-center gap-3">
               <span className="text-lg">🕵️</span>
-              <span className="font-bold text-white tracking-wider text-sm">THE COLD FILE // 2D DETECTIVE</span>
+              <span className="font-bold text-white text-sm">THE COLD FILE // 2D DETECTIVE</span>
               <span className="bg-[#0D1117] text-cyan-400 px-2 py-0.5 rounded border border-[#30363D]">
                 {caseData.caseId}
               </span>
             </div>
 
             <div className="flex items-center gap-3">
-              {/* Dual View Toggle */}
               <div className="flex border border-[#30363D] rounded overflow-hidden">
                 <button
                   onClick={() => { setViewMode('map'); audio.click(); }}
                   className={`px-3 py-1 font-bold text-xs ${viewMode === 'map' ? 'bg-cyan-600 text-white' : 'bg-[#0D1117] text-slate-400'}`}
                 >
-                  🎮 2D PIXEL MAP
+                  🎮 2D MAP
                 </button>
                 <button
                   onClick={() => { setViewMode('terminal'); audio.click(); }}
                   className={`px-3 py-1 font-bold text-xs ${viewMode === 'terminal' ? 'bg-cyan-600 text-white' : 'bg-[#0D1117] text-slate-400'}`}
                 >
-                  🖥️ LOG TERMINAL
+                  🖥️ LOGS
                 </button>
               </div>
 
-              {/* Sound Toggle */}
               <button
                 onClick={() => { const next = !soundMuted; setSoundMuted(next); audio.muted = next; }}
-                className="px-2 py-1 bg-[#0D1117] border border-[#30363D] rounded text-slate-300 text-xs"
+                className="px-2 py-1 bg-[#0D1117] border border-[#30363D] rounded text-slate-300"
               >
-                {soundMuted ? '🔇 MUTE' : '🔊 SFX'}
+                {soundMuted ? '🔇' : '🔊'}
               </button>
 
-              {/* Boss Key */}
+              <button
+                onClick={() => { localStorage.clear(); window.location.reload(); }}
+                className="px-2 py-1 bg-[#0D1117] hover:bg-rose-950 text-rose-400 border border-[#30363D] rounded text-[11px]"
+                title="Reset Game Cache"
+              >
+                RESET
+              </button>
+
               <button
                 onClick={() => setBossMode(true)}
-                className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded border border-slate-600 text-xs"
+                className="px-2.5 py-1 bg-slate-800 text-slate-200 rounded border border-slate-600 text-xs"
               >
                 [SYS_MODE] (ESC)
               </button>
             </div>
           </header>
 
-          {/* BRIEFING BANNER */}
+          {/* BRIEFING */}
           <div className="bg-[#0D1117] border-b border-[#30363D] px-4 py-1.5 flex items-center justify-between text-xs">
-            <div className="flex items-center gap-2 truncate">
-              <span className="text-rose-400 font-bold">[CRIME]:</span>
-              <span className="text-white font-semibold truncate">{caseData.crime.title}</span>
-              <span className="text-slate-400 hidden md:inline">• CRITICAL WINDOW: {caseData.crime.criticalWindow}</span>
+            <div className="truncate">
+              <strong className="text-rose-400">CRIME:</strong> <span className="text-white">{caseData.crime.title}</span>
             </div>
-            <div className="text-amber-400 font-bold shrink-0">
-              AP: {ap}/{maxAp}
-            </div>
+            <div className="text-amber-400 font-bold shrink-0">AP: {ap}/{maxAp}</div>
           </div>
 
-          {/* MAIN CONTENT AREA */}
-          <main className="flex-1 flex flex-col lg:flex-row p-4 gap-4 max-w-[1700px] w-full mx-auto">
-            
-            {/* VIEW 1: 2D PIXEL MAP */}
+          {/* MAIN */}
+          <main className="flex-1 flex flex-col lg:flex-row p-3 gap-3 max-w-[1700px] w-full mx-auto">
             {viewMode === 'map' ? (
-              <div className="flex-1 flex flex-col lg:flex-row gap-4">
-                
-                {/* 2D Tilemap Canvas */}
+              <div className="flex-1 flex flex-col lg:flex-row gap-3">
                 <div className="flex-1 bg-[#0D1117] border-2 border-[#30363D] rounded-lg p-2 flex flex-col items-center justify-center relative shadow-2xl">
                   <div className="w-full flex justify-between items-center text-xs text-slate-400 px-2 py-1 border-b border-[#30363D] mb-2 font-retro text-[9px]">
-                    <span>MOVE: [WASD] or [ARROWS] or CLICK MAP</span>
-                    <span>ACTION: [E] or [SPACE]</span>
+                    <span>MOVE: [WASD] / CLICK MAP</span>
+                    <span>ACTION: [E] / [SPACE]</span>
                   </div>
-
                   <canvas
                     ref={canvasRef}
                     width={MAP_WIDTH * TILE_SIZE}
                     height={MAP_HEIGHT * TILE_SIZE}
                     onClick={handleCanvasClick}
-                    className="border-2 border-[#30363D] rounded bg-black cursor-pointer shadow-inner max-w-full h-auto"
-                    style={{ maxHeight: '680px' }}
+                    className="border border-[#30363D] rounded bg-black cursor-pointer max-w-full h-auto"
+                    style={{ maxHeight: '660px' }}
                   />
                 </div>
 
-                {/* Right Side Tactical Sidebar */}
+                {/* Sidebar */}
                 <div className="w-full lg:w-80 flex flex-col gap-3">
-                  {/* AP Gauge */}
                   <div className="bg-[#161B22] border-2 border-[#30363D] rounded-lg p-3">
                     <div className="flex justify-between items-center text-xs mb-2">
-                      <span className="font-bold text-cyan-400">ACTION POINTS (AP)</span>
-                      <span className="text-amber-400 font-bold">🔥 Streak: {career.streak}</span>
+                      <span className="font-bold text-cyan-400">ACTION POINTS</span>
+                      <span className="text-amber-400 font-bold">Streak: {career.streak}</span>
                     </div>
-                    <div className="grid grid-cols-8 gap-1 mb-2">
+                    <div className="grid grid-cols-8 gap-1">
                       {Array.from({ length: maxAp }).map((_, i) => (
-                        <div
-                          key={i}
-                          className={`h-3 rounded-sm border ${
-                            i < ap ? 'bg-cyan-400 border-cyan-200' : 'bg-black border-[#30363D] opacity-30'
-                          }`}
-                        />
+                        <div key={i} className={`h-3 rounded-sm border ${i < ap ? 'bg-cyan-400 border-cyan-200' : 'bg-black border-[#30363D] opacity-30'}`} />
                       ))}
                     </div>
                   </div>
 
-                  {/* Suspects Quick Roster */}
                   <div className="bg-[#161B22] border-2 border-[#30363D] rounded-lg p-3 flex-1 flex flex-col">
-                    <span className="text-xs font-bold text-white mb-2 block">CAMPUS SUSPECTS (4)</span>
+                    <span className="text-xs font-bold text-white mb-2 block">CAMPUS SUSPECTS</span>
                     <div className="space-y-2 flex-1 overflow-y-auto max-h-[380px]">
                       {caseData.suspects.map(s => (
                         <div
@@ -1429,7 +1115,6 @@
                       ))}
                     </div>
 
-                    {/* Accusation Trigger */}
                     <button
                       onClick={() => setAccusationModalOpen(true)}
                       className="mt-3 w-full py-2.5 bg-gradient-to-r from-rose-700 to-amber-700 hover:from-rose-600 hover:to-amber-600 text-white font-bold text-xs rounded border border-rose-400 shadow-lg tracking-wider"
@@ -1440,26 +1125,16 @@
                 </div>
               </div>
             ) : (
-              /* VIEW 2: FULL FORENSIC LOG TERMINAL */
               <div className="flex-1 bg-[#161B22] border-2 border-[#30363D] rounded-lg p-4 flex flex-col shadow-2xl">
                 <div className="flex items-center gap-2 pb-3 border-b border-[#30363D] mb-3 text-xs font-bold">
-                  <button
-                    onClick={() => setActiveTab('badge')}
-                    className={`px-3 py-1.5 rounded ${activeTab === 'badge' ? 'bg-cyan-600 text-white' : 'bg-[#0D1117] text-slate-400'}`}
-                  >
-                    💳 BADGE LOGS ({caseData.evidence.badgeLogs.length})
+                  <button onClick={() => setActiveTab('badge')} className={`px-3 py-1.5 rounded ${activeTab === 'badge' ? 'bg-cyan-600 text-white' : 'bg-[#0D1117] text-slate-400'}`}>
+                    💳 KEYCARDS ({caseData.evidence.badgeLogs.length})
                   </button>
-                  <button
-                    onClick={() => setActiveTab('chat')}
-                    className={`px-3 py-1.5 rounded ${activeTab === 'chat' ? 'bg-amber-600 text-white' : 'bg-[#0D1117] text-slate-400'}`}
-                  >
-                    💬 CHAT SNIPPETS ({caseData.evidence.chatLogs.length})
+                  <button onClick={() => setActiveTab('chat')} className={`px-3 py-1.5 rounded ${activeTab === 'chat' ? 'bg-amber-600 text-white' : 'bg-[#0D1117] text-slate-400'}`}>
+                    💬 CHATS ({caseData.evidence.chatLogs.length})
                   </button>
-                  <button
-                    onClick={() => setActiveTab('network')}
-                    className={`px-3 py-1.5 rounded ${activeTab === 'network' ? 'bg-emerald-600 text-white' : 'bg-[#0D1117] text-slate-400'}`}
-                  >
-                    🌐 NETWORK TRACES ({caseData.evidence.networkLogs.length})
+                  <button onClick={() => setActiveTab('network')} className={`px-3 py-1.5 rounded ${activeTab === 'network' ? 'bg-emerald-600 text-white' : 'bg-[#0D1117] text-slate-400'}`}>
+                    🌐 NETWORK ({caseData.evidence.networkLogs.length})
                   </button>
                 </div>
 
@@ -1481,47 +1156,38 @@
             )}
           </main>
 
-          {/* ======================================================== */}
-          {/* SUSPECT DOSSIER & INTERROGATION MODAL */}
-          {/* ======================================================== */}
+          {/* SUSPECT MODAL */}
           {activeSuspectModal && (
             <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-              <div className="bg-[#161B22] border-2 border-cyan-400 rounded-lg max-w-lg w-full p-5 font-mono shadow-2xl">
+              <div className="bg-[#161B22] border-2 border-cyan-400 rounded-lg max-w-lg w-full p-5 shadow-2xl">
                 <div className="flex justify-between items-center pb-2 border-b border-[#30363D] mb-3">
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-white text-sm">{activeSuspectModal.name}</span>
-                    <span className="text-xs text-slate-400">({activeSuspectModal.badgeId})</span>
-                  </div>
+                  <span className="font-bold text-white text-sm">{activeSuspectModal.name}</span>
                   <button onClick={() => setActiveSuspectModal(null)} className="text-slate-400 hover:text-white">[CLOSE]</button>
                 </div>
-
-                <div className="space-y-3 text-xs mb-4">
-                  <div className="bg-[#0D1117] p-3 rounded border border-[#30363D]">
-                    <span className="text-slate-400 block text-[10px]">ROLE & DEPT:</span>
-                    <span className="text-cyan-400 font-bold">{activeSuspectModal.role} ({activeSuspectModal.dept})</span>
-                  </div>
-
-                  <div className="bg-[#0D1117] p-3 rounded border border-[#30363D]">
-                    <span className="text-amber-400 block text-[10px] font-bold">STATED ALIBI:</span>
-                    <p className="text-slate-200 mt-1">{activeSuspectModal.statedAlibi}</p>
-                  </div>
+                <div className="bg-[#0D1117] p-3 rounded border border-[#30363D] text-xs mb-4">
+                  <span className="text-amber-400 block font-bold mb-1">STATED ALIBI:</span>
+                  <p className="text-slate-200">{activeSuspectModal.statedAlibi}</p>
                 </div>
-
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <button
-                    onClick={() => triggerSignalTracker(activeSuspectModal)}
+                    onClick={() => {
+                      if (!spendAP(1)) return;
+                      audio.scan();
+                      setActiveSuspectModal(null);
+                      const isMatch = activeSuspectModal.actualRoom === activeSuspectModal.statedRoom;
+                      const target = isMatch ? { x: activeSuspectModal.mapX, y: activeSuspectModal.mapY } : { x: RESTRICTED_ROOM.tileX, y: RESTRICTED_ROOM.tileY };
+                      setRadarBeacon(target);
+                      showToast(isMatch ? `✓ SIGNAL: Confirmed in ${activeSuspectModal.statedRoom}` : `🚨 CONTRADICTION: Signal detected in ${RESTRICTED_ROOM.name}!`);
+                    }}
                     className="p-2.5 bg-cyan-950 hover:bg-cyan-900 border border-cyan-500 text-cyan-300 rounded font-bold"
                   >
                     📡 SIGNAL TRACKER (1 AP)
                   </button>
-
                   <button
                     onClick={() => {
-                      if (!spendAP(1, "Interrogate")) return;
-                      const response = activeSuspectModal.isCulprit 
-                        ? caseData.crime.alibiSlipDialogue 
-                        : "I was in my office reviewing tickets. Check the commit logs!";
-                      showToast(`🎙️ "${response}"`);
+                      if (!spendAP(1)) return;
+                      const resp = activeSuspectModal.isCulprit ? caseData.crime.alibiSlipDialogue : "I was in my assigned room. Check my git commits!";
+                      showToast(`🎙️ "${resp}"`);
                       audio.voiceBeep(450);
                     }}
                     className="p-2.5 bg-amber-950 hover:bg-amber-900 border border-amber-500 text-amber-300 rounded font-bold"
@@ -1533,12 +1199,10 @@
             </div>
           )}
 
-          {/* ======================================================== */}
-          {/* ACCUSATION SHOWDOWN MODAL */}
-          {/* ======================================================== */}
+          {/* ACCUSATION MODAL */}
           {accusationModalOpen && (
             <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
-              <div className="bg-[#161B22] border-2 border-rose-500 rounded-lg max-w-lg w-full p-6 font-mono shadow-2xl">
+              <div className="bg-[#161B22] border-2 border-rose-500 rounded-lg max-w-lg w-full p-6 shadow-2xl">
                 {verdictData ? (
                   <div>
                     <h2 className="text-lg font-bold text-center mb-2 text-white">
@@ -1548,7 +1212,7 @@
                       {verdictData.summary}
                     </p>
                     <button
-                      onClick={() => { setAccusationModalOpen(false); startNewCase(); }}
+                      onClick={() => { setAccusationModalOpen(false); setCaseData(generateCaseData(caseData.caseNumber + 1)); }}
                       className="w-full py-2.5 bg-cyan-600 hover:bg-cyan-500 text-black font-bold rounded"
                     >
                       NEXT CASE ➔
@@ -1557,21 +1221,16 @@
                 ) : (
                   <div>
                     <h2 className="text-sm font-bold text-white mb-3">LOCK IN ACCUSATION SHOWDOWN</h2>
-                    <div className="space-y-3 mb-4 text-xs">
-                      <div>
-                        <label className="block text-slate-400 mb-1">SELECT ACCUSED PRIME SUSPECT:</label>
-                        <select
-                          value={selectedAccusedSuspectId}
-                          onChange={(e) => setSelectedAccusedSuspectId(e.target.value)}
-                          className="w-full bg-[#0D1117] border border-[#30363D] rounded p-2 text-white"
-                        >
-                          <option value="">-- Choose suspect --</option>
-                          {caseData.suspects.map(s => (
-                            <option key={s.id} value={s.id}>{s.name} ({s.role})</option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
+                    <select
+                      value={selectedAccusedSuspectId}
+                      onChange={(e) => setSelectedAccusedSuspectId(e.target.value)}
+                      className="w-full bg-[#0D1117] border border-[#30363D] rounded p-2 text-white text-xs mb-4"
+                    >
+                      <option value="">-- Choose suspect to indict --</option>
+                      {caseData.suspects.map(s => (
+                        <option key={s.id} value={s.id}>{s.name} ({s.role})</option>
+                      ))}
+                    </select>
 
                     <div className="flex justify-end gap-2 text-xs">
                       <button onClick={() => setAccusationModalOpen(false)} className="px-3 py-1.5 bg-[#0D1117] text-slate-300 rounded">
@@ -1580,20 +1239,14 @@
                       <button
                         onClick={() => {
                           const accused = caseData.suspects.find(s => s.id === selectedAccusedSuspectId);
-                          if (!accused) { showToast("Select a suspect!"); return; }
+                          if (!accused) return;
                           if (accused.isCulprit) {
                             audio.success();
-                            setVerdictData({
-                              isSuccess: true,
-                              summary: `Conclusive proof gathered! ${accused.name} was arrested attempting to exfiltrate ${caseData.crime.compromisedAsset}. Motive: ${accused.motive}`
-                            });
-                            setCareer(prev => ({ ...prev, streak: prev.streak + 1, xp: prev.xp + 500 }));
+                            setVerdictData({ isSuccess: true, summary: `Case solved! ${accused.name} was arrested. Motive: ${accused.motive}` });
+                            setCareer(prev => ({ ...prev, streak: prev.streak + 1 }));
                           } else {
                             audio.failure();
-                            setVerdictData({
-                              isSuccess: false,
-                              summary: `Wrongful accusation! ${accused.name} had an airtight alibi. The real culprit was ${caseData.culpritName}!`
-                            });
+                            setVerdictData({ isSuccess: false, summary: `Wrongful accusation! Real culprit was ${caseData.culpritName}!` });
                             setCareer(prev => ({ ...prev, streak: 0 }));
                           }
                         }}
@@ -1608,7 +1261,6 @@
             </div>
           )}
 
-          {/* FOOTER */}
           <footer className="bg-[#161B22] border-t border-[#30363D] px-4 py-2 flex items-center justify-between text-[11px] text-slate-400">
             <span>THE COLD FILE // 2D PIXEL EDITION</span>
             <span>PRESS [ESC] FOR STEALTH BOSS MODE</span>
@@ -1617,7 +1269,12 @@
       );
     }
 
-    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    // Mount inside ErrorBoundary
+    ReactDOM.createRoot(document.getElementById('root')).render(
+      <ErrorBoundary>
+        <App />
+      </ErrorBoundary>
+    );
   </script>
 </body>
 </html>
