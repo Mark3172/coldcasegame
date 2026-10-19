@@ -69,7 +69,7 @@
     .scanlines {
       background: linear-gradient(
         rgba(18, 16, 16, 0) 50%, 
-        rgba(0, 0, 0, 0.22) 50%
+        rgba(0, 0, 0, 0.2) 50%
       );
       background-size: 100% 4px;
       pointer-events: none;
@@ -118,8 +118,8 @@
       if (root && root.children.length === 0) {
         root.innerHTML = '<div style="padding:40px;background:#090D13;color:#F85149;font-family:monospace;text-align:center;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;">' +
           '<h2 style="font-size:22px;margin-bottom:12px;">⚠️ LOADING DIAGNOSTIC DETECTED</h2>' +
-          '<p style="color:#E6EDF3;max-width:550px;margin-bottom:24px;font-size:13px;">Obsolete save data or script conflict detected.<br>Error: ' + msg + '</p>' +
-          '<button onclick="localStorage.clear();location.reload();" style="padding:12px 24px;background:#238636;color:#FFF;border:none;border-radius:6px;font-weight:bold;cursor:pointer;font-size:14px;">🔄 RESET DATA & RELOAD GAME</button>' +
+          '<p style="color:#E6EDF3;max-width:550px;margin-bottom:24px;font-size:13px;">Error: ' + msg + '</p>' +
+          '<button onclick="localStorage.clear();location.reload();" style="padding:12px 24px;background:#238636;color:#FFF;border:none;border-radius:6px;font-weight:bold;cursor:pointer;font-size:14px;">🔄 RESET DATA & RELOAD</button>' +
           '</div>';
       }
     };
@@ -128,7 +128,7 @@
 <body class="bg-[#090D13] text-slate-200 antialiased min-h-screen">
   <div id="root"></div>
 
-  <!-- MAIN SCRIPT (REACT + 2D PIXEL ENGINE) -->
+  <!-- MAIN SCRIPT (REACT + SMOOTH 2D PIXEL ENGINE) -->
   <script type="text/babel">
     const { useState, useEffect, useRef, useMemo, Component } = React;
 
@@ -136,27 +136,24 @@
     class ErrorBoundary extends Component {
       constructor(props) {
         super(props);
-        this.state = { hasError: false, error: null };
+        this.state = { hasError: false };
       }
-      static getDerivedStateFromError(error) {
-        return { hasError: true, error };
-      }
-      componentDidCatch(error, info) {
-        console.error("ErrorBoundary caught:", error, info);
+      static getDerivedStateFromError() {
+        return { hasError: true };
       }
       render() {
         if (this.state.hasError) {
           return (
             <div className="min-h-screen bg-[#090D13] text-rose-400 font-mono flex flex-col items-center justify-center p-6 text-center">
               <h2 className="text-xl font-bold mb-3">⚠️ INVESTIGATION CACHE CONFLICT</h2>
-              <p className="text-slate-300 text-xs max-w-md mb-6 leading-relaxed">
-                An obsolete browser save from a previous version was detected. Click below to clear outdated cache and launch the 2D world:
+              <p className="text-slate-300 text-xs max-w-md mb-6">
+                Click below to clear obsolete browser cache and reload smoothly:
               </p>
               <button
                 onClick={() => { localStorage.clear(); window.location.reload(); }}
                 className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded shadow-lg text-sm"
               >
-                🔄 CLEAR OBSOLETE CACHE & LAUNCH
+                🔄 CLEAR OBSOLETE CACHE & RELOAD
               </button>
             </div>
           );
@@ -166,20 +163,19 @@
     }
 
     // ==========================================
-    // 1. SOUND SYNTHESIZER (WEB AUDIO API)
+    // 1. SOUND SYNTHESIZER WITH PITCH VARIATION
     // ==========================================
     class SoundEngine {
       constructor() {
         this.ctx = null;
         this.muted = false;
+        this.lastStepTime = 0;
       }
 
       init() {
         if (!this.ctx) {
           const AudioContext = window.AudioContext || window.webkitAudioContext;
-          if (AudioContext) {
-            this.ctx = new AudioContext();
-          }
+          if (AudioContext) this.ctx = new AudioContext();
         }
         if (this.ctx && this.ctx.state === 'suspended') {
           this.ctx.resume();
@@ -204,7 +200,15 @@
         } catch (e) {}
       }
 
-      step() { this.playTone(180, 'triangle', 0.03, 0.015); }
+      step() {
+        const now = Date.now();
+        if (now - this.lastStepTime < 180) return; // rate limit footsteps
+        this.lastStepTime = now;
+        // Organic pitch variation between 165Hz and 205Hz
+        const p = 165 + Math.random() * 40;
+        this.playTone(p, 'triangle', 0.035, 0.02);
+      }
+
       interact() { this.playTone(920, 'square', 0.06, 0.03); }
       click() { this.playTone(1800, 'triangle', 0.03, 0.03); }
       scan() {
@@ -361,7 +365,6 @@
       {
         typeId: "CRIME_IP_THEFT",
         title: "PROJECT CHIMERA // QUANTUM CORE EXFILTRATION",
-        incidentType: "CORPORATE_ESPIONAGE",
         incidentTime: "22:18",
         criticalWindow: "22:00 - 22:30",
         restrictedRoom: RESTRICTED_ROOM.name,
@@ -377,7 +380,6 @@
       {
         typeId: "CRIME_WIRE_FRAUD",
         title: "THE PHANTOM WIRE TRANSFER // $14.2M ESCROW SWEEP",
-        incidentType: "FINANCIAL_FRAUD",
         incidentTime: "21:58",
         criticalWindow: "21:45 - 22:15",
         restrictedRoom: RESTRICTED_ROOM.name,
@@ -392,7 +394,6 @@
       }
     ];
 
-    // Case generator
     function generateCaseData(caseNumber = 1) {
       const crime = CRIMES_DATABASE[(caseNumber - 1) % CRIMES_DATABASE.length];
       const shuffledFirst = [...FIRST_NAMES].sort(() => Math.random() - 0.5);
@@ -536,10 +537,10 @@
     }
 
     // ==========================================
-    // 3. DEFENSIVE PIXEL CHIBI SPRITE RENDERER
+    // 3. FLUID 4-PHASE CHIBI SPRITE RENDERER
     // (Matches Reference Image 1)
     // ==========================================
-    function drawPixelChibiCharacter(ctx, x, y, theme, facing = 'down', frame = 0, isWalking = false) {
+    function drawPixelChibiCharacter(ctx, x, y, theme, facing = 'down', walkCycle = 0, isWalking = false) {
       if (!ctx) return;
       const t = theme || SPRITE_THEMES[0] || DETECTIVE_THEME;
       const drawX = isNaN(x) ? 100 : Math.floor(x);
@@ -548,13 +549,16 @@
       ctx.save();
       ctx.translate(drawX, drawY);
 
-      const bobY = isWalking ? (frame % 2 === 0 ? -1 : 1) : Math.sin(Date.now() / 320) * 0.8;
-      const legOffset = isWalking ? (frame % 2 === 0 ? 2 : -2) : 0;
+      // Smooth sine bobbing and leg stride cycle (4 phases: 0, 1, 2, 3)
+      const phase = Math.floor(walkCycle) % 4;
+      const bobY = isWalking ? (phase % 2 === 0 ? -1.5 : 0) : Math.sin(Date.now() / 360) * 0.8;
+      const legStride = isWalking ? (phase === 0 ? 3 : phase === 2 ? -3 : 0) : 0;
+      const armStride = isWalking ? (phase === 0 ? -2 : phase === 2 ? 2 : 0) : 0;
 
-      // Drop shadow
+      // Drop shadow with smooth breathing width
       ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
       ctx.beginPath();
-      ctx.ellipse(12, 29, 9, 3.5, 0, 0, Math.PI * 2);
+      ctx.ellipse(12, 29, isWalking ? 8 : 9, 3.5, 0, 0, Math.PI * 2);
       ctx.fill();
 
       const p = (px, py, w, h, color) => {
@@ -563,15 +567,15 @@
       };
 
       // 1. BOOTS & LEGS (Fold-over cuffs with gold buttons)
-      p(6 - legOffset, 20, 4, 7, t.pants);
-      p(5 - legOffset, 22, 5, 6, t.boots);
-      p(5 - legOffset, 21, 5, 2, t.bootCuffs);
-      p(6 - legOffset, 24, 1, 2, t.cuffGold);
+      p(6 - legStride, 20, 4, 7, t.pants);
+      p(5 - legStride, 22, 5, 6, t.boots);
+      p(5 - legStride, 21, 5, 2, t.bootCuffs);
+      p(6 - legStride, 24, 1, 2, t.cuffGold);
 
-      p(14 + legOffset, 20, 4, 7, t.pants);
-      p(14 + legOffset, 22, 5, 6, t.boots);
-      p(14 + legOffset, 21, 5, 2, t.bootCuffs);
-      p(15 + legOffset, 24, 1, 2, t.cuffGold);
+      p(14 + legStride, 20, 4, 7, t.pants);
+      p(14 + legStride, 22, 5, 6, t.boots);
+      p(14 + legStride, 21, 5, 2, t.bootCuffs);
+      p(15 + legStride, 24, 1, 2, t.cuffGold);
 
       // 2. TORSO, WAISTCOAT & PUFFY SLEEVES
       p(7, 13, 10, 8, t.shirt);
@@ -581,13 +585,15 @@
       p(11, 17, 2, 1, t.cuffGold);
       p(11, 19, 2, 1, t.cuffGold);
 
-      p(4, 14, 3, 5, t.shirt);
-      p(4, 18, 3, 3, t.gloves);
-      p(4, 17, 3, 1, t.cuffGold);
+      // Left Arm with stride
+      p(4, 14 + armStride, 3, 5, t.shirt);
+      p(4, 18 + armStride, 3, 3, t.gloves);
+      p(4, 17 + armStride, 3, 1, t.cuffGold);
 
-      p(17, 14, 3, 5, t.shirt);
-      p(17, 18, 3, 3, t.gloves);
-      p(17, 17, 3, 1, t.cuffGold);
+      // Right Arm with opposite stride
+      p(17, 14 - armStride, 3, 5, t.shirt);
+      p(17, 18 - armStride, 3, 3, t.gloves);
+      p(17, 17 - armStride, 3, 1, t.cuffGold);
 
       // 3. HEAD & FACE
       p(10, 11, 4, 2, t.skinShadow);
@@ -703,7 +709,7 @@
       ctx.fillRect(21 * TILE_SIZE, 5 * TILE_SIZE, 12, 10);
       ctx.fillRect(24 * TILE_SIZE, 5 * TILE_SIZE, 12, 10);
 
-      // Blinking Server Racks
+      // Animated Blinking Server Racks (Chaser LEDs)
       for (let r = 0; r < 4; r++) {
         const rx = (3 + r * 2.5) * TILE_SIZE;
         const ry = 3 * TILE_SIZE;
@@ -711,16 +717,25 @@
         ctx.fillRect(rx, ry, 36, 60);
         ctx.strokeStyle = "#334155";
         ctx.strokeRect(rx, ry, 36, 60);
-        const blink1 = Math.floor(time / 200 + r) % 2 === 0;
+        const blink1 = Math.floor(time / 160 + r) % 2 === 0;
+        const blink2 = Math.floor(time / 240 + r * 2) % 3 === 0;
         ctx.fillStyle = blink1 ? "#22C55E" : "#15803D";
         ctx.fillRect(rx + 6, ry + 10, 4, 4);
-        ctx.fillStyle = "#EF4444";
+        ctx.fillStyle = blink2 ? "#EF4444" : "#991B1B";
         ctx.fillRect(rx + 14, ry + 10, 4, 4);
+        ctx.fillStyle = "#38BDF8";
+        ctx.fillRect(rx + 22, ry + 10, 4, 4);
       }
 
-      // Crime Tape
+      // Animated Crime Tape (gentle wave)
+      const wave = Math.sin(time / 400) * 1.5;
       ctx.fillStyle = "#EAB308";
-      ctx.fillRect(10 * TILE_SIZE, 9 * TILE_SIZE - 2, 3 * TILE_SIZE, 4);
+      ctx.fillRect(10 * TILE_SIZE, 9 * TILE_SIZE - 2 + wave, 3 * TILE_SIZE, 4);
+
+      // Animated Water Cooler Bubble
+      const bubbleY = 15 * TILE_SIZE + 18 - ((time / 30) % 14);
+      ctx.fillStyle = "rgba(56, 189, 248, 0.7)";
+      ctx.fillRect(2 * TILE_SIZE + 8, bubbleY, 3, 3);
 
       // Labels
       ctx.font = "bold 9px 'Press Start 2P', monospace";
@@ -735,10 +750,9 @@
     }
 
     // ==========================================
-    // 5. MAIN REACT APP COMPONENT
+    // 5. MAIN REACT APP (SMOOTH MOVEMENT & KINEMATICS)
     // ==========================================
     function App() {
-      // Synchronous safe state initialization (clears any old incompatible data)
       const [caseData, setCaseData] = useState(() => {
         try {
           const saved = localStorage.getItem('THE_COLD_FILE_STATE_V2');
@@ -757,14 +771,31 @@
       const [viewMode, setViewMode] = useState('map');
       const [activeTab, setActiveTab] = useState('badge');
       const [pinnedLogIds, setPinnedLogIds] = useState([]);
-      const [playerPos, setPlayerPos] = useState({ x: 15, y: 10, facing: 'down', isWalking: false });
+
+      // BUTTERY SMOOTH KINEMATICS STATE (Using ref for 60fps physics)
+      const playerRef = useRef({
+        x: 15 * TILE_SIZE,
+        y: 10 * TILE_SIZE,
+        targetX: null,
+        targetY: null,
+        facing: 'down',
+        walkCycle: 0,
+        isWalking: false,
+        lastStepSound: 0
+      });
+
+      // Dust particles array
+      const dustParticlesRef = useRef([]);
+
+      // Click-to-move target cursor ripple
+      const targetCursorRef = useRef(null); // { x, y, spawnTime }
+
       const [interactTarget, setInteractTarget] = useState(null);
       const [radarBeacon, setRadarBeacon] = useState(null);
 
       // Modals
       const [activeSuspectModal, setActiveSuspectModal] = useState(null);
       const [activeNodeModal, setActiveNodeModal] = useState(null);
-      const [liveLeakModal, setLiveLeakModal] = useState(null);
       const [accusationModalOpen, setAccusationModalOpen] = useState(false);
       const [selectedAccusedSuspectId, setSelectedAccusedSuspectId] = useState('');
       const [verdictData, setVerdictData] = useState(null);
@@ -776,6 +807,7 @@
       const [toastMsg, setToastMsg] = useState(null);
 
       const canvasRef = useRef(null);
+      const keysPressedRef = useRef(new Set());
 
       const showToast = (msg) => {
         setToastMsg(msg);
@@ -792,63 +824,40 @@
         } catch (e) {}
       }, [caseData, ap, maxAp, pinnedLogIds, career]);
 
-      // Controls
+      // KEYBOARD INPUT LISTENER (CONTINUOUS SMOOTH TRACKING)
       useEffect(() => {
         const handleKeyDown = (e) => {
           if (e.key === 'Escape') {
             setBossMode(prev => !prev);
             return;
           }
-          if (activeSuspectModal || activeNodeModal || liveLeakModal || accusationModalOpen) return;
+          if (activeSuspectModal || activeNodeModal || accusationModalOpen) return;
 
-          let dx = 0, dy = 0, facing = playerPos.facing;
-          if (e.key === 'w' || e.key === 'W' || e.key === 'ArrowUp') { dy = -1; facing = 'up'; }
-          else if (e.key === 's' || e.key === 'S' || e.key === 'ArrowDown') { dy = 1; facing = 'down'; }
-          else if (e.key === 'a' || e.key === 'A' || e.key === 'ArrowLeft') { dx = -1; facing = 'left'; }
-          else if (e.key === 'd' || e.key === 'D' || e.key === 'ArrowRight') { dx = 1; facing = 'right'; }
-          else if (e.key === 'e' || e.key === 'E' || e.key === ' ') {
-            triggerNearbyInteraction();
-            return;
-          }
-
-          if (dx !== 0 || dy !== 0) {
+          const key = e.key.toLowerCase();
+          if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
             e.preventDefault();
-            setPlayerPos(prev => {
-              const nx = Math.max(1, Math.min(MAP_WIDTH - 2, prev.x + dx));
-              const ny = Math.max(1, Math.min(MAP_HEIGHT - 2, prev.y + dy));
-              audio.step();
-              return { x: nx, y: ny, facing, isWalking: true };
-            });
-            setTimeout(() => setPlayerPos(prev => ({ ...prev, isWalking: false })), 160);
+            keysPressedRef.current.add(key);
+            // Keyboard immediately overrides click destination
+            playerRef.current.targetX = null;
+            playerRef.current.targetY = null;
+            targetCursorRef.current = null;
+          } else if (key === 'e' || e.key === ' ') {
+            triggerNearbyInteraction();
           }
         };
 
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-      }, [activeSuspectModal, activeNodeModal, liveLeakModal, accusationModalOpen, playerPos]);
+        const handleKeyUp = (e) => {
+          const key = e.key.toLowerCase();
+          keysPressedRef.current.delete(key);
+        };
 
-      // Proximity check
-      useEffect(() => {
-        if (!caseData || !caseData.suspects) return;
-        let found = null;
-        for (const s of caseData.suspects) {
-          const dist = Math.hypot(s.mapX - playerPos.x, s.mapY - playerPos.y);
-          if (dist <= 2.2) {
-            found = { type: 'suspect', data: s, label: `[E] TALK TO ${s.name.toUpperCase()}` };
-            break;
-          }
-        }
-        if (!found) {
-          for (const node of INTERACTIVE_NODES) {
-            const dist = Math.hypot(node.tileX - playerPos.x, node.tileY - playerPos.y);
-            if (dist <= 2.2) {
-              found = { type: 'node', data: node, label: node.label };
-              break;
-            }
-          }
-        }
-        setInteractTarget(found);
-      }, [playerPos, caseData]);
+        window.addEventListener('keydown', handleKeyDown);
+        window.addEventListener('keyup', handleKeyUp);
+        return () => {
+          window.removeEventListener('keydown', handleKeyDown);
+          window.removeEventListener('keyup', handleKeyUp);
+        };
+      }, [activeSuspectModal, activeNodeModal, accusationModalOpen, interactTarget]);
 
       const triggerNearbyInteraction = () => {
         if (!interactTarget) return;
@@ -858,7 +867,7 @@
         } else if (interactTarget.type === 'node') {
           const node = interactTarget.data;
           if (node.type === 'crime_scene') {
-            showToast("🚨 CRIME SCENE: Physical security breach detected in vault!");
+            showToast("🚨 CRIME SCENE: Severe breach detected in vault safe!");
             audio.alert();
           } else {
             setActiveTab(node.type);
@@ -878,32 +887,167 @@
         return true;
       };
 
-      // 60FPS Canvas Render Loop (Defensively guarded)
+      // ==========================================
+      // BUTTERY SMOOTH 60FPS PHYSICS & RENDER LOOP
+      // ==========================================
       useEffect(() => {
         let animId;
-        const render = () => {
+        let lastTime = performance.now();
+
+        const gameLoop = (currentTime) => {
+          const dt = Math.min(0.06, (currentTime - lastTime) / 1000); // capped delta time
+          lastTime = currentTime;
+
           try {
             const canvas = canvasRef.current;
+            const p = playerRef.current;
+            const keys = keysPressedRef.current;
+
+            // 1. UPDATE KINEMATICS & VELOCITY
+            let moveX = 0;
+            let moveY = 0;
+
+            if (keys.has('w') || keys.has('arrowup')) { moveY -= 1; p.facing = 'up'; }
+            if (keys.has('s') || keys.has('arrowdown')) { moveY += 1; p.facing = 'down'; }
+            if (keys.has('a') || keys.has('arrowleft')) { moveX -= 1; p.facing = 'left'; }
+            if (keys.has('d') || keys.has('arrowright')) { moveX += 1; p.facing = 'right'; }
+
+            const speed = 140; // Pixels per second (responsive fluid walk)
+
+            if (moveX !== 0 || moveY !== 0) {
+              // Diagonal vector normalization
+              const len = Math.hypot(moveX, moveY);
+              p.x += (moveX / len) * speed * dt;
+              p.y += (moveY / len) * speed * dt;
+              p.isWalking = true;
+              p.walkCycle += dt * 8; // Smooth 8 steps/second cycle
+
+              // Spawn footstep dust particles
+              if (Math.random() < 0.25) {
+                dustParticlesRef.current.push({
+                  x: p.x + 12 + (Math.random() * 4 - 2),
+                  y: p.y + 26,
+                  vx: (Math.random() - 0.5) * 8,
+                  vy: -Math.random() * 6 - 2,
+                  life: 1.0
+                });
+              }
+
+              // Play soft footstep tone
+              audio.step();
+            } else if (p.targetX !== null && p.targetY !== null) {
+              // Click-to-move smooth pathing
+              const dx = p.targetX - p.x;
+              const dy = p.targetY - p.y;
+              const dist = Math.hypot(dx, dy);
+
+              if (dist > 3) {
+                p.x += (dx / dist) * speed * dt;
+                p.y += (dy / dist) * speed * dt;
+                p.facing = Math.abs(dx) > Math.abs(dy) ? (dx < 0 ? 'left' : 'right') : (dy < 0 ? 'up' : 'down');
+                p.isWalking = true;
+                p.walkCycle += dt * 8;
+                audio.step();
+
+                if (Math.random() < 0.25) {
+                  dustParticlesRef.current.push({
+                    x: p.x + 12 + (Math.random() * 4 - 2),
+                    y: p.y + 26,
+                    vx: (Math.random() - 0.5) * 8,
+                    vy: -Math.random() * 6 - 2,
+                    life: 1.0
+                  });
+                }
+              } else {
+                p.targetX = null;
+                p.targetY = null;
+                p.isWalking = false;
+                targetCursorRef.current = null;
+              }
+            } else {
+              p.isWalking = false;
+            }
+
+            // Boundary collision
+            p.x = Math.max(TILE_SIZE, Math.min((MAP_WIDTH - 2) * TILE_SIZE, p.x));
+            p.y = Math.max(TILE_SIZE, Math.min((MAP_HEIGHT - 2) * TILE_SIZE, p.y));
+
+            // Update dust particles
+            dustParticlesRef.current = dustParticlesRef.current.filter(part => {
+              part.x += part.vx * dt;
+              part.y += part.vy * dt;
+              part.life -= dt * 2.8;
+              return part.life > 0;
+            });
+
+            // Proximity Detection for Interaction
+            if (caseData && caseData.suspects) {
+              const playerTileX = p.x / TILE_SIZE;
+              const playerTileY = p.y / TILE_SIZE;
+              let found = null;
+
+              for (const s of caseData.suspects) {
+                const dist = Math.hypot(s.mapX - playerTileX, s.mapY - playerTileY);
+                if (dist <= 2.2) {
+                  found = { type: 'suspect', data: s, label: `[E] TALK TO ${s.name.toUpperCase()}` };
+                  break;
+                }
+              }
+
+              if (!found) {
+                for (const node of INTERACTIVE_NODES) {
+                  const dist = Math.hypot(node.tileX - playerTileX, node.tileY - playerTileY);
+                  if (dist <= 2.2) {
+                    found = { type: 'node', data: node, label: node.label };
+                    break;
+                  }
+                }
+              }
+              setInteractTarget(found);
+            }
+
+            // 2. CANVAS DRAWING
             if (canvas && caseData) {
               const ctx = canvas.getContext('2d');
-              const now = Date.now();
               ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-              drawWorldTilemap(ctx, canvas.width, canvas.height, now);
+              // Draw Tilemap
+              drawWorldTilemap(ctx, canvas.width, canvas.height, currentTime);
 
-              // Interactive Nodes
+              // Draw Target Cursor (Click-to-move golden ripple)
+              if (targetCursorRef.current) {
+                const tc = targetCursorRef.current;
+                const age = (currentTime - tc.spawnTime) / 1000;
+                const ringSize = (age * 16) % 18 + 4;
+                ctx.strokeStyle = "rgba(227, 179, 65, 0.8)";
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(tc.x + 12, tc.y + 12, ringSize, 0, Math.PI * 2);
+                ctx.stroke();
+              }
+
+              // Draw Dust Particles under feet
+              dustParticlesRef.current.forEach(part => {
+                ctx.fillStyle = `rgba(203, 213, 225, ${part.life * 0.4})`;
+                ctx.fillRect(Math.floor(part.x), Math.floor(part.y), 3, 3);
+              });
+
+              // Interactive Nodes with smooth pulsing rings
               INTERACTIVE_NODES.forEach(node => {
                 const nx = node.tileX * TILE_SIZE;
                 const ny = node.tileY * TILE_SIZE;
-                ctx.fillStyle = "rgba(88, 166, 255, 0.25)";
+                const pulse = Math.sin(currentTime / 300) * 3 + 12;
+
+                ctx.fillStyle = "rgba(88, 166, 255, 0.2)";
                 ctx.beginPath();
-                ctx.arc(nx + 12, ny + 12, 14, 0, Math.PI * 2);
+                ctx.arc(nx + 12, ny + 12, pulse, 0, Math.PI * 2);
                 ctx.fill();
+
                 ctx.font = "14px monospace";
                 ctx.fillText(node.icon, nx + 4, ny + 16);
               });
 
-              // Suspect NPCs
+              // Draw Suspect NPCs (With subtle breathing and floating indicators)
               if (caseData.suspects) {
                 caseData.suspects.forEach((s, idx) => {
                   const sx = (s.mapX !== undefined ? s.mapX : 10) * TILE_SIZE;
@@ -911,73 +1055,89 @@
                   const theme = s.spriteTheme || SPRITE_THEMES[idx % SPRITE_THEMES.length];
                   drawPixelChibiCharacter(ctx, sx, sy, theme, 'down', 0, false);
 
+                  // Name Tag
                   ctx.font = "bold 8px monospace";
                   ctx.fillStyle = "#FFFFFF";
                   ctx.fillText(s.name.split(" ")[0], sx - 2, sy - 4);
                 });
               }
 
-              // Radar Beacon
+              // Draw Radar Beacon Ping if active
               if (radarBeacon) {
                 const rx = radarBeacon.x * TILE_SIZE + 12;
                 const ry = radarBeacon.y * TILE_SIZE + 12;
-                const pulse = (Math.sin(now / 150) + 1) * 12 + 10;
+                const pulse = (Math.sin(currentTime / 180) + 1) * 14 + 10;
                 ctx.strokeStyle = "#F43F5E";
                 ctx.lineWidth = 2;
                 ctx.beginPath();
                 ctx.arc(rx, ry, pulse, 0, Math.PI * 2);
                 ctx.stroke();
+
+                ctx.fillStyle = "#EF4444";
+                ctx.font = "bold 9px 'Press Start 2P', monospace";
+                ctx.fillText("BEACON DETECTED!", rx - 60, ry - 22);
               }
 
-              // Detective Player
+              // Draw Player Detective (With fluid 4-phase walk cycle!)
               drawPixelChibiCharacter(
                 ctx,
-                playerPos.x * TILE_SIZE,
-                playerPos.y * TILE_SIZE,
+                p.x,
+                p.y,
                 DETECTIVE_THEME,
-                playerPos.facing,
-                Math.floor(now / 120),
-                playerPos.isWalking
+                p.facing,
+                p.walkCycle,
+                p.isWalking
               );
 
-              // Interact indicator
+              // Floating Interactive Dialogue Indicator (Smooth springy bob)
               if (interactTarget) {
-                const ix = playerPos.x * TILE_SIZE + 12;
-                const iy = playerPos.y * TILE_SIZE - 12;
+                const ix = p.x + 12;
+                const bob = Math.sin(currentTime / 220) * 3;
+                const iy = p.y - 14 + bob;
+
                 ctx.fillStyle = "rgba(13, 17, 23, 0.9)";
                 ctx.strokeStyle = "#E3B341";
                 ctx.lineWidth = 1;
                 const text = interactTarget.label;
                 ctx.font = "bold 9px monospace";
                 const tw = ctx.measureText(text).width;
-                ctx.fillRect(ix - tw / 2 - 4, iy - 16, tw + 8, 14);
-                ctx.strokeRect(ix - tw / 2 - 4, iy - 16, tw + 8, 14);
+                ctx.fillRect(ix - tw / 2 - 4, iy - 16, tw + 8, 15);
+                ctx.strokeRect(ix - tw / 2 - 4, iy - 16, tw + 8, 15);
                 ctx.fillStyle = "#58A6FF";
-                ctx.fillText(text, ix - tw / 2, iy - 6);
+                ctx.fillText(text, ix - tw / 2, iy - 5);
               }
             }
           } catch (err) {
-            console.error("Render loop caught:", err);
+            console.error("Game loop caught:", err);
           }
-          animId = requestAnimationFrame(render);
-        };
-        render();
-        return () => cancelAnimationFrame(animId);
-      }, [caseData, playerPos, interactTarget, radarBeacon]);
 
+          animId = requestAnimationFrame(gameLoop);
+        };
+
+        animId = requestAnimationFrame(gameLoop);
+        return () => cancelAnimationFrame(animId);
+      }, [caseData, radarBeacon]);
+
+      // SMOOTH CLICK-TO-MOVE (Walks towards clicked target instead of snapping!)
       const handleCanvasClick = (e) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
         const rect = canvas.getBoundingClientRect();
-        const clickX = Math.floor((e.clientX - rect.left) / (rect.width / MAP_WIDTH));
-        const clickY = Math.floor((e.clientY - rect.top) / (rect.height / MAP_HEIGHT));
+        const clickX = ((e.clientX - rect.left) / rect.width) * (MAP_WIDTH * TILE_SIZE);
+        const clickY = ((e.clientY - rect.top) / rect.height) * (MAP_HEIGHT * TILE_SIZE);
 
-        setPlayerPos(prev => {
-          const facing = clickX < prev.x ? 'left' : clickX > prev.x ? 'right' : clickY < prev.y ? 'up' : 'down';
-          audio.step();
-          return { x: clickX, y: clickY, facing, isWalking: true };
-        });
-        setTimeout(() => setPlayerPos(prev => ({ ...prev, isWalking: false })), 200);
+        // Set target destination
+        playerRef.current.targetX = clickX - 12;
+        playerRef.current.targetY = clickY - 14;
+
+        // Spawn target cursor ripple
+        targetCursorRef.current = {
+          x: clickX - 12,
+          y: clickY - 14,
+          spawnTime: performance.now()
+        };
+
+        audio.click();
       };
 
       if (bossMode) {
@@ -1020,13 +1180,13 @@
               <div className="flex border border-[#30363D] rounded overflow-hidden">
                 <button
                   onClick={() => { setViewMode('map'); audio.click(); }}
-                  className={`px-3 py-1 font-bold text-xs ${viewMode === 'map' ? 'bg-cyan-600 text-white' : 'bg-[#0D1117] text-slate-400'}`}
+                  className={`px-3 py-1 font-bold text-xs transition ${viewMode === 'map' ? 'bg-cyan-600 text-white' : 'bg-[#0D1117] text-slate-400'}`}
                 >
                   🎮 2D MAP
                 </button>
                 <button
                   onClick={() => { setViewMode('terminal'); audio.click(); }}
-                  className={`px-3 py-1 font-bold text-xs ${viewMode === 'terminal' ? 'bg-cyan-600 text-white' : 'bg-[#0D1117] text-slate-400'}`}
+                  className={`px-3 py-1 font-bold text-xs transition ${viewMode === 'terminal' ? 'bg-cyan-600 text-white' : 'bg-[#0D1117] text-slate-400'}`}
                 >
                   🖥️ LOGS
                 </button>
@@ -1070,8 +1230,8 @@
               <div className="flex-1 flex flex-col lg:flex-row gap-3">
                 <div className="flex-1 bg-[#0D1117] border-2 border-[#30363D] rounded-lg p-2 flex flex-col items-center justify-center relative shadow-2xl">
                   <div className="w-full flex justify-between items-center text-xs text-slate-400 px-2 py-1 border-b border-[#30363D] mb-2 font-retro text-[9px]">
-                    <span>MOVE: [WASD] / CLICK MAP</span>
-                    <span>ACTION: [E] / [SPACE]</span>
+                    <span className="text-cyan-400">SMOOTH MOVE: HOLD [WASD] or CLICK ANYWHERE TO WALK</span>
+                    <span className="text-amber-400">ACTION: [E] or [SPACE]</span>
                   </div>
                   <canvas
                     ref={canvasRef}
@@ -1269,7 +1429,6 @@
       );
     }
 
-    // Mount inside ErrorBoundary
     ReactDOM.createRoot(document.getElementById('root')).render(
       <ErrorBoundary>
         <App />
