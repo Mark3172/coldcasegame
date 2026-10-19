@@ -1,0 +1,12 @@
+{
+  "name": "the-cold-file",
+  "version": "1.0.0",
+  "description": "An internal corporate mystery & deduction game disguised as a sleek log-analysis tool.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": ["game", "mystery", "deduction", "turn-based", "cyberpunk", "terminal"],
+  "author": "Antigravity",
+  "license": "MIT"
+}
