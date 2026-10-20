@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>THE COLD FILE // 2D PIXEL CORPORATE MYSTERY</title>
+  <title>THE COLD FILE // 2D PIXEL CYBER MYSTERY</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🕵️</text></svg>">
-  
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -15,18 +15,19 @@
         extend: {
           colors: {
             pixelDark: '#070B10',
-            pixelSurface: '#0F1621',
-            pixelBorder: '#233044',
+            pixelSurface: '#0F1722',
+            pixelCard: '#152130',
+            pixelBorder: '#223449',
             pixelCyan: '#38BDF8',
             pixelEmerald: '#10B981',
             pixelAmber: '#F59E0B',
             pixelRose: '#F43F5E',
-            pixelGold: '#FBBF24',
-            pixelPurple: '#818CF8'
+            pixelPurple: '#A855F7',
+            pixelGold: '#FBBF24'
           },
           fontFamily: {
-            pixel: ['"Courier New"', 'Courier', 'monospace'],
-            mono: ['JetBrains Mono', 'Fira Code', 'Consolas', 'monospace']
+            pixel: ['"Press Start 2P"', 'monospace'],
+            mono: ['"JetBrains Mono"', 'Consolas', 'monospace']
           }
         }
       }
@@ -36,7 +37,7 @@
   <!-- Google Fonts for retro pixel feel -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
 
   <!-- React 18 & ReactDOM -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -54,11 +55,11 @@
       image-rendering: pixelated;
     }
 
-    .font-retro {
+    .font-pixel {
       font-family: 'Press Start 2P', monospace;
     }
 
-    /* Pixelated canvas rendering */
+    /* Crisp Pixelated Canvas */
     canvas {
       image-rendering: -moz-crisp-edges;
       image-rendering: -webkit-crisp-edges;
@@ -66,27 +67,65 @@
       image-rendering: crisp-edges;
     }
 
-    /* Scanlines effect */
+    /* Scanlines Overlay */
     .scanlines {
       background: linear-gradient(
         rgba(18, 16, 16, 0) 50%, 
-        rgba(0, 0, 0, 0.25) 50%
+        rgba(0, 0, 0, 0.22) 50%
       );
       background-size: 100% 4px;
       pointer-events: none;
     }
 
-    /* Cyberpunk Glowing Borders */
+    /* Cyber Card Box */
     .cyber-card {
-      background: rgba(15, 22, 33, 0.85);
-      border: 1px solid rgba(56, 189, 248, 0.25);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(56, 189, 248, 0.03);
-    }
-    .cyber-card:hover {
-      border-color: rgba(56, 189, 248, 0.5);
+      background: rgba(15, 23, 34, 0.88);
+      backdrop-filter: blur(8px);
+      border: 2px solid #223449;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
     }
 
-    /* Custom scrollbars */
+    .cyber-btn {
+      background: #1A2636;
+      border: 1px solid #2D435D;
+      box-shadow: 0 3px 0 #0C131C;
+      border-radius: 6px;
+      transition: all 0.1s ease;
+    }
+    .cyber-btn:hover {
+      background: #233449;
+      border-color: #38BDF8;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
+    }
+    .cyber-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #0C131C;
+    }
+
+    /* Pulsing Neon Animations */
+    @keyframes neonPulse {
+      0%, 100% { opacity: 0.9; filter: drop-shadow(0 0 4px #38BDF8); }
+      50% { opacity: 0.5; filter: drop-shadow(0 0 1px #38BDF8); }
+    }
+    .neon-pulse {
+      animation: neonPulse 2.2s infinite ease-in-out;
+    }
+
+    /* Screen Shake for Twists */
+    @keyframes screenShake {
+      0% { transform: translate(2px, 1px) rotate(0deg); }
+      20% { transform: translate(-3px, -2px) rotate(-0.5deg); }
+      40% { transform: translate(3px, 2px) rotate(0.5deg); }
+      60% { transform: translate(-2px, 1px) rotate(0deg); }
+      80% { transform: translate(2px, -1px) rotate(-0.5deg); }
+      100% { transform: translate(0px, 0px) rotate(0deg); }
+    }
+    .shake-effect {
+      animation: screenShake 0.4s ease-in-out;
+    }
+
+    /* Custom Scrollbars */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -95,34 +134,11 @@
       background: #070B10;
     }
     ::-webkit-scrollbar-thumb {
-      background: #233044;
-      border-radius: 2px;
+      background: #223449;
+      border-radius: 3px;
     }
     ::-webkit-scrollbar-thumb:hover {
       background: #38BDF8;
-    }
-
-    /* Screen Shake */
-    @keyframes screenShake {
-      0% { transform: translate(1px, 1px) rotate(0deg); }
-      10% { transform: translate(-1px, -2px) rotate(-0.5deg); }
-      20% { transform: translate(-3px, 0px) rotate(0.5deg); }
-      30% { transform: translate(3px, 2px) rotate(0deg); }
-      40% { transform: translate(1px, -1px) rotate(0.5deg); }
-      50% { transform: translate(-1px, 2px) rotate(-0.5deg); }
-      60% { transform: translate(-3px, 1px) rotate(0deg); }
-      70% { transform: translate(3px, 1px) rotate(-0.5deg); }
-      80% { transform: translate(-1px, -1px) rotate(0.5deg); }
-      90% { transform: translate(1px, 2px) rotate(0deg); }
-      100% { transform: translate(1px, -2px) rotate(0deg); }
-    }
-    .shake-effect {
-      animation: screenShake 0.4s ease-in-out;
-    }
-
-    /* Detective Lens Overlay */
-    .lens-active {
-      filter: contrast(115%) saturate(85%) hue-rotate(185deg);
     }
   </style>
 
@@ -144,7 +160,7 @@
 <body class="bg-[#070B10] text-slate-200 antialiased min-h-screen">
   <div id="root"></div>
 
-  <!-- MAIN SCRIPT (REACT + CYBER-NOIR ATMOSPHERE ENGINE) -->
+  <!-- MAIN REACT + 2D ENGINE SCRIPT -->
   <script type="text/babel">
     const { useState, useEffect, useRef, useMemo, Component } = React;
 
@@ -161,13 +177,13 @@
         if (this.state.hasError) {
           return (
             <div className="min-h-screen bg-[#070B10] text-rose-400 font-mono flex flex-col items-center justify-center p-6 text-center">
-              <h2 className="text-xl font-bold mb-3">⚠️ CACHE CONFLICT DETECTED</h2>
-              <p className="text-slate-300 text-xs max-w-md mb-6">
-                Click below to clear obsolete browser cache and reload smoothly:
+              <h2 className="text-xl font-bold mb-3 font-pixel text-rose-400">⚠️ CACHE CONFLICT DETECTED</h2>
+              <p className="text-slate-300 text-xs max-w-md mb-6 leading-relaxed">
+                A saved game state conflict was detected. Click below to clear obsolete browser cache and reload smoothly:
               </p>
               <button
                 onClick={() => { localStorage.clear(); window.location.reload(); }}
-                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded shadow-lg text-sm"
+                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded shadow-lg text-xs"
               >
                 🔄 CLEAR OBSOLETE CACHE & RELOAD
               </button>
@@ -179,15 +195,15 @@
     }
 
     // ==========================================
-    // 1. SOUND & AMBIENT LO-FI SYNTH BGM ENGINE
+    // 1. SOUND & AMBIENT SYNTH AUDIO ENGINE
     // ==========================================
     class SoundEngine {
       constructor() {
         this.ctx = null;
         this.muted = false;
         this.bgmEnabled = false;
-        this.bgmNodes = [];
         this.lastStepTime = 0;
+        this.bgmTimer = null;
       }
 
       init() {
@@ -222,29 +238,12 @@
         const now = Date.now();
         if (now - this.lastStepTime < 180) return;
         this.lastStepTime = now;
-        const p = 165 + Math.random() * 40;
-        this.playTone(p, 'triangle', 0.035, 0.02);
+        const p = 160 + Math.random() * 40;
+        this.playTone(p, 'triangle', 0.035, 0.018);
       }
 
-      interact() { this.playTone(920, 'square', 0.06, 0.03); }
-      click() { this.playTone(1800, 'triangle', 0.03, 0.03); }
-      lensToggle() {
-        this.init();
-        if (!this.ctx || this.muted) return;
-        try {
-          const osc = this.ctx.createOscillator();
-          const gain = this.ctx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(800, this.ctx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(300, this.ctx.currentTime + 0.2);
-          gain.gain.setValueAtTime(0.04, this.ctx.currentTime);
-          gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.2);
-          osc.connect(gain);
-          gain.connect(this.ctx.destination);
-          osc.start();
-          osc.stop(this.ctx.currentTime + 0.21);
-        } catch (e) {}
-      }
+      interact() { this.playTone(880, 'triangle', 0.07, 0.035); }
+      click() { this.playTone(1400, 'triangle', 0.02, 0.025); }
 
       scan() {
         if (this.muted) return;
@@ -255,14 +254,45 @@
           const gain = this.ctx.createGain();
           osc.type = 'sawtooth';
           osc.frequency.setValueAtTime(320, this.ctx.currentTime);
-          osc.frequency.exponentialRampToValueAtTime(1400, this.ctx.currentTime + 0.28);
+          osc.frequency.exponentialRampToValueAtTime(1600, this.ctx.currentTime + 0.3);
           gain.gain.setValueAtTime(0.04, this.ctx.currentTime);
-          gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.28);
+          gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.3);
           osc.connect(gain);
           gain.connect(this.ctx.destination);
           osc.start();
-          osc.stop(this.ctx.currentTime + 0.29);
+          osc.stop(this.ctx.currentTime + 0.31);
         } catch (e) {}
+      }
+
+      sonar() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(1050, now);
+          osc.frequency.exponentialRampToValueAtTime(420, now + 0.45);
+          gain.gain.setValueAtTime(0.06, now);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.46);
+        } catch (e) {}
+      }
+
+      decrypt() {
+        if (this.muted) return;
+        this.init();
+        if (!this.ctx) return;
+        for (let i = 0; i < 6; i++) {
+          setTimeout(() => {
+            this.playTone(600 + Math.random() * 800, 'sawtooth', 0.03, 0.02);
+          }, i * 45);
+        }
       }
 
       alert() {
@@ -271,12 +301,12 @@
         if (!this.ctx) return;
         try {
           const now = this.ctx.currentTime;
-          [440, 880, 440, 880].forEach((freq, idx) => {
+          [520, 880, 520, 880].forEach((freq, idx) => {
             const osc = this.ctx.createOscillator();
             const gain = this.ctx.createGain();
             osc.type = 'sawtooth';
             osc.frequency.setValueAtTime(freq, now + idx * 0.09);
-            gain.gain.setValueAtTime(0.05, now + idx * 0.09);
+            gain.gain.setValueAtTime(0.045, now + idx * 0.09);
             gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.09 + 0.08);
             osc.connect(gain);
             gain.connect(this.ctx.destination);
@@ -296,13 +326,13 @@
             const osc = this.ctx.createOscillator();
             const gain = this.ctx.createGain();
             osc.type = 'triangle';
-            osc.frequency.setValueAtTime(freq, now + idx * 0.1);
-            gain.gain.setValueAtTime(0.06, now + idx * 0.1);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.1 + 0.28);
+            osc.frequency.setValueAtTime(freq, now + idx * 0.11);
+            gain.gain.setValueAtTime(0.05, now + idx * 0.11);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.11 + 0.32);
             osc.connect(gain);
             gain.connect(this.ctx.destination);
-            osc.start(now + idx * 0.1);
-            osc.stop(now + idx * 0.1 + 0.3);
+            osc.start(now + idx * 0.11);
+            osc.stop(now + idx * 0.11 + 0.34);
           });
         } catch (e) {}
       }
@@ -318,7 +348,7 @@
             const gain = this.ctx.createGain();
             osc.type = 'sawtooth';
             osc.frequency.setValueAtTime(freq, now + idx * 0.14);
-            gain.gain.setValueAtTime(0.06, now + idx * 0.14);
+            gain.gain.setValueAtTime(0.05, now + idx * 0.14);
             gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.14 + 0.2);
             osc.connect(gain);
             gain.connect(this.ctx.destination);
@@ -328,9 +358,8 @@
         } catch (e) {}
       }
 
-      voiceBeep(pitch = 500) { this.playTone(pitch, 'sawtooth', 0.04, 0.025); }
+      voiceBeep(pitch = 500) { this.playTone(pitch, 'triangle', 0.04, 0.025); }
 
-      // Cyber-Noir Generative Lo-Fi Ambient Chord Engine
       startBGM() {
         if (this.bgmEnabled) return;
         this.init();
@@ -349,11 +378,10 @@
           if (!this.bgmEnabled || !this.ctx) return;
           const freqs = chordProg[chordIdx % chordProg.length];
           chordIdx++;
-
           const now = this.ctx.currentTime;
           const duration = 6.0;
 
-          freqs.forEach((freq, i) => {
+          freqs.forEach((freq) => {
             try {
               const osc = this.ctx.createOscillator();
               const gain = this.ctx.createGain();
@@ -362,10 +390,9 @@
               osc.type = 'sawtooth';
               osc.frequency.setValueAtTime(freq, now);
 
-              // Lowpass warm vinyl filter
               filter.type = 'lowpass';
               filter.frequency.setValueAtTime(450, now);
-              filter.frequency.exponentialRampToValueAtTime(700, now + duration / 2);
+              filter.frequency.exponentialRampToValueAtTime(650, now + duration / 2);
               filter.frequency.exponentialRampToValueAtTime(400, now + duration);
 
               gain.gain.setValueAtTime(0.0001, now);
@@ -401,19 +428,20 @@
     const FIRST_NAMES = ["Elena", "Marcus", "Priya", "Devon", "Alistair", "Samantha", "Victor", "Naomi"];
     const LAST_NAMES = ["Vance", "Thorne", "Sharma", "Cruz", "Sterling", "Kowalski", "Chen", "Sinclair"];
 
+    // Character Themes adhering directly to Reference Image 1
     const SPRITE_THEMES = [
       {
-        id: "theme_white", // Matches reference image 1 directly!
+        id: "theme_white", // Direct match to Reference 1!
         name: "White Fluffy Hair / Slate Vest",
-        hair: "#F0F4F8", hairShadow: "#CBD5E1", hairOutline: "#1E293B",
+        hair: "#F5F8FA", hairShadow: "#D0D9E2", hairOutline: "#1E293B",
         skin: "#FFE5D0", skinShadow: "#FDBA74", eye: "#1E293B",
-        vest: "#64748B", vestShadow: "#475569", shirt: "#FFFFFF",
-        cuffGold: "#F59E0B", gloves: "#334155", pants: "#334155",
-        boots: "#1E293B", bootCuffs: "#64748B"
+        vest: "#58677C", vestShadow: "#3E4C60", shirt: "#FFFFFF",
+        cuffGold: "#F59E0B", gloves: "#2D3748", pants: "#2D3748",
+        boots: "#1A202C", bootCuffs: "#58677C"
       },
       {
         id: "theme_dark",
-        name: "Raven Black / Navy Suit",
+        name: "Raven Black / Navy Vest",
         hair: "#1E293B", hairShadow: "#0F172A", hairOutline: "#020617",
         skin: "#FFE5D0", skinShadow: "#FDBA74", eye: "#0F172A",
         vest: "#1E3A8A", vestShadow: "#172554", shirt: "#F8FAFC",
@@ -431,7 +459,7 @@
       },
       {
         id: "theme_crimson",
-        name: "Copper Tousled / Crimson Coat",
+        name: "Copper Tousled / Crimson Vest",
         hair: "#EA580C", hairShadow: "#C2410C", hairOutline: "#431407",
         skin: "#FFE5D0", skinShadow: "#FDBA74", eye: "#1E293B",
         vest: "#991B1B", vestShadow: "#7F1D1D", shirt: "#FEF2F2",
@@ -449,15 +477,15 @@
     };
 
     const ROOM_LOCATIONS = [
-      { name: "Conference Room 4A", tileX: 23, tileY: 5, color: "#38BDF8" },
-      { name: "Executive 7th Floor Lounge", tileX: 23, tileY: 17, color: "#F43F5E" },
-      { name: "Cafeteria & Breakroom", tileX: 7, tileY: 17, color: "#10B981" },
-      { name: "Engineering Pod Alpha", tileX: 15, tileY: 11, color: "#F59E0B" }
+      { name: "Conference Room 4A", tileX: 24, tileY: 5, color: "#38BDF8", act: "typing" },
+      { name: "Executive 7th Floor Lounge", tileX: 24, tileY: 17, color: "#F43F5E", act: "relaxing" },
+      { name: "Cafeteria & Breakroom", tileX: 6, tileY: 17, color: "#10B981", act: "drinking" },
+      { name: "Engineering Pod Alpha", tileX: 15, tileY: 11, color: "#F59E0B", act: "inspecting" }
     ];
 
     const RESTRICTED_ROOM = {
       name: "Sublevel 2 - Core Server Vault",
-      tileX: 7,
+      tileX: 6,
       tileY: 5,
       color: "#F85149"
     };
@@ -525,17 +553,18 @@
           actualRoom: assignedRoom.name,
           mapX: assignedRoom.tileX,
           mapY: assignedRoom.tileY,
+          currentActivity: assignedRoom.act,
           spriteTheme: SPRITE_THEMES[i % SPRITE_THEMES.length],
           isCulprit: false,
           userTag: "UNVERIFIED",
           stressLevel: 25,
           motive: "Routine corporate performance; clean background audit, no outstanding personal loans.",
           statedAlibi: `Claims they were working quietly in ${assignedRoom.name} reviewing engineering tickets from 21:30 until 23:00, with noise-canceling headphones on.`,
-          interrogated: false
+          interrogatedCount: 0
         });
       }
 
-      // 1 Culprit
+      // Culprit
       const culpritIndex = Math.floor(Math.random() * 4);
       const culprit = suspects[culpritIndex];
       culprit.isCulprit = true;
@@ -543,7 +572,7 @@
       culprit.motive = crime.culpritMotive;
       culprit.statedAlibi = `Maintains they were stationed in ${culprit.statedRoom} drafting the Q3 governance audit from 21:30 to 22:45, never going anywhere near ${RESTRICTED_ROOM.name}.`;
 
-      // 1 Red Herring
+      // Red Herring
       const innocentIndices = [0, 1, 2, 3].filter(idx => idx !== culpritIndex);
       const redHerringIndex = innocentIndices[0];
       const redHerring = suspects[redHerringIndex];
@@ -605,7 +634,8 @@
         status: "HIGH_RISK",
         details: `CONTRADICTION: Encrypted socket opened by ${culprit.name} at ${crime.incidentTime}:32 communicating with external buyer while claiming to be reading offline documents!`,
         contradiction: `Encrypted Relay Chat coordinating transfer at ${crime.incidentTime}:32`,
-        isCulpritContradiction: true
+        isCulpritContradiction: true,
+        isRedacted: true
       });
 
       // Network Stream
@@ -638,13 +668,13 @@
     }
 
     // ==========================================
-    // 3. HIGH-RES CHIBI PORTRAIT RENDERER
-    // (Large Dialogue Bust matching Reference 1)
+    // 3. HANDCRAFTED CHIBI DIALOGUE BUST PORTRAIT
+    // (Detailed pixel art matching Reference 1)
     // ==========================================
-    function drawChibiDialoguePortrait(ctx, theme) {
+    function drawChibiDialoguePortrait(ctx, theme, stressLevel = 25) {
       if (!ctx) return;
       const t = theme || SPRITE_THEMES[0];
-      ctx.clearRect(0, 0, 80, 100);
+      ctx.clearRect(0, 0, 96, 120);
 
       const p = (px, py, w, h, color) => {
         ctx.fillStyle = color || "#FFF";
@@ -652,77 +682,93 @@
       };
 
       // 1. Shoulders & Vest
-      p(16, 68, 48, 32, t.shirt);
-      p(22, 70, 36, 30, t.vest);
-      p(22, 85, 36, 15, t.vestShadow);
+      p(20, 80, 56, 40, t.shirt);
+      p(26, 82, 44, 38, t.vest);
+      p(26, 100, 44, 20, t.vestShadow);
       // Gold Buttons
-      p(38, 76, 4, 3, t.cuffGold);
-      p(38, 86, 4, 3, t.cuffGold);
+      p(46, 88, 4, 4, t.cuffGold);
+      p(46, 102, 4, 4, t.cuffGold);
       // Sleeves & Cuffs
-      p(8, 72, 10, 28, t.shirt);
-      p(62, 72, 10, 28, t.shirt);
-      p(10, 92, 8, 4, t.cuffGold);
-      p(62, 92, 8, 4, t.cuffGold);
+      p(10, 86, 12, 34, t.shirt);
+      p(74, 86, 12, 34, t.shirt);
+      p(12, 110, 10, 5, t.cuffGold);
+      p(74, 110, 10, 5, t.cuffGold);
 
       // 2. Neck & Face
-      p(34, 58, 12, 12, t.skinShadow);
-      p(20, 30, 40, 32, t.skin);
-      p(16, 36, 4, 16, t.skin); // Ears
-      p(60, 36, 4, 16, t.skin);
+      p(40, 70, 16, 14, t.skinShadow);
+      p(24, 36, 48, 38, t.skin);
+      p(18, 44, 6, 20, t.skin); // Ears
+      p(72, 44, 6, 20, t.skin);
 
-      // Expressive Eyes (Large pixel eyes with specular shine!)
-      p(26, 38, 8, 10, t.eye);
-      p(26, 38, 4, 4, "#FFFFFF"); // Big highlight
-      p(30, 44, 2, 2, "#FFFFFF");
+      // Expressive Anime Eyes (Large pixel eyes with specular shine!)
+      const eyeOpen = stressLevel > 70 ? 12 : 10;
+      p(32, 46, 10, eyeOpen, t.eye);
+      p(32, 46, 5, 5, "#FFFFFF"); // Main highlight
+      p(37, 52, 3, 3, "#FFFFFF");
 
-      p(46, 38, 8, 10, t.eye);
-      p(46, 38, 4, 4, "#FFFFFF");
-      p(50, 44, 2, 2, "#FFFFFF");
+      p(54, 46, 10, eyeOpen, t.eye);
+      p(54, 46, 5, 5, "#FFFFFF");
+      p(59, 52, 3, 3, "#FFFFFF");
 
       // Soft Blush
-      p(24, 48, 6, 3, "#F472B6");
-      p(50, 48, 6, 3, "#F472B6");
+      p(28, 58, 8, 4, "#F472B6");
+      p(60, 58, 8, 4, "#F472B6");
 
-      // 3. Voluminous Fluffy Anime Hair (From Reference 1!)
-      p(12, 12, 56, 24, t.hair);
-      p(8, 20, 8, 28, t.hair);
-      p(64, 20, 8, 28, t.hair);
+      // Mouth
+      if (stressLevel > 60) {
+        // Nervous wavy mouth
+        p(45, 64, 6, 2, "#991B1B");
+      } else {
+        p(46, 64, 4, 2, "#991B1B");
+      }
+
+      // Nervous Sweat Drop if stressed!
+      if (stressLevel > 50) {
+        p(22, 40, 4, 7, "#38BDF8");
+        p(23, 38, 2, 2, "#FFFFFF");
+      }
+
+      // 3. Voluminous Fluffy Anime Hair (From Reference 1)
+      p(14, 14, 68, 28, t.hair);
+      p(10, 24, 10, 34, t.hair);
+      p(76, 24, 10, 34, t.hair);
 
       // Angled side tufts (Signature chibi shape)
-      p(4, 26, 8, 14, t.hair);
-      p(2, 36, 6, 12, t.hairShadow);
-      p(68, 26, 8, 14, t.hair);
-      p(72, 36, 6, 12, t.hairShadow);
+      p(6, 32, 10, 18, t.hair);
+      p(4, 44, 8, 14, t.hairShadow);
+      p(80, 32, 10, 18, t.hair);
+      p(84, 44, 8, 14, t.hairShadow);
 
       // Bangs
-      p(18, 18, 44, 14, t.hair);
-      p(22, 28, 10, 10, t.hair);
-      p(36, 28, 8, 8, t.hair);
-      p(48, 28, 10, 10, t.hair);
+      p(22, 22, 52, 18, t.hair);
+      p(26, 34, 12, 12, t.hair);
+      p(42, 34, 12, 10, t.hair);
+      p(58, 34, 12, 12, t.hair);
 
       // Highlights
-      p(26, 14, 28, 4, "#FFFFFF");
-      p(14, 30, 4, 8, t.hairShadow);
-      p(62, 30, 4, 8, t.hairShadow);
+      p(32, 18, 32, 5, "#FFFFFF");
+      p(16, 36, 6, 10, t.hairShadow);
+      p(74, 36, 6, 10, t.hairShadow);
     }
 
-    // In-game 24x32 Sprite Renderer
-    function drawPixelChibiCharacter(ctx, x, y, theme, facing = 'down', walkCycle = 0, isWalking = false) {
+    // In-game 24x32 Sprite Renderer (Matching Reference Image 1 with Fluid Animation)
+    function drawPixelChibiCharacter(ctx, x, y, theme, facing = 'down', walkProgress = 0, isWalking = false, isBlinking = false) {
       if (!ctx) return;
       const t = theme || SPRITE_THEMES[0] || DETECTIVE_THEME;
-      const drawX = isNaN(x) ? 100 : Math.floor(x);
-      const drawY = isNaN(y) ? 100 : Math.floor(y);
+      const drawX = Math.floor(x);
+      const drawY = Math.floor(y);
 
       ctx.save();
       ctx.translate(drawX, drawY);
 
-      const phase = Math.floor(walkCycle) % 4;
-      const bobY = isWalking ? (phase % 2 === 0 ? -1.5 : 0) : Math.sin(Date.now() / 360) * 0.8;
-      const legStride = isWalking ? (phase === 0 ? 3 : phase === 2 ? -3 : 0) : 0;
-      const armStride = isWalking ? (phase === 0 ? -2 : phase === 2 ? 2 : 0) : 0;
+      // Continuous Fluid Stride & Arm Swing (Sinusoidal Lerp)
+      const strideSin = isWalking ? Math.sin(walkProgress) : 0;
+      const legStride = Math.round(strideSin * 3);
+      const armStride = Math.round(-strideSin * 2.5);
+      const bobY = isWalking ? -Math.abs(Math.sin(walkProgress)) * 2 : Math.sin(Date.now() / 360) * 0.8;
 
-      // Drop shadow
-      ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
+      // Drop shadow (Soft ambient oval)
+      ctx.fillStyle = "rgba(0, 0, 0, 0.45)";
       ctx.beginPath();
       ctx.ellipse(12, 29, isWalking ? 8 : 9, 3.5, 0, 0, Math.PI * 2);
       ctx.fill();
@@ -732,7 +778,7 @@
         ctx.fillRect(px, py + bobY, w, h);
       };
 
-      // 1. BOOTS & LEGS
+      // 1. BOOTS & LEGS (Fold-over cuffs with gold buttons)
       p(6 - legStride, 20, 4, 7, t.pants);
       p(5 - legStride, 22, 5, 6, t.boots);
       p(5 - legStride, 21, 5, 2, t.bootCuffs);
@@ -751,7 +797,7 @@
       p(11, 17, 2, 1, t.cuffGold);
       p(11, 19, 2, 1, t.cuffGold);
 
-      // Arms
+      // Puffy Sleeves & Gloves
       p(4, 14 + armStride, 3, 5, t.shirt);
       p(4, 18 + armStride, 3, 3, t.gloves);
       p(4, 17 + armStride, 3, 1, t.cuffGold);
@@ -768,17 +814,24 @@
 
       if (facing !== 'up') {
         const eyeOffset = facing === 'left' ? -1 : facing === 'right' ? 1 : 0;
-        p(8 + eyeOffset, 8, 2, 3, t.eye);
-        p(8 + eyeOffset, 8, 1, 1, "#FFFFFF");
+        if (isBlinking) {
+          // Closed eye slit
+          p(8 + eyeOffset, 9, 3, 1, t.eye);
+          p(14 + eyeOffset, 9, 3, 1, t.eye);
+        } else {
+          // Big anime eyes with specular glint
+          p(8 + eyeOffset, 8, 2, 3, t.eye);
+          p(8 + eyeOffset, 8, 1, 1, "#FFFFFF");
 
-        p(14 + eyeOffset, 8, 2, 3, t.eye);
-        p(14 + eyeOffset, 8, 1, 1, "#FFFFFF");
+          p(14 + eyeOffset, 8, 2, 3, t.eye);
+          p(14 + eyeOffset, 8, 1, 1, "#FFFFFF");
 
-        p(7 + eyeOffset, 10, 1, 1, "#F472B6");
-        p(16 + eyeOffset, 10, 1, 1, "#F472B6");
+          p(7 + eyeOffset, 10, 1, 1, "#F472B6");
+          p(16 + eyeOffset, 10, 1, 1, "#F472B6");
+        }
       }
 
-      // 4. BIG FLUFFY ANIME HAIR
+      // 4. BIG FLUFFY ANIME HAIR (Reference 1)
       p(4, 3, 16, 5, t.hair);
       p(3, 5, 2, 5, t.hair);
       p(19, 5, 2, 5, t.hair);
@@ -801,185 +854,212 @@
     }
 
     // ==========================================
-    // 4. 2D TILEMAP & LIGHTING ENGINE
+    // 4. TILEMAP & PRE-RENDERED SPROUT LANDS BUFFER
     // ==========================================
-    const MAP_WIDTH = 30;
-    const MAP_HEIGHT = 22;
+    const MAP_WIDTH = 32;
+    const MAP_HEIGHT = 24;
     const TILE_SIZE = 24;
 
     const INTERACTIVE_NODES = [
-      { id: "node_badge", name: "Keycard Security Gate", tileX: 15, tileY: 5, type: "badge", label: "[E] SWIPE LOGS", icon: "💳" },
-      { id: "node_chat", name: "SecOps Chat Terminal", tileX: 13, tileY: 15, type: "chat", label: "[E] CHAT RELAY", icon: "💬" },
-      { id: "node_net", name: "Core Network Rack", tileX: 17, tileY: 15, type: "network", label: "[E] PCAP TRACE", icon: "🌐" },
-      { id: "node_crime_tape", name: "Breached Vault Safe", tileX: 7, tileY: 4, type: "crime_scene", label: "[E] CRIME SCENE", icon: "🚨" }
+      { id: "node_badge", name: "Keycard Security Gate", tileX: 16, tileY: 6, type: "badge", label: "[E] SWIPE TERMINAL", icon: "💳", color: "#38BDF8" },
+      { id: "node_chat", name: "SecOps Chat Relay", tileX: 14, tileY: 17, type: "chat", label: "[E] CHAT WIRETAP", icon: "💬", color: "#F59E0B" },
+      { id: "node_net", name: "Core Network PCAP Rack", tileX: 17, tileY: 17, type: "network", label: "[E] NETWORK SNIFFER", icon: "🌐", color: "#10B981" },
+      { id: "node_crime_tape", name: "Breached Vault Safe", tileX: 6, tileY: 4, type: "crime_scene", label: "[E] CRIME SCENE", icon: "🚨", color: "#F43F5E" }
     ];
 
-    function drawWorldTilemap(ctx, width, height, time, lensActive) {
-      if (!ctx) return;
+    // Solid collision matrix
+    function isSolidTile(x, y) {
+      if (x <= 0 || y <= 0 || x >= MAP_WIDTH - 1 || y >= MAP_HEIGHT - 1) return true;
+
+      // Partition walls with 3-tile wide doorways
+      // Left vertical wall: x = 13 (doorway at y: 7, 8, 9)
+      if (x === 13) {
+        if (y < 7 || (y > 9 && y < 14) || y > 17) return true;
+      }
+      // Right vertical wall: x = 18 (doorway at y: 7, 8, 9)
+      if (x === 18) {
+        if (y < 7 || (y > 9 && y < 14) || y > 17) return true;
+      }
+      // Horizontal upper wall: y = 10 (doorway at x: 14, 15, 16, 17)
+      if (y === 10) {
+        if (x < 14 || x > 17) return true;
+      }
+      // Horizontal lower wall: y = 13 (doorway at x: 14, 15, 16, 17)
+      if (y === 13) {
+        if (x < 14 || x > 17) return true;
+      }
+
+      // Conference Table: x: 22..26, y: 4..6
+      if (x >= 22 && x <= 26 && y >= 4 && y <= 6) return true;
+
+      // Server Racks in Vault: x: 3..10, y: 3
+      if (x >= 3 && x <= 10 && y === 3) return true;
+
+      return false;
+    }
+
+    function checkCollision(px, py, width, height) {
+      const minX = Math.floor(px / TILE_SIZE);
+      const maxX = Math.floor((px + width - 1) / TILE_SIZE);
+      const minY = Math.floor(py / TILE_SIZE);
+      const maxY = Math.floor((py + height - 1) / TILE_SIZE);
+
+      for (let tx = minX; tx <= maxX; tx++) {
+        for (let ty = minY; ty <= maxY; ty++) {
+          if (isSolidTile(tx, ty)) return true;
+        }
+      }
+      return false;
+    }
+
+    let cachedMapCanvas = null;
+
+    function buildStaticMapBuffer() {
+      const buffer = document.createElement('canvas');
+      buffer.width = MAP_WIDTH * TILE_SIZE;
+      buffer.height = MAP_HEIGHT * TILE_SIZE;
+      const ctx = buffer.getContext('2d');
+
+      // 1. Cozy Floors (Warm wood parquet, soft cafeteria tiles, velvet rugs)
       for (let y = 0; y < MAP_HEIGHT; y++) {
         for (let x = 0; x < MAP_WIDTH; x++) {
           const px = x * TILE_SIZE;
           const py = y * TILE_SIZE;
 
+          // Outer Wall Border
           if (x === 0 || y === 0 || x === MAP_WIDTH - 1 || y === MAP_HEIGHT - 1) {
-            ctx.fillStyle = "#111722";
+            ctx.fillStyle = "#121A24";
             ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
-            ctx.strokeStyle = "#1E293B";
-            ctx.strokeRect(px, py, TILE_SIZE, TILE_SIZE);
+            ctx.fillStyle = "#1C2938";
+            ctx.fillRect(px + 1, py + 1, TILE_SIZE - 2, 3);
             continue;
           }
 
           if (x < 13 && y < 10) {
-            // Server Vault
-            ctx.fillStyle = (x + y) % 2 === 0 ? "#070E1A" : "#0C1524";
+            // Server Vault (Cool Navy Slate with metal seams)
+            ctx.fillStyle = (x + y) % 2 === 0 ? "#111823" : "#16202C";
             ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
-            // Glowing cyan conduit floor tracks
-            if (x === 6 || y === 6) {
-              ctx.fillStyle = "rgba(56, 189, 248, 0.25)";
-              ctx.fillRect(px + 10, py, 4, TILE_SIZE);
+            ctx.strokeStyle = "#1A2634";
+            ctx.strokeRect(px, py, TILE_SIZE, TILE_SIZE);
+          } else if (x > 18 && y < 10) {
+            // Conference Room 4A (Sprout Lands Warm Honey Wood Planks)
+            ctx.fillStyle = (x + y) % 2 === 0 ? "#9A6635" : "#88582A";
+            ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
+            ctx.fillStyle = "#6F441E";
+            ctx.fillRect(px, py + TILE_SIZE - 2, TILE_SIZE, 2); // Wood plank groove
+          } else if (x < 13 && y > 13) {
+            // Cafeteria (Cozy Cream-Beige Tiles)
+            ctx.fillStyle = (x + y) % 2 === 0 ? "#EBE0CF" : "#DDD1BD";
+            ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
+            ctx.strokeStyle = "#C5B8A5";
+            ctx.strokeRect(px, py, TILE_SIZE, TILE_SIZE);
+          } else if (x > 18 && y > 13) {
+            // Executive Lounge (Rich Burgundy Velvet Rug with Gold Trim)
+            ctx.fillStyle = (x + y) % 2 === 0 ? "#591B2A" : "#692033";
+            ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
+            if (x === 19 || x === MAP_WIDTH - 2 || y === 14 || y === MAP_HEIGHT - 2) {
+              ctx.fillStyle = "#EAB308";
+              ctx.fillRect(px, py, TILE_SIZE, 2); // Gold fringe border
             }
-          } else if (x > 17 && y < 10) {
-            // Conference Room
-            ctx.fillStyle = (x + y) % 2 === 0 ? "#17202E" : "#1E293B";
-            ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
-          } else if (x < 13 && y > 12) {
-            // Cafeteria
-            ctx.fillStyle = (x + y) % 2 === 0 ? "#0F2137" : "#172A45";
-            ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
-          } else if (x > 17 && y > 12) {
-            // Executive Lounge
-            ctx.fillStyle = (x + y) % 2 === 0 ? "#2D1524" : "#381C2E";
-            ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
           } else {
-            // Central Hallway
-            ctx.fillStyle = "#0D131C";
+            // Central Security Hallway (Warm Linoleum with soft grid)
+            ctx.fillStyle = (x + y) % 2 === 0 ? "#1E2A38" : "#243243";
             ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
-            ctx.strokeStyle = "#16202E";
+            ctx.strokeStyle = "#192330";
             ctx.strokeRect(px, py, TILE_SIZE, TILE_SIZE);
           }
         }
       }
 
-      // Walls
-      ctx.fillStyle = "#1E293B";
-      ctx.fillRect(13 * TILE_SIZE, 1 * TILE_SIZE, 4, 8 * TILE_SIZE);
-      ctx.fillRect(17 * TILE_SIZE, 1 * TILE_SIZE, 4, 8 * TILE_SIZE);
-      ctx.fillRect(13 * TILE_SIZE, 13 * TILE_SIZE, 4, 8 * TILE_SIZE);
-      ctx.fillRect(17 * TILE_SIZE, 13 * TILE_SIZE, 4, 8 * TILE_SIZE);
-      ctx.fillRect(1 * TILE_SIZE, 9 * TILE_SIZE, 12 * TILE_SIZE, 4);
-      ctx.fillRect(18 * TILE_SIZE, 9 * TILE_SIZE, 11 * TILE_SIZE, 4);
-      ctx.fillRect(1 * TILE_SIZE, 13 * TILE_SIZE, 12 * TILE_SIZE, 4);
-      ctx.fillRect(18 * TILE_SIZE, 13 * TILE_SIZE, 11 * TILE_SIZE, 4);
+      // 2. Interior Walls (Sprout Lands style with depth and wood capping)
+      const drawWall = (wx, wy, ww, wh) => {
+        ctx.fillStyle = "#18222D";
+        ctx.fillRect(wx, wy, ww, wh);
+        ctx.fillStyle = "#2D3E52";
+        ctx.fillRect(wx, wy, ww, 3); // Highlight
+        ctx.fillStyle = "#0F161E";
+        ctx.fillRect(wx, wy + wh - 3, ww, 3); // Shadow
+      };
 
-      // Conference Skyline Window (Neon rain outside!)
-      ctx.fillStyle = "#040810";
-      ctx.fillRect(20 * TILE_SIZE, 1 * TILE_SIZE + 2, 7 * TILE_SIZE, 14);
-      // Neon rain streaks
-      ctx.fillStyle = "rgba(56, 189, 248, 0.6)";
-      for (let w = 0; w < 6; w++) {
-        const rx = 20 * TILE_SIZE + ((time / 20 + w * 28) % (7 * TILE_SIZE));
-        ctx.fillRect(rx, 1 * TILE_SIZE + 2 + ((time / 10 + w * 5) % 12), 1, 4);
-      }
+      // Draw walls respecting open doorways
+      drawWall(13 * TILE_SIZE, 1 * TILE_SIZE, 8, 6 * TILE_SIZE);
+      drawWall(13 * TILE_SIZE, 10 * TILE_SIZE, 8, 3 * TILE_SIZE);
+      drawWall(13 * TILE_SIZE, 18 * TILE_SIZE, 8, 5 * TILE_SIZE);
 
-      // Conference Table
-      ctx.fillStyle = "#78350F";
-      ctx.fillRect(20 * TILE_SIZE, 4 * TILE_SIZE, 7 * TILE_SIZE, 3 * TILE_SIZE);
-      ctx.fillStyle = "#92400E";
-      ctx.fillRect(20 * TILE_SIZE + 2, 4 * TILE_SIZE + 2, 7 * TILE_SIZE - 4, 3 * TILE_SIZE - 4);
-      ctx.fillStyle = "#38BDF8";
-      ctx.fillRect(21 * TILE_SIZE, 5 * TILE_SIZE, 12, 10);
-      ctx.fillRect(24 * TILE_SIZE, 5 * TILE_SIZE, 12, 10);
+      drawWall(18 * TILE_SIZE, 1 * TILE_SIZE, 8, 6 * TILE_SIZE);
+      drawWall(18 * TILE_SIZE, 10 * TILE_SIZE, 8, 3 * TILE_SIZE);
+      drawWall(18 * TILE_SIZE, 18 * TILE_SIZE, 8, 5 * TILE_SIZE);
 
-      // Server Racks with pulsating LEDs
+      drawWall(1 * TILE_SIZE, 10 * TILE_SIZE, 12 * TILE_SIZE, 8);
+      drawWall(19 * TILE_SIZE, 10 * TILE_SIZE, 12 * TILE_SIZE, 8);
+      drawWall(1 * TILE_SIZE, 13 * TILE_SIZE, 12 * TILE_SIZE, 8);
+      drawWall(19 * TILE_SIZE, 13 * TILE_SIZE, 12 * TILE_SIZE, 8);
+
+      // 3. Furniture (Sprout Lands Detailing)
+      // A) Conference Mahogany Table with soft shadow
+      ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
+      ctx.fillRect(22 * TILE_SIZE + 4, 4 * TILE_SIZE + 4, 5 * TILE_SIZE, 3 * TILE_SIZE);
+      ctx.fillStyle = "#582C13";
+      ctx.fillRect(22 * TILE_SIZE, 4 * TILE_SIZE, 5 * TILE_SIZE, 3 * TILE_SIZE);
+      ctx.fillStyle = "#723B1B";
+      ctx.fillRect(22 * TILE_SIZE + 2, 4 * TILE_SIZE + 2, 5 * TILE_SIZE - 4, 3 * TILE_SIZE - 4);
+
+      // Laptops & Mugs on table
+      ctx.fillStyle = "#94A3B8";
+      ctx.fillRect(23 * TILE_SIZE, 5 * TILE_SIZE, 12, 10);
+      ctx.fillRect(25 * TILE_SIZE, 5 * TILE_SIZE, 12, 10);
+      ctx.fillStyle = "#FFFFFF"; // Coffee mug
+      ctx.fillRect(24 * TILE_SIZE + 2, 5 * TILE_SIZE + 2, 5, 5);
+
+      // B) Server Racks (Navy Metal Racks in Sublevel 2)
       for (let r = 0; r < 4; r++) {
-        const rx = (3 + r * 2.5) * TILE_SIZE;
+        const rx = (3 + r * 2) * TILE_SIZE;
         const ry = 3 * TILE_SIZE;
-        ctx.fillStyle = "#0A101D";
-        ctx.fillRect(rx, ry, 36, 60);
-        ctx.strokeStyle = "#1E293B";
-        ctx.strokeRect(rx, ry, 36, 60);
-
-        const blink1 = Math.floor(time / 160 + r) % 2 === 0;
-        ctx.fillStyle = blink1 ? "#10B981" : "#065F46";
-        ctx.fillRect(rx + 6, ry + 10, 4, 4);
-        ctx.fillStyle = "#F43F5E";
-        ctx.fillRect(rx + 14, ry + 10, 4, 4);
-        ctx.fillStyle = "#38BDF8";
-        ctx.fillRect(rx + 22, ry + 10, 4, 4);
+        ctx.fillStyle = "#090E14";
+        ctx.fillRect(rx, ry, 36, 48);
+        ctx.strokeStyle = "#1E2C3D";
+        ctx.strokeRect(rx, ry, 36, 48);
       }
 
-      // Crime Tape
-      const wave = Math.sin(time / 400) * 1.5;
-      ctx.fillStyle = "#FBBF24";
-      ctx.fillRect(10 * TILE_SIZE, 9 * TILE_SIZE - 2 + wave, 3 * TILE_SIZE, 4);
+      // C) Potted Plants (Cute Sprout Lands Bushes)
+      const drawPlant = (px, py) => {
+        ctx.fillStyle = "#B45309"; // Terracotta pot
+        ctx.fillRect(px + 4, py + 10, 16, 14);
+        ctx.fillStyle = "#16A34A"; // Green bush
+        ctx.beginPath();
+        ctx.arc(px + 12, py + 8, 10, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#4ADE80"; // Highlight leaf
+        ctx.beginPath();
+        ctx.arc(px + 9, py + 6, 4, 0, Math.PI * 2);
+        ctx.fill();
+      };
+      drawPlant(19 * TILE_SIZE, 14 * TILE_SIZE);
+      drawPlant(29 * TILE_SIZE, 14 * TILE_SIZE);
+      drawPlant(19 * TILE_SIZE, 21 * TILE_SIZE);
+      drawPlant(29 * TILE_SIZE, 21 * TILE_SIZE);
 
-      // Labels
+      // D) Soft Room Sign Headers
       ctx.font = "bold 8px 'Press Start 2P', monospace";
-      ctx.fillStyle = "#F43F5E";
-      ctx.fillText("RESTRICTED SERVER VAULT", 2 * TILE_SIZE, 2.2 * TILE_SIZE);
+      ctx.fillStyle = "#F87171";
+      ctx.fillText("SERVER VAULT (RESTRICTED)", 2 * TILE_SIZE, 2.2 * TILE_SIZE);
       ctx.fillStyle = "#38BDF8";
-      ctx.fillText("CONFERENCE ROOM 4A", 19 * TILE_SIZE, 2.2 * TILE_SIZE);
-      ctx.fillStyle = "#10B981";
-      ctx.fillText("CAFETERIA & BREAKROOM", 2 * TILE_SIZE, 13.8 * TILE_SIZE);
-      ctx.fillStyle = "#818CF8";
-      ctx.fillText("EXECUTIVE LOUNGE", 19 * TILE_SIZE, 13.8 * TILE_SIZE);
-    }
+      ctx.fillText("CONFERENCE ROOM 4A", 20 * TILE_SIZE, 2.2 * TILE_SIZE);
+      ctx.fillStyle = "#34D399";
+      ctx.fillText("BREAKROOM & CAFETERIA", 2 * TILE_SIZE, 14.8 * TILE_SIZE);
+      ctx.fillStyle = "#F472B6";
+      ctx.fillText("EXECUTIVE LOUNGE", 20 * TILE_SIZE, 14.8 * TILE_SIZE);
 
-    // Dynamic Lighting & Atmosphere Mask
-    function drawAtmosphericLighting(ctx, width, height, playerX, playerY, time, lensActive) {
-      ctx.save();
-
-      // If Detective Lens is active, cool blue cyber scanline mode
-      if (lensActive) {
-        ctx.fillStyle = "rgba(6, 182, 212, 0.12)";
-        ctx.fillRect(0, 0, width, height);
-
-        // Scanline grid
-        ctx.strokeStyle = "rgba(6, 182, 212, 0.15)";
-        ctx.lineWidth = 1;
-        for (let l = 0; l < height; l += 8) {
-          ctx.beginPath();
-          ctx.moveTo(0, l);
-          ctx.lineTo(width, l);
-          ctx.stroke();
-        }
-        ctx.restore();
-        return;
-      }
-
-      // Normal Neo-Noir Vignette + Flashlight Cone
-      const grad = ctx.createRadialGradient(
-        playerX + 12, playerY + 12, 20,
-        playerX + 12, playerY + 12, 160
-      );
-      grad.addColorStop(0, "rgba(7, 11, 16, 0.0)");
-      grad.addColorStop(0.5, "rgba(7, 11, 16, 0.25)");
-      grad.addColorStop(1, "rgba(7, 11, 16, 0.65)");
-
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, width, height);
-
-      // Red Emergency Alarm Pulse in Server Vault
-      const alarmPulse = (Math.sin(time / 280) + 1) * 0.12;
-      const vaultGrad = ctx.createRadialGradient(
-        7 * TILE_SIZE, 5 * TILE_SIZE, 10,
-        7 * TILE_SIZE, 5 * TILE_SIZE, 110
-      );
-      vaultGrad.addColorStop(0, `rgba(244, 63, 94, ${alarmPulse + 0.1})`);
-      vaultGrad.addColorStop(1, "rgba(244, 63, 94, 0.0)");
-      ctx.fillStyle = vaultGrad;
-      ctx.fillRect(1 * TILE_SIZE, 1 * TILE_SIZE, 12 * TILE_SIZE, 9 * TILE_SIZE);
-
-      ctx.restore();
+      return buffer;
     }
 
     // ==========================================
-    // 5. MAIN REACT APP (SMOOTH & COOL DESIGN)
+    // 5. MAIN REACT APP (SILKY SMOOTH + HIGH TECH)
     // ==========================================
     function App() {
       const [caseData, setCaseData] = useState(() => {
         try {
-          const saved = localStorage.getItem('THE_COLD_FILE_STATE_V2');
+          const saved = localStorage.getItem('THE_COLD_FILE_STATE_V3');
           if (saved) {
             const parsed = JSON.parse(saved);
             if (parsed.caseData && parsed.caseData.suspects && parsed.caseData.suspects[0]?.spriteTheme) {
@@ -995,41 +1075,44 @@
       const [viewMode, setViewMode] = useState('map');
       const [activeTab, setActiveTab] = useState('badge');
       const [pinnedLogIds, setPinnedLogIds] = useState([]);
-
-      // Detective Focus Lens Mode
-      const [lensActive, setLensActive] = useState(false);
-
-      // Audio BGM State
       const [bgmActive, setBgmActive] = useState(false);
 
-      // Smooth Kinematics Ref
+      // KINEMATICS REF (SILKY SMOOTH MOMENTUM)
       const playerRef = useRef({
-        x: 15 * TILE_SIZE,
-        y: 10 * TILE_SIZE,
+        x: 15.5 * TILE_SIZE,
+        y: 11.5 * TILE_SIZE,
+        vx: 0,
+        vy: 0,
         targetX: null,
         targetY: null,
         facing: 'down',
-        walkCycle: 0,
-        isWalking: false
+        walkProgress: 0,
+        isWalking: false,
+        lastBlinkTime: 0
       });
 
-      // Atmospheric Particles Ref
+      // Particles & Radar Beacons
       const dustParticlesRef = useRef([]);
-      const fogParticlesRef = useRef([]);
       const targetCursorRef = useRef(null);
-
-      const [interactTarget, setInteractTarget] = useState(null);
       const [radarBeacon, setRadarBeacon] = useState(null);
+      const [radarSweepAngle, setRadarSweepAngle] = useState(0);
+
+      // Decoupled Interaction Target
+      const currentTargetIdRef = useRef(null);
+      const [interactTarget, setInteractTarget] = useState(null);
 
       // Modals
       const [activeSuspectModal, setActiveSuspectModal] = useState(null);
+      const [interrogationDialogue, setInterrogationDialogue] = useState(null);
       const [activeNodeModal, setActiveNodeModal] = useState(null);
+      const [liveLeakModal, setLiveLeakModal] = useState(null);
       const [accusationModalOpen, setAccusationModalOpen] = useState(false);
       const [selectedAccusedSuspectId, setSelectedAccusedSuspectId] = useState('');
+      const [selectedContradictionLogId, setSelectedContradictionLogId] = useState('');
       const [verdictData, setVerdictData] = useState(null);
       const [shakeScreen, setShakeScreen] = useState(false);
 
-      const [career, setCareer] = useState({ xp: 150, streak: 0 });
+      const [career, setCareer] = useState({ xp: 180, streak: 0, rankTitle: "SecOps Detective II" });
       const [bossMode, setBossMode] = useState(false);
       const [soundMuted, setSoundMuted] = useState(false);
       const [toastMsg, setToastMsg] = useState(null);
@@ -1047,21 +1130,11 @@
       useEffect(() => {
         if (!caseData) return;
         try {
-          localStorage.setItem('THE_COLD_FILE_STATE_V2', JSON.stringify({
+          localStorage.setItem('THE_COLD_FILE_STATE_V3', JSON.stringify({
             caseData, ap, maxAp, pinnedLogIds, career
           }));
         } catch (e) {}
       }, [caseData, ap, maxAp, pinnedLogIds, career]);
-
-      // Toggle Lens
-      const toggleDetectiveLens = () => {
-        audio.lensToggle();
-        setLensActive(prev => {
-          const next = !prev;
-          showToast(next ? "🔍 DETECTIVE LENS: UV Footprints & Clues Revealed" : "Normal Vision Restored");
-          return next;
-        });
-      };
 
       // Toggle BGM
       const toggleBGM = () => {
@@ -1072,8 +1145,54 @@
         } else {
           audio.startBGM();
           setBgmActive(true);
-          showToast("🎵 Cyber-Noir Ambient BGM Playing");
+          showToast("🎵 Cozy Lo-Fi Detective BGM Playing");
         }
+      };
+
+      // Spend AP & Chance for Surprise Plot Twist Live Leak
+      const spendAP = (cost, actionName = "INVESTIGATION") => {
+        if (ap < cost) {
+          audio.alert();
+          showToast(`⚠️ INSUFFICIENT AP! (${cost} required, ${ap} remaining)`);
+          return false;
+        }
+        setAp(prev => prev - cost);
+        audio.click();
+
+        // 30% chance for a Dopamine Plot Twist Live Leak!
+        if (Math.random() < 0.32) {
+          triggerSurpriseLiveLeak();
+        }
+        return true;
+      };
+
+      // Trigger Surprise Live Leak Modal
+      const triggerSurpriseLiveLeak = () => {
+        const events = [
+          {
+            title: "ANONYMOUS WHISTLEBLOWER RELAY",
+            desc: "An encrypted drop on an onion relay just leaked internal credentials!",
+            reward: "Instantly revealed that the culprit has LEVEL-4 ROOT access.",
+            actionType: "HINT_ACCESS"
+          },
+          {
+            title: "COVER-UP ATTEMPT INTERCEPTED",
+            desc: "A workstation in the Engineering Pod attempted to force-delete bash history logs!",
+            reward: "Deep Scan verified the incident occurred during the critical window.",
+            actionType: "HINT_TIME"
+          },
+          {
+            title: "ENCRYPTED DRIVE CRACKED",
+            desc: "SecOps automated brute-force cracked an abandoned flash drive from the breakroom.",
+            reward: "Cleared 1 innocent suspect from suspicion completely!",
+            actionType: "CLEAR_SUSPECT"
+          }
+        ];
+        const evt = events[Math.floor(Math.random() * events.length)];
+        audio.alert();
+        setShakeScreen(true);
+        setTimeout(() => setShakeScreen(false), 400);
+        setLiveLeakModal(evt);
       };
 
       // Keyboard Controls
@@ -1083,12 +1202,7 @@
             setBossMode(prev => !prev);
             return;
           }
-          if (e.key === 'Tab') {
-            e.preventDefault();
-            toggleDetectiveLens();
-            return;
-          }
-          if (activeSuspectModal || activeNodeModal || accusationModalOpen) return;
+          if (activeSuspectModal || activeNodeModal || accusationModalOpen || liveLeakModal) return;
 
           const key = e.key.toLowerCase();
           if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
@@ -1113,17 +1227,18 @@
           window.removeEventListener('keydown', handleKeyDown);
           window.removeEventListener('keyup', handleKeyUp);
         };
-      }, [activeSuspectModal, activeNodeModal, accusationModalOpen, interactTarget]);
+      }, [activeSuspectModal, activeNodeModal, accusationModalOpen, liveLeakModal, interactTarget]);
 
       const triggerNearbyInteraction = () => {
         if (!interactTarget) return;
         audio.interact();
         if (interactTarget.type === 'suspect') {
           setActiveSuspectModal(interactTarget.data);
+          setInterrogationDialogue(null);
         } else if (interactTarget.type === 'node') {
           const node = interactTarget.data;
           if (node.type === 'crime_scene') {
-            showToast("🚨 CRIME SCENE: Severe breach detected in vault safe!");
+            showToast("🚨 BREACHED SAFE: Physical seal was broken with an authorized biometric override!");
             audio.alert();
           } else {
             setActiveTab(node.type);
@@ -1132,32 +1247,27 @@
         }
       };
 
-      const spendAP = (cost) => {
-        if (ap < cost) {
-          audio.alert();
-          showToast(`⚠️ INSUFFICIENT AP! (${cost} required, ${ap} left)`);
-          return false;
-        }
-        setAp(prev => prev - 1);
-        audio.click();
-        return true;
-      };
-
       // Draw Dialogue Portrait when suspect modal opens
       useEffect(() => {
         if (activeSuspectModal && portraitCanvasRef.current) {
           const ctx = portraitCanvasRef.current.getContext('2d');
-          drawChibiDialoguePortrait(ctx, activeSuspectModal.spriteTheme);
+          drawChibiDialoguePortrait(ctx, activeSuspectModal.spriteTheme, activeSuspectModal.stressLevel);
         }
       }, [activeSuspectModal]);
 
-      // 60FPS Physics & Atmospheric Render Loop
+      // ==========================================
+      // 60FPS SILKY SMOOTH KINEMATICS & RENDER LOOP
+      // ==========================================
       useEffect(() => {
+        if (!cachedMapCanvas) {
+          cachedMapCanvas = buildStaticMapBuffer();
+        }
+
         let animId;
         let lastTime = performance.now();
 
         const gameLoop = (currentTime) => {
-          const dt = Math.min(0.06, (currentTime - lastTime) / 1000);
+          const dt = Math.min(0.04, (currentTime - lastTime) / 1000);
           lastTime = currentTime;
 
           try {
@@ -1165,23 +1275,85 @@
             const p = playerRef.current;
             const keys = keysPressedRef.current;
 
-            // 1. KINEMATICS
-            let moveX = 0, moveY = 0;
-            if (keys.has('w') || keys.has('arrowup')) { moveY -= 1; p.facing = 'up'; }
-            if (keys.has('s') || keys.has('arrowdown')) { moveY += 1; p.facing = 'down'; }
-            if (keys.has('a') || keys.has('arrowleft')) { moveX -= 1; p.facing = 'left'; }
-            if (keys.has('d') || keys.has('arrowright')) { moveX += 1; p.facing = 'right'; }
+            // 1. SMOOTH VECTOR ACCELERATION & DIRECTIONAL BLEND
+            let inputX = 0, inputY = 0;
+            if (keys.has('w') || keys.has('arrowup')) inputY -= 1;
+            if (keys.has('s') || keys.has('arrowdown')) inputY += 1;
+            if (keys.has('a') || keys.has('arrowleft')) inputX -= 1;
+            if (keys.has('d') || keys.has('arrowright')) inputX += 1;
 
-            const speed = 140;
+            const accel = 1600; // Responsive acceleration
+            const friction = 0.81; // Viscous damping
+            const maxSpeed = 145; // Fluid walking speed
 
-            if (moveX !== 0 || moveY !== 0) {
-              const len = Math.hypot(moveX, moveY);
-              p.x += (moveX / len) * speed * dt;
-              p.y += (moveY / len) * speed * dt;
+            if (inputX !== 0 || inputY !== 0) {
+              const len = Math.hypot(inputX, inputY);
+              p.vx += (inputX / len) * accel * dt;
+              p.vy += (inputY / len) * accel * dt;
+
+              // Smooth Facing Orientation
+              if (Math.abs(inputX) > Math.abs(inputY)) {
+                p.facing = inputX < 0 ? 'left' : 'right';
+              } else {
+                p.facing = inputY < 0 ? 'up' : 'down';
+              }
               p.isWalking = true;
-              p.walkCycle += dt * 8;
+              audio.step();
+            } else if (p.targetX !== null && p.targetY !== null) {
+              // Click-to-move glide
+              const dx = p.targetX - p.x;
+              const dy = p.targetY - p.y;
+              const dist = Math.hypot(dx, dy);
 
-              if (Math.random() < 0.25) {
+              if (dist > 4) {
+                p.vx += (dx / dist) * accel * dt;
+                p.vy += (dy / dist) * accel * dt;
+                p.facing = Math.abs(dx) > Math.abs(dy) ? (dx < 0 ? 'left' : 'right') : (dy < 0 ? 'up' : 'down');
+                p.isWalking = true;
+                audio.step();
+              } else {
+                p.targetX = null;
+                p.targetY = null;
+                targetCursorRef.current = null;
+              }
+            }
+
+            // Apply friction
+            p.vx *= friction;
+            p.vy *= friction;
+
+            // Clamp max speed
+            const currentSpeed = Math.hypot(p.vx, p.vy);
+            if (currentSpeed > maxSpeed) {
+              p.vx = (p.vx / currentSpeed) * maxSpeed;
+              p.vy = (p.vy / currentSpeed) * maxSpeed;
+            }
+
+            // 2. SILKY WALL-SLIDING COLLISION (Independent X and Y axes)
+            const footW = 14;
+            const footH = 10;
+            const footOffY = 18;
+
+            const nextX = p.x + p.vx * dt;
+            if (!checkCollision(nextX + 5, p.y + footOffY, footW, footH)) {
+              p.x = nextX;
+            } else {
+              p.vx = 0; // Wall slide absorption
+            }
+
+            const nextY = p.y + p.vy * dt;
+            if (!checkCollision(p.x + 5, nextY + footOffY, footW, footH)) {
+              p.y = nextY;
+            } else {
+              p.vy = 0; // Wall slide absorption
+            }
+
+            // Stride Cycle & Dust Particles
+            if (currentSpeed > 8) {
+              p.isWalking = true;
+              p.walkProgress += dt * 9.5;
+
+              if (Math.random() < 0.28) {
                 dustParticlesRef.current.push({
                   x: p.x + 12 + (Math.random() * 4 - 2),
                   y: p.y + 26,
@@ -1190,43 +1362,11 @@
                   life: 1.0
                 });
               }
-              audio.step();
-            } else if (p.targetX !== null && p.targetY !== null) {
-              const dx = p.targetX - p.x;
-              const dy = p.targetY - p.y;
-              const dist = Math.hypot(dx, dy);
-
-              if (dist > 3) {
-                p.x += (dx / dist) * speed * dt;
-                p.y += (dy / dist) * speed * dt;
-                p.facing = Math.abs(dx) > Math.abs(dy) ? (dx < 0 ? 'left' : 'right') : (dy < 0 ? 'up' : 'down');
-                p.isWalking = true;
-                p.walkCycle += dt * 8;
-                audio.step();
-
-                if (Math.random() < 0.25) {
-                  dustParticlesRef.current.push({
-                    x: p.x + 12 + (Math.random() * 4 - 2),
-                    y: p.y + 26,
-                    vx: (Math.random() - 0.5) * 8,
-                    vy: -Math.random() * 6 - 2,
-                    life: 1.0
-                  });
-                }
-              } else {
-                p.targetX = null;
-                p.targetY = null;
-                p.isWalking = false;
-                targetCursorRef.current = null;
-              }
             } else {
               p.isWalking = false;
             }
 
-            p.x = Math.max(TILE_SIZE, Math.min((MAP_WIDTH - 2) * TILE_SIZE, p.x));
-            p.y = Math.max(TILE_SIZE, Math.min((MAP_HEIGHT - 2) * TILE_SIZE, p.y));
-
-            // Particles update
+            // Update dust particles
             dustParticlesRef.current = dustParticlesRef.current.filter(part => {
               part.x += part.vx * dt;
               part.y += part.vy * dt;
@@ -1234,34 +1374,18 @@
               return part.life > 0;
             });
 
-            // Nitrogen cold fog puff in vault
-            if (Math.random() < 0.08) {
-              fogParticlesRef.current.push({
-                x: 7 * TILE_SIZE + Math.random() * 20,
-                y: 5 * TILE_SIZE + Math.random() * 10,
-                vx: (Math.random() - 0.5) * 6,
-                vy: (Math.random() - 0.5) * 6,
-                size: 8 + Math.random() * 10,
-                life: 1.0
-              });
-            }
-            fogParticlesRef.current = fogParticlesRef.current.filter(f => {
-              f.x += f.vx * dt;
-              f.y += f.vy * dt;
-              f.life -= dt * 0.8;
-              return f.life > 0;
-            });
-
-            // Proximity
+            // 3. PROXIMITY CHECK (Only updates React on actual target ID transition)
             if (caseData && caseData.suspects) {
               const playerTileX = p.x / TILE_SIZE;
               const playerTileY = p.y / TILE_SIZE;
               let found = null;
+              let foundId = null;
 
               for (const s of caseData.suspects) {
                 const dist = Math.hypot(s.mapX - playerTileX, s.mapY - playerTileY);
                 if (dist <= 2.2) {
-                  found = { type: 'suspect', data: s, label: `[E] TALK TO ${s.name.toUpperCase()}` };
+                  found = { type: 'suspect', data: s, label: `[E] QUESTION ${s.name.toUpperCase()}` };
+                  foundId = s.id;
                   break;
                 }
               }
@@ -1271,69 +1395,77 @@
                   const dist = Math.hypot(node.tileX - playerTileX, node.tileY - playerTileY);
                   if (dist <= 2.2) {
                     found = { type: 'node', data: node, label: node.label };
+                    foundId = node.id;
                     break;
                   }
                 }
               }
-              setInteractTarget(found);
+
+              if (foundId !== currentTargetIdRef.current) {
+                currentTargetIdRef.current = foundId;
+                setInteractTarget(found);
+              }
             }
 
-            // 2. CANVAS DRAWING
+            // 4. CANVAS RENDER PASS
             if (canvas && caseData) {
               const ctx = canvas.getContext('2d');
               ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-              // Tilemap
-              drawWorldTilemap(ctx, canvas.width, canvas.height, currentTime, lensActive);
-
-              // Glowing UV Footprints (When Detective Lens is active!)
-              if (lensActive && caseData.culpritId) {
-                const culprit = caseData.suspects.find(s => s.isCulprit);
-                if (culprit) {
-                  ctx.fillStyle = "rgba(56, 189, 248, 0.45)";
-                  for (let fp = 0; fp < 7; fp++) {
-                    const fx = 7 * TILE_SIZE + (culprit.mapX * TILE_SIZE - 7 * TILE_SIZE) * (fp / 6);
-                    const fy = 5 * TILE_SIZE + (culprit.mapY * TILE_SIZE - 5 * TILE_SIZE) * (fp / 6);
-                    ctx.beginPath();
-                    ctx.arc(fx + 12, fy + 12, 4, 0, Math.PI * 2);
-                    ctx.fill();
-                  }
-                }
+              // 4A. Draw Pre-rendered Background Map
+              if (cachedMapCanvas) {
+                ctx.drawImage(cachedMapCanvas, 0, 0);
               }
+
+              // 4B. Dynamic Animated Overlays
+              // Blinking server LEDs
+              for (let r = 0; r < 4; r++) {
+                const rx = (3 + r * 2) * TILE_SIZE;
+                const ry = 3 * TILE_SIZE;
+                const b1 = Math.floor(currentTime / 180 + r) % 2 === 0;
+                ctx.fillStyle = b1 ? "#10B981" : "#064E3B";
+                ctx.fillRect(rx + 6, ry + 10, 4, 4);
+                ctx.fillStyle = "#F43F5E";
+                ctx.fillRect(rx + 14, ry + 10, 4, 4);
+                ctx.fillStyle = "#38BDF8";
+                ctx.fillRect(rx + 22, ry + 10, 4, 4);
+              }
+
+              // Coffee Mug Steam in Conference Room
+              const steamY = 5 * TILE_SIZE - ((currentTime / 40) % 12);
+              ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+              ctx.fillRect(24 * TILE_SIZE + 3, steamY, 2, 3);
+
+              // Animated Breached Safe Hazard Glow
+              const pulseSafe = Math.sin(currentTime / 280) * 0.25 + 0.35;
+              ctx.fillStyle = `rgba(244, 63, 94, ${pulseSafe})`;
+              ctx.fillRect(6 * TILE_SIZE - 4, 4 * TILE_SIZE - 4, 32, 32);
 
               // Click-to-move Ripple Cursor
               if (targetCursorRef.current) {
                 const tc = targetCursorRef.current;
                 const age = (currentTime - tc.spawnTime) / 1000;
-                const ringSize = (age * 16) % 18 + 4;
-                ctx.strokeStyle = "rgba(251, 191, 36, 0.85)";
+                const ringSize = (age * 18) % 20 + 4;
+                ctx.strokeStyle = "rgba(56, 189, 248, 0.85)";
                 ctx.lineWidth = 1.5;
                 ctx.beginPath();
                 ctx.arc(tc.x + 12, tc.y + 12, ringSize, 0, Math.PI * 2);
                 ctx.stroke();
               }
 
-              // Nitrogen fog in vault
-              fogParticlesRef.current.forEach(f => {
-                ctx.fillStyle = `rgba(186, 230, 253, ${f.life * 0.25})`;
-                ctx.beginPath();
-                ctx.arc(f.x, f.y, f.size, 0, Math.PI * 2);
-                ctx.fill();
-              });
-
               // Dust Particles
               dustParticlesRef.current.forEach(part => {
-                ctx.fillStyle = `rgba(203, 213, 225, ${part.life * 0.4})`;
+                ctx.fillStyle = `rgba(203, 213, 225, ${part.life * 0.45})`;
                 ctx.fillRect(Math.floor(part.x), Math.floor(part.y), 3, 3);
               });
 
-              // Interactive Nodes
+              // Interactive Terminals (Glowing holographic blips)
               INTERACTIVE_NODES.forEach(node => {
                 const nx = node.tileX * TILE_SIZE;
                 const ny = node.tileY * TILE_SIZE;
-                const pulse = Math.sin(currentTime / 300) * 3 + 12;
+                const pulse = Math.sin(currentTime / 280) * 3 + 12;
 
-                ctx.fillStyle = "rgba(56, 189, 248, 0.22)";
+                ctx.fillStyle = "rgba(56, 189, 248, 0.25)";
                 ctx.beginPath();
                 ctx.arc(nx + 12, ny + 12, pulse, 0, Math.PI * 2);
                 ctx.fill();
@@ -1342,70 +1474,87 @@
                 ctx.fillText(node.icon, nx + 4, ny + 16);
               });
 
-              // Suspect NPCs
+              // Suspect NPCs (Alive with micro-actions and gentle breathing)
+              const blinkNow = Math.floor(currentTime / 3200) % 2 === 0 && (currentTime % 3200 < 180);
+
               if (caseData.suspects) {
                 caseData.suspects.forEach((s, idx) => {
                   const sx = (s.mapX !== undefined ? s.mapX : 10) * TILE_SIZE;
                   const sy = (s.mapY !== undefined ? s.mapY : 10) * TILE_SIZE;
                   const theme = s.spriteTheme || SPRITE_THEMES[idx % SPRITE_THEMES.length];
-                  drawPixelChibiCharacter(ctx, sx, sy, theme, 'down', 0, false);
+
+                  drawPixelChibiCharacter(ctx, sx, sy, theme, 'down', 0, false, blinkNow);
+
+                  // Overhead Name Tag & Status
+                  ctx.fillStyle = "rgba(15, 23, 34, 0.85)";
+                  ctx.fillRect(sx - 8, sy - 8, 40, 10);
+                  ctx.strokeStyle = "#38BDF8";
+                  ctx.lineWidth = 1;
+                  ctx.strokeRect(sx - 8, sy - 8, 40, 10);
 
                   ctx.font = "bold 8px monospace";
-                  ctx.fillStyle = "#FFFFFF";
-                  ctx.fillText(s.name.split(" ")[0], sx - 2, sy - 4);
+                  ctx.fillStyle = "#E2E8F0";
+                  ctx.fillText(s.name.split(" ")[0], sx - 4, sy);
                 });
               }
 
-              // Radar Beacon Ping
+              // Radar Beacon & Sonar Sweep (From Signal Tracker Gadget!)
               if (radarBeacon) {
                 const rx = radarBeacon.x * TILE_SIZE + 12;
                 const ry = radarBeacon.y * TILE_SIZE + 12;
-                const pulse = (Math.sin(currentTime / 180) + 1) * 14 + 10;
+                const pulse = (Math.sin(currentTime / 180) + 1) * 16 + 10;
+
                 ctx.strokeStyle = "#F43F5E";
                 ctx.lineWidth = 2;
                 ctx.beginPath();
                 ctx.arc(rx, ry, pulse, 0, Math.PI * 2);
                 ctx.stroke();
 
+                // Rotating radar sweep line
+                const angle = (currentTime / 500) % (Math.PI * 2);
+                ctx.strokeStyle = "rgba(244, 63, 94, 0.6)";
+                ctx.beginPath();
+                ctx.moveTo(rx, ry);
+                ctx.lineTo(rx + Math.cos(angle) * 36, ry + Math.sin(angle) * 36);
+                ctx.stroke();
+
                 ctx.fillStyle = "#F43F5E";
-                ctx.font = "bold 9px 'Press Start 2P', monospace";
-                ctx.fillText("BEACON DETECTED!", rx - 60, ry - 22);
+                ctx.font = "bold 8px 'Press Start 2P', monospace";
+                ctx.fillText("BEACON DETECTED", rx - 48, ry - 24);
               }
 
-              // Detective Player
+              // Detective Player Character (Silky animated Reference 1 chibi)
               drawPixelChibiCharacter(
                 ctx,
                 p.x,
                 p.y,
                 DETECTIVE_THEME,
                 p.facing,
-                p.walkCycle,
-                p.isWalking
+                p.walkProgress,
+                p.isWalking,
+                blinkNow
               );
 
-              // Floating Interactive Dialogue Indicator
+              // Floating Interactive Indicator with gentle springy bob
               if (interactTarget) {
                 const ix = p.x + 12;
                 const bob = Math.sin(currentTime / 220) * 3;
                 const iy = p.y - 14 + bob;
 
-                ctx.fillStyle = "rgba(7, 11, 16, 0.92)";
-                ctx.strokeStyle = "#FBBF24";
-                ctx.lineWidth = 1;
+                ctx.fillStyle = "rgba(7, 11, 16, 0.94)";
+                ctx.strokeStyle = "#38BDF8";
+                ctx.lineWidth = 1.5;
                 const text = interactTarget.label;
                 ctx.font = "bold 9px monospace";
                 const tw = ctx.measureText(text).width;
-                ctx.fillRect(ix - tw / 2 - 4, iy - 16, tw + 8, 15);
-                ctx.strokeRect(ix - tw / 2 - 4, iy - 16, tw + 8, 15);
+                ctx.fillRect(ix - tw / 2 - 6, iy - 16, tw + 12, 16);
+                ctx.strokeRect(ix - tw / 2 - 6, iy - 16, tw + 12, 16);
                 ctx.fillStyle = "#38BDF8";
                 ctx.fillText(text, ix - tw / 2, iy - 5);
               }
-
-              // Atmospheric Lighting Pass
-              drawAtmosphericLighting(ctx, canvas.width, canvas.height, p.x, p.y, currentTime, lensActive);
             }
           } catch (err) {
-            console.error("Game loop caught:", err);
+            console.error("Game loop error:", err);
           }
 
           animId = requestAnimationFrame(gameLoop);
@@ -1413,8 +1562,9 @@
 
         animId = requestAnimationFrame(gameLoop);
         return () => cancelAnimationFrame(animId);
-      }, [caseData, radarBeacon, lensActive]);
+      }, [caseData, radarBeacon, interactTarget]);
 
+      // Click to move target
       const handleCanvasClick = (e) => {
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -1433,17 +1583,32 @@
         audio.click();
       };
 
+      // Boss Mode View
       if (bossMode) {
         return (
           <div className="min-h-screen bg-[#111827] text-slate-300 font-sans p-6 select-text">
             <div className="flex items-center justify-between pb-4 border-b border-slate-700 mb-6">
-              <span className="font-bold text-white text-base">Grafana Cloud // Cluster Ingress Latency (p99: 14.2ms)</span>
+              <span className="font-bold text-white text-base">Grafana Cloud // Ingress Cluster Latency (p99: 14.2ms)</span>
               <button onClick={() => setBossMode(false)} className="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1 rounded text-xs">
                 [Esc] Return
               </button>
             </div>
-            <div className="h-44 bg-slate-950 rounded flex items-center justify-center text-xs text-slate-500 font-mono">
-              [ALL 64 CLUSTER PODS OPERATIONAL]
+            <div className="grid grid-cols-3 gap-4 mb-6">
+              <div className="p-4 bg-slate-900 rounded border border-slate-800">
+                <div className="text-xs text-slate-400">Total Ingress Throughput</div>
+                <div className="text-2xl font-bold text-emerald-400 mt-1">2.84 GB/s</div>
+              </div>
+              <div className="p-4 bg-slate-900 rounded border border-slate-800">
+                <div className="text-xs text-slate-400">Active Pod Nodes</div>
+                <div className="text-2xl font-bold text-cyan-400 mt-1">64 / 64 Healthy</div>
+              </div>
+              <div className="p-4 bg-slate-900 rounded border border-slate-800">
+                <div className="text-xs text-slate-400">Error Budget Burn</div>
+                <div className="text-2xl font-bold text-indigo-400 mt-1">0.02% / 24h</div>
+              </div>
+            </div>
+            <div className="h-64 bg-slate-950 rounded flex items-center justify-center text-xs text-slate-500 font-mono border border-slate-800">
+              [SYSTEM API LATENCY & SERVER HEALTH TELEMETRY NORMAL]
             </div>
           </div>
         );
@@ -1454,77 +1619,60 @@
           <div className="fixed inset-0 scanlines z-40 pointer-events-none opacity-25"></div>
 
           {toastMsg && (
-            <div className="fixed top-4 right-4 z-50 bg-[#0F1621] border-2 border-cyan-400 text-cyan-300 px-4 py-2 rounded shadow-2xl text-xs flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
-              <span>{toastMsg}</span>
+            <div className="fixed top-4 right-4 z-50 cyber-card border-2 border-cyan-400 text-cyan-300 px-4 py-2.5 rounded shadow-2xl text-xs flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
+              <span className="font-bold">{toastMsg}</span>
             </div>
           )}
 
-          {/* COOL RETRO HEADER */}
-          <header className="bg-[#0F1621] border-b border-[#233044] px-4 py-2.5 flex items-center justify-between text-xs sticky top-0 z-30 shadow-lg">
+          {/* TOP HIGH-TECH CYBER HEADER */}
+          <header className="bg-[#0F1722] border-b-2 border-[#223449] px-4 py-2.5 flex items-center justify-between text-xs sticky top-0 z-30 shadow-xl">
             <div className="flex items-center gap-3">
-              <span className="text-xl">🕵️</span>
+              <span className="text-2xl">🕵️</span>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-white text-sm tracking-wider">THE COLD FILE</span>
-                  <span className="text-[10px] bg-cyan-950/60 text-cyan-300 border border-cyan-800/60 px-1.5 py-0.2 rounded font-mono">
-                    2D NEO-NOIR
+                  <span className="font-bold text-white text-sm tracking-wider font-pixel">THE COLD FILE</span>
+                  <span className="text-[10px] bg-cyan-950 text-cyan-300 border border-cyan-700 px-1.5 py-0.5 rounded font-mono">
+                    2D INVESTIGATOR
                   </span>
                 </div>
                 <div className="text-[10px] text-slate-400 font-mono">
-                  CASE: <strong className="text-cyan-400">{caseData.caseId}</strong>
+                  CASE: <strong className="text-cyan-400">{caseData.caseId}</strong> | RANK: <span className="text-amber-400">{career.rankTitle}</span>
                 </div>
               </div>
             </div>
 
             <div className="flex items-center gap-2.5">
-              {/* Detective Lens Quick Action */}
-              <button
-                onClick={toggleDetectiveLens}
-                className={`px-3 py-1.5 rounded font-bold text-xs transition border flex items-center gap-1.5 ${
-                  lensActive 
-                    ? 'bg-cyan-500 text-black border-cyan-300 shadow-[0_0_12px_rgba(56,189,248,0.7)]' 
-                    : 'bg-[#070B10] text-cyan-400 border-[#233044] hover:border-cyan-500'
-                }`}
-                title="Toggle Detective Focus Lens [Tab]"
-              >
-                <span>🔍 LENS</span>
-                <span className="text-[9px] opacity-75">[TAB]</span>
-              </button>
-
-              {/* View Mode Toggle */}
-              <div className="flex border border-[#233044] rounded overflow-hidden">
+              {/* View Toggle */}
+              <div className="flex border border-[#223449] rounded overflow-hidden">
                 <button
                   onClick={() => { setViewMode('map'); audio.click(); }}
-                  className={`px-3 py-1.5 font-bold text-xs transition ${viewMode === 'map' ? 'bg-cyan-600 text-white' : 'bg-[#070B10] text-slate-400'}`}
+                  className={`px-3 py-1.5 font-bold text-xs transition ${viewMode === 'map' ? 'bg-cyan-600 text-white shadow-lg' : 'bg-[#070B10] text-slate-400'}`}
                 >
-                  🎮 MAP
+                  🎮 2D MAP
                 </button>
                 <button
                   onClick={() => { setViewMode('terminal'); audio.click(); }}
-                  className={`px-3 py-1.5 font-bold text-xs transition ${viewMode === 'terminal' ? 'bg-cyan-600 text-white' : 'bg-[#070B10] text-slate-400'}`}
+                  className={`px-3 py-1.5 font-bold text-xs transition ${viewMode === 'terminal' ? 'bg-cyan-600 text-white shadow-lg' : 'bg-[#070B10] text-slate-400'}`}
                 >
                   🖥️ LOGS
                 </button>
               </div>
 
-              {/* Ambient Lo-Fi BGM Toggle */}
+              {/* BGM Toggle */}
               <button
                 onClick={toggleBGM}
-                className={`px-2.5 py-1.5 border rounded text-xs transition ${
-                  bgmActive 
-                    ? 'bg-emerald-950 text-emerald-400 border-emerald-600 font-bold' 
-                    : 'bg-[#070B10] text-slate-400 border-[#233044]'
+                className={`px-3 py-1.5 cyber-btn text-xs font-bold ${
+                  bgmActive ? 'text-emerald-400 border-emerald-500' : 'text-slate-400'
                 }`}
-                title="Toggle Cyber-Noir Generative BGM"
               >
                 {bgmActive ? '🎵 BGM: ON' : '🎵 BGM: OFF'}
               </button>
 
-              {/* SFX Toggle */}
+              {/* Sound Toggle */}
               <button
                 onClick={() => { const next = !soundMuted; setSoundMuted(next); audio.muted = next; }}
-                className="px-2 py-1.5 bg-[#070B10] border border-[#233044] rounded text-slate-300"
+                className="px-2.5 py-1.5 cyber-btn text-slate-300 text-xs"
               >
                 {soundMuted ? '🔇' : '🔊'}
               </button>
@@ -1532,36 +1680,36 @@
               {/* Boss Key */}
               <button
                 onClick={() => setBossMode(true)}
-                className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded border border-slate-600 text-xs"
+                className="px-3 py-1.5 cyber-btn text-slate-200 text-xs font-bold"
               >
-                [SYS] (ESC)
+                [SYS_MODE] (ESC)
               </button>
             </div>
           </header>
 
-          {/* CASE BRIEFING TICKER */}
-          <div className="bg-[#070B10] border-b border-[#233044] px-4 py-1.5 flex items-center justify-between text-xs">
-            <div className="flex items-center gap-3 truncate">
-              <span className="text-rose-400 font-bold shrink-0">[INCIDENT]: {caseData.crime.title}</span>
+          {/* CRITICAL INCIDENT BRIEFING BAR */}
+          <div className="bg-[#0A0F15] border-b border-[#223449] px-4 py-2 flex items-center justify-between text-xs">
+            <div className="flex items-center gap-2 truncate">
+              <span className="text-rose-400 font-bold shrink-0">[BREACH]: {caseData.crime.title}</span>
               <span className="text-slate-400 hidden md:inline truncate">{caseData.crime.summary}</span>
             </div>
-            <div className="text-amber-400 font-bold shrink-0 flex items-center gap-2">
-              <span>WINDOW: {caseData.crime.criticalWindow}</span>
-              <span className="bg-[#0F1621] px-2 py-0.5 rounded border border-amber-500/40 text-amber-300">
-                AP: {ap}/{maxAp}
+            <div className="text-amber-400 font-bold shrink-0 flex items-center gap-3">
+              <span>CRITICAL WINDOW: {caseData.crime.criticalWindow}</span>
+              <span className="bg-[#152130] px-2.5 py-1 rounded border border-amber-500/50 text-amber-300 shadow-md">
+                COMPUTE AP: {ap}/{maxAp}
               </span>
             </div>
           </div>
 
-          {/* MAIN GAME VIEW */}
-          <main className="flex-1 flex flex-col lg:flex-row p-3 gap-3 max-w-[1700px] w-full mx-auto">
+          {/* MAIN GAMEPLAY VIEW */}
+          <main className="flex-1 flex flex-col lg:flex-row p-3 gap-3 max-w-[1740px] w-full mx-auto">
             {viewMode === 'map' ? (
               <div className="flex-1 flex flex-col lg:flex-row gap-3">
-                {/* 2D Map Container */}
-                <div className="flex-1 cyber-card rounded-lg p-2.5 flex flex-col items-center justify-center relative shadow-2xl overflow-hidden">
-                  <div className="w-full flex justify-between items-center text-xs text-slate-400 px-2 py-1 border-b border-[#233044] mb-2 font-retro text-[9px]">
-                    <span className="text-cyan-400">MOVE: [WASD] or CLICK FLOOR</span>
-                    <span className="text-amber-400">LENS: [TAB] | TALK: [E]</span>
+                {/* 2D Canvas Container */}
+                <div className="flex-1 cyber-card p-3 flex flex-col items-center justify-center relative shadow-2xl overflow-hidden">
+                  <div className="w-full flex justify-between items-center text-xs text-slate-400 px-2 py-1.5 border-b border-[#223449] mb-2 font-pixel text-[9px]">
+                    <span className="text-cyan-400">HOLD [WASD] OR CLICK ANYWHERE TO GLIDE</span>
+                    <span className="text-amber-400">INTERACT: [E] OR [SPACE]</span>
                   </div>
 
                   <canvas
@@ -1569,51 +1717,104 @@
                     width={MAP_WIDTH * TILE_SIZE}
                     height={MAP_HEIGHT * TILE_SIZE}
                     onClick={handleCanvasClick}
-                    className="border border-[#233044] rounded bg-black cursor-pointer max-w-full h-auto shadow-inner"
-                    style={{ maxHeight: '660px' }}
+                    className="border-2 border-[#223449] rounded bg-black cursor-crosshair max-w-full h-auto shadow-[0_0_30px_rgba(0,0,0,0.8)]"
+                    style={{ maxHeight: '680px' }}
                   />
                 </div>
 
-                {/* Right Tactical Sidebar */}
-                <div className="w-full lg:w-80 flex flex-col gap-3">
-                  {/* AP Gauge & Progress */}
-                  <div className="cyber-card rounded-lg p-3">
-                    <div className="flex justify-between items-center text-xs mb-2">
-                      <span className="font-bold text-cyan-400">COMPUTE AP</span>
+                {/* Cyber Sidebar: Suspects & Gadget Dock */}
+                <div className="w-full lg:w-88 flex flex-col gap-3">
+                  {/* AP Power Cells */}
+                  <div className="cyber-card p-3.5">
+                    <div className="flex justify-between items-center text-xs mb-2.5">
+                      <span className="font-bold text-cyan-400 font-pixel text-[10px]">COMPUTE AP</span>
                       <span className="text-amber-400 font-bold">🔥 Streak: {career.streak}</span>
                     </div>
                     <div className="grid grid-cols-8 gap-1.5 mb-2">
                       {Array.from({ length: maxAp }).map((_, i) => (
-                        <div key={i} className={`h-3.5 rounded-sm border ${i < ap ? 'bg-cyan-400 border-cyan-200 shadow-[0_0_8px_rgba(56,189,248,0.8)]' : 'bg-black border-[#233044] opacity-25'}`} />
+                        <div
+                          key={i}
+                          className={`h-4 rounded border transition-all duration-300 ${
+                            i < ap
+                              ? 'bg-cyan-400 border-cyan-200 shadow-[0_0_10px_rgba(56,189,248,0.9)]'
+                              : 'bg-black border-[#223449] opacity-20'
+                          }`}
+                        />
                       ))}
                     </div>
                   </div>
 
-                  {/* Campus Suspects */}
-                  <div className="cyber-card rounded-lg p-3 flex-1 flex flex-col">
+                  {/* Detective Gadgets Dock */}
+                  <div className="cyber-card p-3.5">
+                    <div className="text-xs font-bold text-white mb-2 font-pixel text-[10px] text-cyan-400">
+                      TACTICAL GADGETS DOCK
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <button
+                        onClick={() => {
+                          if (!spendAP(1, "SIGNAL_TRACKER")) return;
+                          audio.sonar();
+                          const culprit = caseData.suspects.find(s => s.isCulprit);
+                          setRadarBeacon({ x: RESTRICTED_ROOM.tileX, y: RESTRICTED_ROOM.tileY });
+                          showToast(`📡 SONAR PING: An active RFID beacon was detected inside ${RESTRICTED_ROOM.name}!`);
+                        }}
+                        className="p-2.5 cyber-btn text-cyan-300 font-bold flex flex-col items-center justify-center gap-1"
+                      >
+                        <span className="text-base">📡</span>
+                        <span className="text-[10px]">RADAR PING (1 AP)</span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          if (!spendAP(1, "DECRYPTOR")) return;
+                          audio.decrypt();
+                          // Decrypt chat logs
+                          const nextChat = caseData.evidence.chatLogs.map(c => {
+                            if (c.isRedacted) {
+                              return { ...c, message: c.revealedMessage, isRedacted: false };
+                            }
+                            return c;
+                          });
+                          setCaseData(prev => ({
+                            ...prev,
+                            evidence: { ...prev.evidence, chatLogs: nextChat }
+                          }));
+                          showToast("🔓 PACKET DECRYPTED: [REDACTED] logs successfully unscrambled!");
+                        }}
+                        className="p-2.5 cyber-btn text-emerald-300 font-bold flex flex-col items-center justify-center gap-1"
+                      >
+                        <span className="text-base">🔓</span>
+                        <span className="text-[10px]">DECRYPTOR (1 AP)</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Campus Suspect Dossiers */}
+                  <div className="cyber-card p-3.5 flex-1 flex flex-col">
                     <div className="flex justify-between items-center mb-2.5">
-                      <span className="text-xs font-bold text-white tracking-wider">CAMPUS SUSPECTS (4)</span>
+                      <span className="text-xs font-bold text-white tracking-wider font-pixel text-[10px]">CAMPUS SUSPECTS (4)</span>
                       <span className="text-[10px] text-slate-400">CLICK TO TARGET</span>
                     </div>
-                    <div className="space-y-2 flex-1 overflow-y-auto max-h-[380px]">
+
+                    <div className="space-y-2 flex-1 overflow-y-auto max-h-[300px]">
                       {caseData.suspects.map(s => (
                         <div
                           key={s.id}
                           onClick={() => { setActiveSuspectModal(s); audio.click(); }}
-                          className="p-2.5 bg-[#070B10] border border-[#233044] hover:border-cyan-400 rounded cursor-pointer transition flex items-center justify-between group"
+                          className="p-2.5 bg-[#0A0F15] border border-[#223449] hover:border-cyan-400 rounded-lg cursor-pointer transition flex items-center justify-between group"
                         >
                           <div>
                             <div className="font-bold text-white text-xs group-hover:text-cyan-300 transition">{s.name}</div>
                             <div className="text-[10px] text-slate-400">{s.statedRoom}</div>
                           </div>
-                          <span className="text-xs font-retro text-cyan-400 group-hover:scale-105 transition">[INSPECT]</span>
+                          <span className="text-xs font-pixel text-[9px] text-cyan-400 group-hover:scale-105 transition">[INTERROGATE]</span>
                         </div>
                       ))}
                     </div>
 
                     <button
                       onClick={() => setAccusationModalOpen(true)}
-                      className="mt-3.5 w-full py-3 bg-gradient-to-r from-rose-700 via-red-600 to-amber-700 hover:from-rose-600 hover:to-amber-600 text-white font-bold text-xs rounded border border-rose-400 shadow-[0_0_15px_rgba(244,63,94,0.4)] tracking-wider"
+                      className="mt-3.5 w-full py-3.5 bg-gradient-to-r from-rose-700 via-red-600 to-amber-700 hover:from-rose-600 hover:to-amber-600 text-white font-bold text-xs rounded-lg border border-rose-400 shadow-[0_0_20px_rgba(244,63,94,0.4)] tracking-wider font-pixel text-[10px]"
                     >
                       ⚖️ LOCK IN ACCUSATION
                     </button>
@@ -1621,30 +1822,31 @@
                 </div>
               </div>
             ) : (
-              /* LOG TERMINAL VIEW */
-              <div className="flex-1 cyber-card rounded-lg p-4 flex flex-col shadow-2xl">
-                <div className="flex items-center gap-2 pb-3 border-b border-[#233044] mb-3 text-xs font-bold">
-                  <button onClick={() => setActiveTab('badge')} className={`px-3 py-1.5 rounded ${activeTab === 'badge' ? 'bg-cyan-600 text-white' : 'bg-[#070B10] text-slate-400'}`}>
+              <div className="flex-1 cyber-card p-4 flex flex-col shadow-2xl">
+                <div className="flex items-center gap-2 pb-3 border-b border-[#223449] mb-3 text-xs font-bold">
+                  <button onClick={() => setActiveTab('badge')} className={`px-3 py-1.5 rounded ${activeTab === 'badge' ? 'bg-cyan-600 text-white shadow-lg' : 'bg-[#0A0F15] text-slate-400'}`}>
                     💳 KEYCARDS ({caseData.evidence.badgeLogs.length})
                   </button>
-                  <button onClick={() => setActiveTab('chat')} className={`px-3 py-1.5 rounded ${activeTab === 'chat' ? 'bg-amber-600 text-white' : 'bg-[#070B10] text-slate-400'}`}>
+                  <button onClick={() => setActiveTab('chat')} className={`px-3 py-1.5 rounded ${activeTab === 'chat' ? 'bg-amber-600 text-white shadow-lg' : 'bg-[#0A0F15] text-slate-400'}`}>
                     💬 CHATS ({caseData.evidence.chatLogs.length})
                   </button>
-                  <button onClick={() => setActiveTab('network')} className={`px-3 py-1.5 rounded ${activeTab === 'network' ? 'bg-emerald-600 text-white' : 'bg-[#070B10] text-slate-400'}`}>
+                  <button onClick={() => setActiveTab('network')} className={`px-3 py-1.5 rounded ${activeTab === 'network' ? 'bg-emerald-600 text-white shadow-lg' : 'bg-[#0A0F15] text-slate-400'}`}>
                     🌐 NETWORK ({caseData.evidence.networkLogs.length})
                   </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto space-y-2 text-xs">
+                <div className="flex-1 overflow-y-auto space-y-2.5 text-xs">
                   {caseData.evidence[`${activeTab}Logs`].map(item => (
-                    <div key={item.id} className="p-3 bg-[#070B10] border border-[#233044] rounded">
+                    <div key={item.id} className="p-3 bg-[#0A0F15] border border-[#223449] rounded-lg">
                       <div className="flex justify-between items-center mb-1">
                         <span className="text-cyan-400 font-bold">[{item.timestamp}] {item.holderName || item.sender || item.source}</span>
-                        <span className="text-slate-400">{item.location || item.channel || item.protocol}</span>
+                        <span className="text-slate-400 text-[10px]">{item.location || item.channel || item.protocol}</span>
                       </div>
-                      <p className="text-slate-300 text-[11px]">{item.details || item.message}</p>
+                      <p className="text-slate-200 text-xs leading-relaxed">{item.details || item.message}</p>
                       {item.contradiction && (
-                        <div className="mt-1 text-rose-400 font-bold text-[10px]">CONTRADICTION: {item.contradiction}</div>
+                        <div className="mt-2 text-rose-400 font-bold text-[11px] bg-rose-950/40 p-2 rounded border border-rose-800">
+                          CONTRADICTION DETECTED: {item.contradiction}
+                        </div>
                       )}
                     </div>
                   ))}
@@ -1653,64 +1855,125 @@
             )}
           </main>
 
-          {/* COOL DIALOGUE & INTERROGATION BUST MODAL */}
+          {/* SPROUT LANDS CHIBI DIALOGUE BUST MODAL (REFERENCE 1) */}
           {activeSuspectModal && (
             <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
-              <div className="cyber-card border-2 border-cyan-400 rounded-lg max-w-xl w-full p-5 shadow-2xl">
-                <div className="flex justify-between items-center pb-2.5 border-b border-[#233044] mb-4">
+              <div className="cyber-card border-2 border-cyan-400 rounded-xl max-w-xl w-full p-5 shadow-2xl">
+                <div className="flex justify-between items-center pb-2.5 border-b border-[#223449] mb-4">
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-white text-base">{activeSuspectModal.name}</span>
+                    <span className="font-bold text-white text-base font-pixel text-xs">{activeSuspectModal.name}</span>
                     <span className="text-xs text-slate-400">({activeSuspectModal.badgeId})</span>
                   </div>
-                  <button onClick={() => setActiveSuspectModal(null)} className="text-slate-400 hover:text-white text-xs">[CLOSE]</button>
+                  <button onClick={() => setActiveSuspectModal(null)} className="text-slate-400 hover:text-white text-xs font-bold">[CLOSE ✕]</button>
                 </div>
 
-                {/* Chibi Anime Portrait & Bio Card */}
+                {/* Handcrafted Chibi Anime Bust Portrait */}
                 <div className="flex gap-4 mb-4">
-                  <div className="w-20 h-24 bg-black border-2 border-cyan-500 rounded flex items-center justify-center shrink-0 shadow-lg">
-                    <canvas ref={portraitCanvasRef} width={80} height={100} className="w-full h-full" />
+                  <div className="w-24 h-28 bg-[#070B10] border-2 border-cyan-500 rounded-lg flex items-center justify-center shrink-0 shadow-lg overflow-hidden">
+                    <canvas ref={portraitCanvasRef} width={96} height={120} className="w-full h-full" />
                   </div>
 
                   <div className="flex-1 space-y-2 text-xs">
-                    <div className="bg-[#070B10] p-2.5 rounded border border-[#233044]">
-                      <span className="text-slate-400 block text-[10px]">ROLE & DEPT:</span>
-                      <span className="text-cyan-400 font-bold">{activeSuspectModal.role} ({activeSuspectModal.dept})</span>
+                    <div className="bg-[#0A0F15] p-2.5 rounded border border-[#223449]">
+                      <span className="text-slate-400 block text-[10px]">ROLE & CLEARANCE:</span>
+                      <span className="text-cyan-400 font-bold">{activeSuspectModal.role} ({activeSuspectModal.accessLevel})</span>
                     </div>
 
-                    <div className="bg-[#070B10] p-2.5 rounded border border-[#233044]">
+                    <div className="bg-[#0A0F15] p-2.5 rounded border border-[#223449]">
                       <span className="text-amber-400 block text-[10px] font-bold">STATED ALIBI:</span>
-                      <p className="text-slate-200 mt-0.5 text-[11px] leading-relaxed">{activeSuspectModal.statedAlibi}</p>
+                      <p className="text-slate-200 mt-0.5 text-xs leading-relaxed">{activeSuspectModal.statedAlibi}</p>
+                    </div>
+
+                    {/* Suspect Stress Meter */}
+                    <div className="bg-[#0A0F15] p-2 rounded border border-[#223449]">
+                      <div className="flex justify-between text-[10px] mb-1">
+                        <span className="text-slate-400">PSYCHOLOGICAL STRESS:</span>
+                        <span className={`font-bold ${activeSuspectModal.stressLevel > 60 ? 'text-rose-400' : 'text-emerald-400'}`}>
+                          {activeSuspectModal.stressLevel}%
+                        </span>
+                      </div>
+                      <div className="h-2 bg-black rounded-full overflow-hidden">
+                        <div
+                          className={`h-full transition-all duration-300 ${activeSuspectModal.stressLevel > 60 ? 'bg-rose-500 shadow-[0_0_8px_#F43F5E]' : 'bg-emerald-500'}`}
+                          style={{ width: `${activeSuspectModal.stressLevel}%` }}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
 
+                {interrogationDialogue && (
+                  <div className="bg-[#0A0F15] p-3 rounded-lg border border-amber-500/40 text-amber-200 text-xs mb-4 leading-relaxed">
+                    <strong>SUSPECT RESPONSE:</strong> "{interrogationDialogue}"
+                  </div>
+                )}
+
+                {/* Interrogation Actions */}
                 <div className="grid grid-cols-2 gap-3 text-xs">
                   <button
                     onClick={() => {
-                      if (!spendAP(1)) return;
+                      if (!spendAP(1, "TRACKER")) return;
                       audio.scan();
                       setActiveSuspectModal(null);
                       const isMatch = activeSuspectModal.actualRoom === activeSuspectModal.statedRoom;
                       const target = isMatch ? { x: activeSuspectModal.mapX, y: activeSuspectModal.mapY } : { x: RESTRICTED_ROOM.tileX, y: RESTRICTED_ROOM.tileY };
                       setRadarBeacon(target);
-                      showToast(isMatch ? `✓ SIGNAL: Confirmed in ${activeSuspectModal.statedRoom}` : `🚨 CONTRADICTION: Signal detected in ${RESTRICTED_ROOM.name}!`);
+                      showToast(isMatch ? `✓ RFID Confirmed in ${activeSuspectModal.statedRoom}` : `🚨 RFID Detected inside ${RESTRICTED_ROOM.name}!`);
                     }}
-                    className="p-3 bg-cyan-950/70 hover:bg-cyan-900 border border-cyan-500 text-cyan-300 rounded font-bold shadow-lg"
+                    className="p-3 cyber-btn text-cyan-300 font-bold"
                   >
                     📡 SIGNAL TRACKER (1 AP)
                   </button>
+
                   <button
                     onClick={() => {
-                      if (!spendAP(1)) return;
-                      const resp = activeSuspectModal.isCulprit ? caseData.crime.alibiSlipDialogue : "I was in my assigned room. Check my git commits!";
-                      showToast(`🎙️ "${resp}"`);
-                      audio.voiceBeep(450);
+                      if (!spendAP(1, "INTERROGATE")) return;
+                      const newStress = Math.min(100, activeSuspectModal.stressLevel + 25);
+                      activeSuspectModal.stressLevel = newStress;
+
+                      let reply = "";
+                      if (activeSuspectModal.isCulprit) {
+                        reply = newStress > 60 ? caseData.crime.alibiSlipDialogue : "I already told you my alibi. What reason would I have to breach the core vault?";
+                      } else {
+                        reply = "Check my git commits or cafeteria logs! I was nowhere near the vault during the incident.";
+                      }
+                      setInterrogationDialogue(reply);
+                      audio.voiceBeep(480);
+
+                      // Redraw with new stress
+                      if (portraitCanvasRef.current) {
+                        const ctx = portraitCanvasRef.current.getContext('2d');
+                        drawChibiDialoguePortrait(ctx, activeSuspectModal.spriteTheme, newStress);
+                      }
                     }}
-                    className="p-3 bg-amber-950/70 hover:bg-amber-900 border border-amber-500 text-amber-300 rounded font-bold shadow-lg"
+                    className="p-3 cyber-btn text-amber-300 font-bold"
                   >
-                    🎙️ INTERROGATE (1 AP)
+                    🎙️ PRESS ON ALIBI (1 AP)
                   </button>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* SURPRISE LIVE LEAK POPUP MODAL */}
+          {liveLeakModal && (
+            <div className="fixed inset-0 bg-black/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+              <div className="cyber-card border-2 border-rose-500 rounded-xl max-w-md w-full p-6 shadow-2xl">
+                <div className="flex items-center gap-2 mb-3 text-rose-400 font-pixel text-xs">
+                  <span className="text-xl">🚨</span>
+                  <span>SURPRISE INTERCEPT ALERT</span>
+                </div>
+                <h3 className="text-white font-bold text-sm mb-2">{liveLeakModal.title}</h3>
+                <p className="text-slate-300 text-xs mb-3 leading-relaxed">{liveLeakModal.desc}</p>
+                <div className="bg-[#0A0F15] p-3 rounded border border-rose-500/50 text-rose-300 text-xs font-bold mb-4">
+                  {liveLeakModal.reward}
+                </div>
+                <button
+                  onClick={() => setLiveLeakModal(null)}
+                  className="w-full py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-lg text-xs"
+                >
+                  DISMISS & RESUME INVESTIGATION
+                </button>
               </div>
             </div>
           )}
@@ -1718,29 +1981,39 @@
           {/* ACCUSATION SHOWDOWN MODAL */}
           {accusationModalOpen && (
             <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
-              <div className="cyber-card border-2 border-rose-500 rounded-lg max-w-lg w-full p-6 shadow-2xl">
+              <div className="cyber-card border-2 border-rose-500 rounded-xl max-w-lg w-full p-6 shadow-2xl">
                 {verdictData ? (
                   <div>
-                    <h2 className="text-lg font-bold text-center mb-2 text-white">
+                    <h2 className="text-base font-bold text-center mb-3 text-white font-pixel">
                       {verdictData.isSuccess ? '🏆 GUILTY VERDICT CONFIRMED!' : '❌ WRONGFUL ACCUSATION!'}
                     </h2>
-                    <p className="text-xs text-slate-300 mb-4 bg-[#070B10] p-3 rounded border border-[#233044]">
+                    <p className="text-xs text-slate-300 mb-4 bg-[#0A0F15] p-3.5 rounded-lg border border-[#223449] leading-relaxed">
                       {verdictData.summary}
                     </p>
                     <button
-                      onClick={() => { setAccusationModalOpen(false); setCaseData(generateCaseData(caseData.caseNumber + 1)); }}
-                      className="w-full py-2.5 bg-cyan-600 hover:bg-cyan-500 text-black font-bold rounded"
+                      onClick={() => {
+                        setAccusationModalOpen(false);
+                        setVerdictData(null);
+                        setCaseData(generateCaseData(caseData.caseNumber + 1));
+                        setAp(8);
+                      }}
+                      className="w-full py-3 bg-cyan-600 hover:bg-cyan-500 text-black font-bold rounded-lg text-xs font-pixel"
                     >
-                      NEXT CASE ➔
+                      PROCEED TO NEXT CASE ➔
                     </button>
                   </div>
                 ) : (
                   <div>
-                    <h2 className="text-sm font-bold text-white mb-3">LOCK IN ACCUSATION SHOWDOWN</h2>
+                    <h2 className="text-xs font-bold text-white mb-3 font-pixel">LOCK IN ACCUSATION SHOWDOWN</h2>
+                    <p className="text-[11px] text-slate-400 mb-3">
+                      Select the primary culprit to indict. Contradictions cross-reference automatically against logged biometric and network evidence.
+                    </p>
+
+                    <label className="text-[10px] text-slate-400 block mb-1">SELECT SUSPECT TO INDICT:</label>
                     <select
                       value={selectedAccusedSuspectId}
                       onChange={(e) => setSelectedAccusedSuspectId(e.target.value)}
-                      className="w-full bg-[#070B10] border border-[#233044] rounded p-2 text-white text-xs mb-4"
+                      className="w-full bg-[#0A0F15] border border-[#223449] rounded-lg p-2.5 text-white text-xs mb-4"
                     >
                       <option value="">-- Choose suspect to indict --</option>
                       {caseData.suspects.map(s => (
@@ -1749,7 +2022,7 @@
                     </select>
 
                     <div className="flex justify-end gap-2 text-xs">
-                      <button onClick={() => setAccusationModalOpen(false)} className="px-3 py-1.5 bg-[#070B10] text-slate-300 rounded">
+                      <button onClick={() => setAccusationModalOpen(false)} className="px-4 py-2 cyber-btn text-slate-300">
                         CANCEL
                       </button>
                       <button
@@ -1758,15 +2031,26 @@
                           if (!accused) return;
                           if (accused.isCulprit) {
                             audio.success();
-                            setVerdictData({ isSuccess: true, summary: `Case solved! ${accused.name} was arrested. Motive: ${accused.motive}` });
-                            setCareer(prev => ({ ...prev, streak: prev.streak + 1 }));
+                            setVerdictData({
+                              isSuccess: true,
+                              summary: `Case solved! ${accused.name} was taken into custody after their RFID swipe into ${RESTRICTED_ROOM.name} shattered their alibi. Motive: ${accused.motive}`
+                            });
+                            setCareer(prev => ({
+                              ...prev,
+                              streak: prev.streak + 1,
+                              xp: prev.xp + 250,
+                              rankTitle: "Chief SecOps Investigator"
+                            }));
                           } else {
                             audio.failure();
-                            setVerdictData({ isSuccess: false, summary: `Wrongful accusation! Real culprit was ${caseData.culpritName}!` });
+                            setVerdictData({
+                              isSuccess: false,
+                              summary: `Wrongful accusation! ${accused.name} was fully innocent. The real culprit was ${caseData.culpritName}!`
+                            });
                             setCareer(prev => ({ ...prev, streak: 0 }));
                           }
                         }}
-                        className="px-4 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded"
+                        className="px-5 py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-lg"
                       >
                         INDICT TARGET ➔
                       </button>
@@ -1777,9 +2061,9 @@
             </div>
           )}
 
-          <footer className="bg-[#0F1621] border-t border-[#233044] px-4 py-2 flex items-center justify-between text-[11px] text-slate-400">
-            <span>THE COLD FILE // CYBER-NOIR PIXEL EDITION</span>
-            <span>PRESS [TAB] FOR DETECTIVE LENS • [ESC] FOR STEALTH BOSS MODE</span>
+          <footer className="bg-[#0F1722] border-t border-[#223449] px-4 py-2 flex items-center justify-between text-[11px] text-slate-400">
+            <span>THE COLD FILE // SPROUT LANDS x CYBER-NOIR EDITION</span>
+            <span>PRESS [ESC] FOR STEALTH BOSS MODE</span>
           </footer>
         </div>
       );
