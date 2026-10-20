@@ -152,6 +152,82 @@
     ::-webkit-scrollbar-thumb:hover {
       background: #38BDF8;
     }
+
+    /* Custom Cyber-Detective Holographic Cursor */
+    * {
+      cursor: none !important;
+    }
+
+    .cyber-cursor-dot {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 6px;
+      height: 6px;
+      background: #38BDF8;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 99999;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 8px #38BDF8, 0 0 16px rgba(56, 189, 248, 0.8);
+      transition: background 0.15s ease;
+    }
+
+    .cyber-cursor-reticle {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 34px;
+      height: 34px;
+      border: 1.5px solid rgba(56, 189, 248, 0.65);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 99998;
+      transform: translate(-50%, -50%);
+      transition: width 0.18s ease, height 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cyber-cursor-reticle.hovered {
+      width: 48px;
+      height: 48px;
+      border-color: #F59E0B;
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.5);
+    }
+
+    .cyber-cursor-reticle.clicked {
+      transform: translate(-50%, -50%) scale(1.4);
+      border-color: #F43F5E;
+      box-shadow: 0 0 20px rgba(244, 63, 94, 0.8);
+    }
+
+    /* 4 Cardinal Crosshair Ticks */
+    .reticle-tick {
+      position: absolute;
+      background: #38BDF8;
+      transition: background 0.15s ease;
+    }
+    .cyber-cursor-reticle.hovered .reticle-tick {
+      background: #F59E0B;
+    }
+    .cyber-cursor-reticle.clicked .reticle-tick {
+      background: #F43F5E;
+    }
+    .tick-top { top: -5px; left: calc(50% - 1px); width: 2px; height: 5px; }
+    .tick-bottom { bottom: -5px; left: calc(50% - 1px); width: 2px; height: 5px; }
+    .tick-left { left: -5px; top: calc(50% - 1px); width: 5px; height: 2px; }
+    .tick-right { right: -5px; top: calc(50% - 1px); width: 5px; height: 2px; }
+
+    /* Rotating HUD animation */
+    @keyframes hudSpin {
+      from { transform: translate(-50%, -50%) rotate(0deg); }
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+    .reticle-spin {
+      animation: hudSpin 9s linear infinite;
+    }
   </style>
 
   <!-- Global Diagnostic Fallback -->
@@ -976,16 +1052,125 @@
       addWall(-14.5, 0, 0.5, 29); // West
       addWall(14.5, 0, 0.5, 29);  // East
 
-      // Interior Dividing Walls (Leaving open central doors)
-      addWall(-3.5, -8.5, 0.5, 11);
-      addWall(3.5, -8.5, 0.5, 11);
-      addWall(-3.5, 8.5, 0.5, 11);
-      addWall(3.5, 8.5, 0.5, 11);
-
+      // Interior Dividing Walls with 2.4-unit Doorway Thresholds
+      // A) North-West Server Vault Walls & Doorway
+      addWall(-3.5, -10.35, 0.5, 8.3);
+      addWall(-3.5, -3.4, 0.5, 0.8);
       addWall(-9, -3, 11, 0.5);
+
+      // B) North-East Conference Room Walls & Doorway
+      addWall(3.5, -10.35, 0.5, 8.3);
+      addWall(3.5, -3.4, 0.5, 0.8);
       addWall(9, -3, 11, 0.5);
+
+      // C) South-West Cafeteria Walls & Doorway
+      addWall(-3.5, 3.4, 0.5, 0.8);
+      addWall(-3.5, 10.35, 0.5, 8.3);
       addWall(-9, 3, 11, 0.5);
+
+      // D) South-East Executive Lounge Walls & Doorway
+      addWall(3.5, 3.4, 0.5, 0.8);
+      addWall(3.5, 10.35, 0.5, 8.3);
       addWall(9, 3, 11, 0.5);
+
+      // 3. Automated Sliding Proximity Security Doors
+      const doors = [];
+      const createSlidingDoor = (dx, dz, rotationY, signColorHex, panelColorHex, isHazard = false) => {
+        const doorGroup = new THREE.Group();
+        doorGroup.position.set(dx, 0, dz);
+        doorGroup.rotation.y = rotationY;
+        officeGroup.add(doorGroup);
+
+        // Frame posts (Left & Right)
+        const frameMat = mat(0x1B2635, 0.4, 0.4);
+        const postL = new THREE.Mesh(new THREE.BoxGeometry(0.22, 2.5, 0.42), frameMat);
+        postL.position.set(-1.22, 1.25, 0);
+        postL.castShadow = true;
+        doorGroup.add(postL);
+
+        const postR = new THREE.Mesh(new THREE.BoxGeometry(0.22, 2.5, 0.42), frameMat);
+        postR.position.set(1.22, 1.25, 0);
+        postR.castShadow = true;
+        doorGroup.add(postR);
+
+        // Overhead Lintel Header
+        const lintel = new THREE.Mesh(new THREE.BoxGeometry(2.65, 0.4, 0.46), frameMat);
+        lintel.position.set(0, 2.45, 0);
+        doorGroup.add(lintel);
+
+        // Glowing Room Sign LED on Lintel
+        const signGeom = new THREE.BoxGeometry(1.6, 0.16, 0.52);
+        const signMat = new THREE.MeshBasicMaterial({ color: signColorHex });
+        const signMesh = new THREE.Mesh(signGeom, signMat);
+        signMesh.position.set(0, 2.45, 0);
+        doorGroup.add(signMesh);
+
+        // Left & Right Sliding Door Panels
+        const panelMat = new THREE.MeshStandardMaterial({
+          color: panelColorHex,
+          roughness: 0.15,
+          metalness: 0.1,
+          transparent: true,
+          opacity: 0.82
+        });
+
+        const panelL = new THREE.Mesh(new THREE.BoxGeometry(1.08, 2.2, 0.08), panelMat);
+        panelL.position.set(-0.55, 1.1, 0);
+        panelL.castShadow = true;
+        doorGroup.add(panelL);
+
+        const panelR = new THREE.Mesh(new THREE.BoxGeometry(1.08, 2.2, 0.08), panelMat);
+        panelR.position.set(0.55, 1.1, 0);
+        panelR.castShadow = true;
+        doorGroup.add(panelR);
+
+        // Door Handles
+        const handleMat = mat(isHazard ? 0xFBBF24 : 0xE2E8F0, 0.2, 0.8);
+        const handleL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.5, 0.12), handleMat);
+        handleL.position.set(0.42, 0, 0);
+        panelL.add(handleL);
+
+        const handleR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.5, 0.12), handleMat);
+        handleR.position.set(-0.42, 0, 0);
+        panelR.add(handleR);
+
+        // Biometric Wall Scanner Post
+        const scannerBox = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.28, 0.14), mat(0x0F1722));
+        scannerBox.position.set(1.36, 1.25, 0);
+        doorGroup.add(scannerBox);
+
+        const scannerLed = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.08, 0.08), new THREE.MeshBasicMaterial({ color: signColorHex }));
+        scannerLed.position.set(1.42, 1.3, 0);
+        doorGroup.add(scannerLed);
+
+        const doorObj = {
+          x: dx,
+          z: dz,
+          state: 0.0,
+          update: function(pX, pZ, dt) {
+            const dist = Math.hypot(this.x - pX, this.z - pZ);
+            const shouldOpen = dist < 3.2;
+            const target = shouldOpen ? 1.0 : 0.0;
+            if (Math.abs(this.state - target) > 0.01) {
+              if (shouldOpen && this.state < 0.1) {
+                audio.playTone(isHazard ? 380 : 560, 'sine', 0.06, 0.015);
+              }
+              this.state += (target - this.state) * dt * 7.5;
+              panelL.position.x = -0.55 - this.state * 0.95;
+              panelR.position.x = 0.55 + this.state * 0.95;
+            }
+          }
+        };
+
+        doors.push(doorObj);
+        return doorObj;
+      };
+
+      // 4 Interactive Proximity Doors
+      createSlidingDoor(-3.5, -5.0, Math.PI / 2, 0xF43F5E, 0x1E293B, true);  // Server Vault (Blast Door)
+      createSlidingDoor(3.5, -5.0, Math.PI / 2, 0x38BDF8, 0x0284C7, false);  // Conference Room 4A (Cyan Glass)
+      createSlidingDoor(-3.5, 5.0, Math.PI / 2, 0x10B981, 0x059669, false);  // Cafeteria & Breakroom (Emerald Glass)
+      createSlidingDoor(3.5, 5.0, Math.PI / 2, 0xF59E0B, 0x581C2B, false);   // Executive Lounge (Obsidian Glass)
 
       // 3. 3D Furniture & Atmosphere
       // A) Server Vault Racks (with emissive LED blinking strips)
@@ -1118,7 +1303,95 @@
         return { ...p, group: pedGroup };
       });
 
-      return { officeGroup, serverRacks, pedestalMeshes };
+      return { officeGroup, serverRacks, pedestalMeshes, doors };
+    }
+
+    // ==========================================
+    // 5. CUSTOM CYBER-DETECTIVE HOLOGRAPHIC CURSOR
+    // ==========================================
+    function CyberCursor() {
+      const [pos, setPos] = useState({ x: -100, y: -100 });
+      const [trail, setTrail] = useState({ x: -100, y: -100 });
+      const [hovered, setHovered] = useState(false);
+      const [hoverLabel, setHoverLabel] = useState('');
+      const [clicked, setClicked] = useState(false);
+
+      useEffect(() => {
+        let mouseX = -100, mouseY = -100;
+        let trailX = -100, trailY = -100;
+        let animId;
+
+        const onMouseMove = (e) => {
+          mouseX = e.clientX;
+          mouseY = e.clientY;
+          setPos({ x: e.clientX, y: e.clientY });
+
+          const el = e.target.closest('button, a, input, select, [onClick], canvas');
+          if (el) {
+            setHovered(true);
+            if (el.tagName === 'BUTTON') setHoverLabel('ACTION');
+            else if (el.tagName === 'CANVAS') setHoverLabel('GLIDE');
+            else setHoverLabel('INSPECT');
+          } else {
+            setHovered(false);
+            setHoverLabel('');
+          }
+        };
+
+        const onMouseDown = () => {
+          setClicked(true);
+          setTimeout(() => setClicked(false), 240);
+        };
+
+        const loop = () => {
+          trailX += (mouseX - trailX) * 0.32;
+          trailY += (mouseY - trailY) * 0.32;
+          setTrail({ x: trailX, y: trailY });
+          animId = requestAnimationFrame(loop);
+        };
+        animId = requestAnimationFrame(loop);
+
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('mousedown', onMouseDown);
+        return () => {
+          window.removeEventListener('mousemove', onMouseMove);
+          window.removeEventListener('mousedown', onMouseDown);
+          cancelAnimationFrame(animId);
+        };
+      }, []);
+
+      if (pos.x < 0) return null;
+
+      return (
+        <React.Fragment>
+          {/* Laser Core Dot */}
+          <div
+            className="cyber-cursor-dot"
+            style={{ transform: `translate3d(${pos.x}px, ${pos.y}px, 0)` }}
+          />
+
+          {/* Smooth Trailing Rotating HUD Reticle */}
+          <div
+            className={`cyber-cursor-reticle reticle-spin ${hovered ? 'hovered' : ''} ${clicked ? 'clicked' : ''}`}
+            style={{ transform: `translate3d(${trail.x}px, ${trail.y}px, 0)` }}
+          >
+            <div className="reticle-tick tick-top" />
+            <div className="reticle-tick tick-bottom" />
+            <div className="reticle-tick tick-left" />
+            <div className="reticle-tick tick-right" />
+          </div>
+
+          {/* Precision Hover Tag */}
+          {hovered && hoverLabel && (
+            <div
+              className="fixed pointer-events-none z-[99999] text-[9px] font-pixel text-amber-300 bg-[#070B10]/95 px-2 py-0.5 rounded border border-amber-500/60 shadow-lg tracking-wider"
+              style={{ transform: `translate3d(${pos.x + 16}px, ${pos.y + 12}px, 0)` }}
+            >
+              [{hoverLabel}]
+            </div>
+          )}
+        </React.Fragment>
+      );
     }
 
     // ==========================================
@@ -1390,7 +1663,7 @@
         scene.add(concourseLight);
 
         // 3. Build Office Environment
-        const { officeGroup, serverRacks, pedestalMeshes } = build3DOfficeScene(scene);
+        const { officeGroup, serverRacks, pedestalMeshes, doors } = build3DOfficeScene(scene);
 
         // 4. Create Detective Mesh
         const playerMesh = createLowPolyChibiCharacter(DETECTIVE_THEME, true);
@@ -1422,7 +1695,8 @@
           suspectMeshes,
           pedestals: pedestalMeshes,
           radarMesh,
-          serverRacks
+          serverRacks,
+          doors
         };
 
         // Resize handler
@@ -1571,6 +1845,11 @@
               sm.mesh.userData.animate(dt, false, 0, currentTime / 1000);
             });
 
+            // Animate Automatic Sliding Proximity Doors
+            if (three.doors) {
+              three.doors.forEach(d => d.update(p.x, p.z, dt));
+            }
+
             // Smooth 3D Camera Tracking with Isometric Perspective
             const camDist = cameraZoomRef.current;
             const targetCamX = p.x + Math.sin(orbit) * camDist;
@@ -1654,6 +1933,9 @@
 
       return (
         <div className={`min-h-screen flex flex-col font-mono ${shakeScreen ? 'shake-effect' : ''}`}>
+          {/* Custom Cyber-Detective Holographic Reticle */}
+          <CyberCursor />
+
           <div className="fixed inset-0 scanlines z-40 pointer-events-none opacity-20"></div>
 
           {toastMsg && (
