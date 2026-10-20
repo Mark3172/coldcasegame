@@ -2,3 +2,6 @@ node_modules/
 .DS_Store
 Thumbs.db
 *.log
+edge-test-profile/
+test_*.png
+live_preview.png
