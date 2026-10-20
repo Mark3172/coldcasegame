@@ -89,10 +89,9 @@
       pointer-events: none;
     }
 
-    /* Cyber Card Box */
+    /* Cyber Card Box - High Performance Solid Background */
     .cyber-card {
-      background: rgba(15, 23, 34, 0.88);
-      backdrop-filter: blur(8px);
+      background: #0E1622;
       border: 2px solid #223449;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
       border-radius: 8px;
@@ -171,6 +170,7 @@
       transform: translate(-50%, -50%);
       box-shadow: 0 0 8px #38BDF8, 0 0 16px rgba(56, 189, 248, 0.8);
       transition: background 0.15s ease;
+      will-change: transform;
     }
 
     .cyber-cursor-reticle {
@@ -188,6 +188,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      will-change: transform;
     }
 
     .cyber-cursor-reticle.hovered {
@@ -1037,7 +1038,6 @@
       const addWall = (x, z, width, depth, height = 2.4) => {
         const wall = new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), wallMat);
         wall.position.set(x, height / 2, z);
-        wall.castShadow = true;
         wall.receiveShadow = true;
         officeGroup.add(wall);
 
@@ -1085,12 +1085,10 @@
         const frameMat = mat(0x1B2635, 0.4, 0.4);
         const postL = new THREE.Mesh(new THREE.BoxGeometry(0.22, 2.5, 0.42), frameMat);
         postL.position.set(-1.22, 1.25, 0);
-        postL.castShadow = true;
         doorGroup.add(postL);
 
         const postR = new THREE.Mesh(new THREE.BoxGeometry(0.22, 2.5, 0.42), frameMat);
         postR.position.set(1.22, 1.25, 0);
-        postR.castShadow = true;
         doorGroup.add(postR);
 
         // Overhead Lintel Header
@@ -1116,12 +1114,10 @@
 
         const panelL = new THREE.Mesh(new THREE.BoxGeometry(1.08, 2.2, 0.08), panelMat);
         panelL.position.set(-0.55, 1.1, 0);
-        panelL.castShadow = true;
         doorGroup.add(panelL);
 
         const panelR = new THREE.Mesh(new THREE.BoxGeometry(1.08, 2.2, 0.08), panelMat);
         panelR.position.set(0.55, 1.1, 0);
-        panelR.castShadow = true;
         doorGroup.add(panelR);
 
         // Door Handles
@@ -1307,52 +1303,75 @@
     }
 
     // ==========================================
-    // 5. CUSTOM CYBER-DETECTIVE HOLOGRAPHIC CURSOR
+    // 5. CUSTOM CYBER-DETECTIVE HOLOGRAPHIC CURSOR (Zero-Overhead Direct DOM)
     // ==========================================
     function CyberCursor() {
-      const [pos, setPos] = useState({ x: -100, y: -100 });
-      const [trail, setTrail] = useState({ x: -100, y: -100 });
-      const [hovered, setHovered] = useState(false);
-      const [hoverLabel, setHoverLabel] = useState('');
-      const [clicked, setClicked] = useState(false);
+      const dotRef = useRef(null);
+      const reticleRef = useRef(null);
+      const labelRef = useRef(null);
 
       useEffect(() => {
         let mouseX = -100, mouseY = -100;
         let trailX = -100, trailY = -100;
         let animId;
+        let isHovered = false;
+        let currentLabel = '';
 
         const onMouseMove = (e) => {
           mouseX = e.clientX;
           mouseY = e.clientY;
-          setPos({ x: e.clientX, y: e.clientY });
+          if (dotRef.current) {
+            dotRef.current.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+          }
 
           const el = e.target.closest('button, a, input, select, [onClick], canvas');
           if (el) {
-            setHovered(true);
-            if (el.tagName === 'BUTTON') setHoverLabel('ACTION');
-            else if (el.tagName === 'CANVAS') setHoverLabel('GLIDE');
-            else setHoverLabel('INSPECT');
+            if (!isHovered) {
+              isHovered = true;
+              if (reticleRef.current) reticleRef.current.classList.add('hovered');
+            }
+            const newLabel = el.tagName === 'BUTTON' ? 'ACTION' : el.tagName === 'CANVAS' ? 'GLIDE' : 'INSPECT';
+            if (newLabel !== currentLabel) {
+              currentLabel = newLabel;
+              if (labelRef.current) {
+                labelRef.current.textContent = `[${newLabel}]`;
+                labelRef.current.style.display = 'block';
+              }
+            }
+            if (labelRef.current) {
+              labelRef.current.style.transform = `translate3d(${mouseX + 16}px, ${mouseY + 12}px, 0)`;
+            }
           } else {
-            setHovered(false);
-            setHoverLabel('');
+            if (isHovered) {
+              isHovered = false;
+              currentLabel = '';
+              if (reticleRef.current) reticleRef.current.classList.remove('hovered');
+              if (labelRef.current) labelRef.current.style.display = 'none';
+            }
           }
         };
 
         const onMouseDown = () => {
-          setClicked(true);
-          setTimeout(() => setClicked(false), 240);
+          if (reticleRef.current) {
+            reticleRef.current.classList.add('clicked');
+            setTimeout(() => {
+              if (reticleRef.current) reticleRef.current.classList.remove('clicked');
+            }, 200);
+          }
         };
 
         const loop = () => {
-          trailX += (mouseX - trailX) * 0.32;
-          trailY += (mouseY - trailY) * 0.32;
-          setTrail({ x: trailX, y: trailY });
+          trailX += (mouseX - trailX) * 0.35;
+          trailY += (mouseY - trailY) * 0.35;
+          if (reticleRef.current) {
+            reticleRef.current.style.transform = `translate3d(${trailX}px, ${trailY}px, 0)`;
+          }
           animId = requestAnimationFrame(loop);
         };
         animId = requestAnimationFrame(loop);
 
-        window.addEventListener('mousemove', onMouseMove);
-        window.addEventListener('mousedown', onMouseDown);
+        window.addEventListener('mousemove', onMouseMove, { passive: true });
+        window.addEventListener('mousedown', onMouseDown, { passive: true });
         return () => {
           window.removeEventListener('mousemove', onMouseMove);
           window.removeEventListener('mousedown', onMouseDown);
@@ -1360,36 +1379,20 @@
         };
       }, []);
 
-      if (pos.x < 0) return null;
-
       return (
         <React.Fragment>
-          {/* Laser Core Dot */}
-          <div
-            className="cyber-cursor-dot"
-            style={{ transform: `translate3d(${pos.x}px, ${pos.y}px, 0)` }}
-          />
-
-          {/* Smooth Trailing Rotating HUD Reticle */}
-          <div
-            className={`cyber-cursor-reticle reticle-spin ${hovered ? 'hovered' : ''} ${clicked ? 'clicked' : ''}`}
-            style={{ transform: `translate3d(${trail.x}px, ${trail.y}px, 0)` }}
-          >
+          <div ref={dotRef} className="cyber-cursor-dot" style={{ transform: 'translate3d(-100px, -100px, 0)' }} />
+          <div ref={reticleRef} className="cyber-cursor-reticle reticle-spin" style={{ transform: 'translate3d(-100px, -100px, 0)' }}>
             <div className="reticle-tick tick-top" />
             <div className="reticle-tick tick-bottom" />
             <div className="reticle-tick tick-left" />
             <div className="reticle-tick tick-right" />
           </div>
-
-          {/* Precision Hover Tag */}
-          {hovered && hoverLabel && (
-            <div
-              className="fixed pointer-events-none z-[99999] text-[9px] font-pixel text-amber-300 bg-[#070B10]/95 px-2 py-0.5 rounded border border-amber-500/60 shadow-lg tracking-wider"
-              style={{ transform: `translate3d(${pos.x + 16}px, ${pos.y + 12}px, 0)` }}
-            >
-              [{hoverLabel}]
-            </div>
-          )}
+          <div
+            ref={labelRef}
+            className="fixed pointer-events-none z-[99999] text-[9px] font-pixel text-amber-300 bg-[#070B10]/95 px-2 py-0.5 rounded border border-amber-500/60 shadow-lg tracking-wider"
+            style={{ transform: 'translate3d(-100px, -100px, 0)', display: 'none' }}
+          />
         </React.Fragment>
       );
     }
@@ -1453,8 +1456,33 @@
 
       const [career, setCareer] = useState({ xp: 220, streak: 0, rankTitle: "Senior SecOps Investigator" });
       const [bossMode, setBossMode] = useState(false);
+      const [turboMode, setTurboMode] = useState(() => {
+        try {
+          return localStorage.getItem('THE_COLD_FILE_TURBO') === 'true';
+        } catch(e) { return false; }
+      });
       const [soundMuted, setSoundMuted] = useState(false);
       const [toastMsg, setToastMsg] = useState(null);
+
+      const toggleTurboMode = () => {
+        const next = !turboMode;
+        setTurboMode(next);
+        try { localStorage.setItem('THE_COLD_FILE_TURBO', next ? 'true' : 'false'); } catch(e){}
+        const three = threeRef.current;
+        if (three && three.renderer) {
+          if (next) {
+            three.renderer.shadowMap.enabled = false;
+            three.renderer.setPixelRatio(1.0);
+            if (three.pointLights) three.pointLights.forEach(l => l.visible = false);
+            showToast("⚡ TURBO 60FPS: ON (Lightweight & Butter-Smooth)");
+          } else {
+            three.renderer.shadowMap.enabled = true;
+            three.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.25));
+            if (three.pointLights) three.pointLights.forEach(l => l.visible = true);
+            showToast("🎨 HIGH FIDELITY 3D: ON");
+          }
+        }
+      };
 
       const canvasContainerRef = useRef(null);
       const portraitCanvasRef = useRef(null);
@@ -1630,11 +1658,13 @@
           }
 
           const key = e.key.toLowerCase();
-          if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
-            e.preventDefault();
+          if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'shift'].includes(key)) {
+            if (key !== 'shift') {
+              e.preventDefault();
+              playerRef.current.targetX = null;
+              playerRef.current.targetZ = null;
+            }
             keysPressedRef.current.add(key);
-            playerRef.current.targetX = null;
-            playerRef.current.targetZ = null;
           } else if (key === 'q') {
             cameraAngleRef.current -= 0.35; // Rotate camera left
           } else if (key === 'r') {
@@ -1680,11 +1710,16 @@
         const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
         camera.position.set(0, 16, 20);
 
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+        const renderer = new THREE.WebGLRenderer({
+          antialias: true,
+          alpha: true,
+          powerPreference: "high-performance",
+          precision: "mediump"
+        });
         renderer.setSize(width, height);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-        renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.setPixelRatio(turboMode ? 1.0 : Math.min(window.devicePixelRatio, 1.25));
+        renderer.shadowMap.enabled = !turboMode;
+        renderer.shadowMap.type = THREE.BasicShadowMap;
         renderer.domElement.style.width = '100%';
         renderer.domElement.style.height = '100%';
         renderer.domElement.style.display = 'block';
@@ -1698,27 +1733,30 @@
         const dirLight = new THREE.DirectionalLight(0xFFFFFF, 0.95);
         dirLight.position.set(12, 24, 15);
         dirLight.castShadow = true;
-        dirLight.shadow.mapSize.width = 1024;
-        dirLight.shadow.mapSize.height = 1024;
+        dirLight.shadow.mapSize.width = 512;
+        dirLight.shadow.mapSize.height = 512;
         dirLight.shadow.camera.near = 0.5;
-        dirLight.shadow.camera.far = 50;
-        dirLight.shadow.camera.left = -18;
-        dirLight.shadow.camera.right = 18;
-        dirLight.shadow.camera.top = 18;
-        dirLight.shadow.camera.bottom = -18;
+        dirLight.shadow.camera.far = 45;
+        dirLight.shadow.camera.left = -16;
+        dirLight.shadow.camera.right = 16;
+        dirLight.shadow.camera.top = 16;
+        dirLight.shadow.camera.bottom = -16;
         scene.add(dirLight);
 
-        // Room Point Lights
-        const vaultLight = new THREE.PointLight(0xF43F5E, 1.2, 12);
-        vaultLight.position.set(-9, 3.5, -8.5);
+        // Room Point Lights (optimized radius & attenuation)
+        const vaultLight = new THREE.PointLight(0xF43F5E, 1.1, 9);
+        vaultLight.position.set(-9, 3.2, -8.5);
+        vaultLight.visible = !turboMode;
         scene.add(vaultLight);
 
-        const confLight = new THREE.PointLight(0xF59E0B, 1.0, 14);
-        confLight.position.set(9, 3.5, -8.5);
+        const confLight = new THREE.PointLight(0xF59E0B, 0.9, 10);
+        confLight.position.set(9, 3.2, -8.5);
+        confLight.visible = !turboMode;
         scene.add(confLight);
 
-        const concourseLight = new THREE.PointLight(0x38BDF8, 0.8, 12);
-        concourseLight.position.set(0, 3.5, 0);
+        const concourseLight = new THREE.PointLight(0x38BDF8, 0.7, 9);
+        concourseLight.position.set(0, 3.2, 0);
+        concourseLight.visible = !turboMode;
         scene.add(concourseLight);
 
         // 3. Build Office Environment
@@ -1755,7 +1793,8 @@
           pedestals: pedestalMeshes,
           radarMesh,
           serverRacks,
-          doors
+          doors,
+          pointLights: [vaultLight, confLight, concourseLight]
         };
 
         // Resize handler
@@ -1851,6 +1890,12 @@
         let animId;
         let lastTime = performance.now();
 
+        // 0-allocation cached vector helpers
+        const _vCamForward = new THREE.Vector3();
+        const _vCamRight = new THREE.Vector3();
+        const _vMoveDir = new THREE.Vector3();
+        const _vTargetCam = new THREE.Vector3();
+
         const loop = (currentTime) => {
           const dt = Math.min(0.04, (currentTime - lastTime) / 1000);
           lastTime = currentTime;
@@ -1868,23 +1913,25 @@
             if (keys.has('a') || keys.has('arrowleft')) inputX -= 1;
             if (keys.has('d') || keys.has('arrowright')) inputX += 1;
 
-            const camForward = new THREE.Vector3(-Math.sin(orbit), 0, -Math.cos(orbit));
-            const camRight = new THREE.Vector3(Math.cos(orbit), 0, -Math.sin(orbit));
+            _vCamForward.set(-Math.sin(orbit), 0, -Math.cos(orbit));
+            _vCamRight.set(Math.cos(orbit), 0, -Math.sin(orbit));
 
-            const moveDir = new THREE.Vector3();
-            if (inputZ < 0) moveDir.add(camForward);
-            if (inputZ > 0) moveDir.sub(camForward);
-            if (inputX > 0) moveDir.add(camRight);
-            if (inputX < 0) moveDir.sub(camRight);
+            _vMoveDir.set(0, 0, 0);
+            if (inputZ < 0) _vMoveDir.add(_vCamForward);
+            if (inputZ > 0) _vMoveDir.sub(_vCamForward);
+            if (inputX > 0) _vMoveDir.add(_vCamRight);
+            if (inputX < 0) _vMoveDir.sub(_vCamRight);
 
-            const accel = 26; // Smooth 3D acceleration
-            const friction = 0.82;
-            const maxSpeed = 7.5;
+            // Snappy, agile physics with [SHIFT] Sprinting
+            const isSprinting = keys.has('shift');
+            const maxSpeed = isSprinting ? 12.8 : 9.0;
+            const accel = isSprinting ? 95 : 75;
+            const friction = isSprinting ? 0.65 : 0.58;
 
-            if (moveDir.lengthSq() > 0) {
-              moveDir.normalize();
-              p.vx += moveDir.x * accel * dt;
-              p.vz += moveDir.z * accel * dt;
+            if (_vMoveDir.lengthSq() > 0) {
+              _vMoveDir.normalize();
+              p.vx += _vMoveDir.x * accel * dt;
+              p.vz += _vMoveDir.z * accel * dt;
               p.isWalking = true;
               audio.step();
             } else if (p.targetX !== null && p.targetZ !== null) {
@@ -1900,6 +1947,14 @@
               } else {
                 p.targetX = null;
                 p.targetZ = null;
+              }
+            } else {
+              // Active responsive braking: stops cleanly within 1-2 frames without ice-skating
+              p.vx *= 0.38;
+              p.vz *= 0.38;
+              if (Math.hypot(p.vx, p.vz) < 0.12) {
+                p.vx = 0;
+                p.vz = 0;
               }
             }
 
@@ -1923,7 +1978,7 @@
 
             // Smooth Character Heading Rotation
             if (currentSpeed > 0.4) {
-              p.walkProgress += dt * 11;
+              p.walkProgress += dt * (isSprinting ? 17 : 12.5);
               p.rotationY = Math.atan2(p.vx, p.vz);
             } else {
               p.isWalking = false;
@@ -1943,13 +1998,14 @@
               three.doors.forEach(d => d.update(p.x, p.z, dt));
             }
 
-            // Smooth 3D Camera Tracking with Isometric Perspective
+            // Smooth 3D Camera Tracking with Tight Isometric Perspective
             const camDist = cameraZoomRef.current;
             const targetCamX = p.x + Math.sin(orbit) * camDist;
             const targetCamZ = p.z + Math.cos(orbit) * camDist;
             const targetCamY = 14 + camDist * 0.35;
 
-            three.camera.position.lerp(new THREE.Vector3(targetCamX, targetCamY, targetCamZ), dt * 7);
+            _vTargetCam.set(targetCamX, targetCamY, targetCamZ);
+            three.camera.position.lerp(_vTargetCam, Math.min(1.0, dt * 9));
             three.camera.lookAt(p.x, 0.8, p.z);
 
             // 2. Proximity Check for Interactions
@@ -2035,7 +2091,7 @@
           <div className="fixed inset-0 scanlines z-40 pointer-events-none opacity-20"></div>
 
           {toastMsg && (
-            <div className="fixed top-4 right-4 z-50 cyber-card border-2 border-cyan-400 text-cyan-300 px-4 py-2.5 rounded shadow-2xl text-xs flex items-center gap-2">
+            <div className="fixed top-14 right-4 z-50 cyber-card border-2 border-cyan-400 text-cyan-300 px-4 py-2.5 rounded shadow-2xl text-xs flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
               <span className="font-bold">{toastMsg}</span>
             </div>
@@ -2115,6 +2171,18 @@
                 </button>
               </div>
 
+              {/* Turbo 60FPS / Eco Mode Toggle */}
+              <button
+                onClick={toggleTurboMode}
+                className={`px-3 py-1.5 cyber-btn text-xs font-bold transition flex items-center gap-1 ${
+                  turboMode ? 'text-amber-400 border-amber-500 bg-amber-950/40 shadow-[0_0_12px_rgba(245,158,11,0.3)]' : 'text-slate-400'
+                }`}
+                title="Toggle Lightweight Turbo Mode (Disables dynamic shadows and point lights for maximum 60-120+ FPS)"
+              >
+                <span>⚡</span>
+                <span>{turboMode ? 'TURBO: 60FPS' : 'TURBO: OFF'}</span>
+              </button>
+
               {/* BGM Toggle */}
               <button
                 onClick={toggleBGM}
@@ -2164,8 +2232,8 @@
                 {/* 3D WebGL Canvas Container (Main Stage) */}
                 <div className="flex-1 min-w-0 cyber-card p-2 flex flex-col items-center justify-center relative shadow-2xl overflow-hidden min-h-[580px]">
                   <div className="w-full flex justify-between items-center text-xs text-slate-400 px-3 py-1.5 border-b border-[#223449] mb-1 font-pixel text-[9px] z-10">
-                    <span className="text-cyan-400">MOVE: [WASD] / CLICK FLOOR | ROTATE: [Q] / [R]</span>
-                    <span className="text-amber-400">ACTION: [E] OR [SPACE]</span>
+                    <span className="text-cyan-400">MOVE: [WASD] | SPRINT: [HOLD SHIFT] | ROTATE: [Q] / [R]</span>
+                    <span className="text-amber-400">ACTION: [E] / [SPACE] / CLICK</span>
                   </div>
 
                   {/* 3D Container */}
