@@ -229,6 +229,18 @@
     .reticle-spin {
       animation: hudSpin 9s linear infinite;
     }
+
+    /* Vending Machine Kick Animation */
+    @keyframes kickImpact {
+      0% { transform: scale(1); }
+      25% { transform: scale(0.96) translate(-8px, 4px) rotate(-1.5deg); }
+      50% { transform: scale(1.03) translate(6px, -3px) rotate(1deg); }
+      75% { transform: scale(0.98) translate(-3px, 1px) rotate(-0.5deg); }
+      100% { transform: scale(1) translate(0, 0) rotate(0deg); }
+    }
+    .kick-anim {
+      animation: kickImpact 0.22s ease-out;
+    }
   </style>
 
   <!-- Global Diagnostic Fallback -->
@@ -334,6 +346,27 @@
 
       interact() { this.playTone(880, 'triangle', 0.07, 0.035); }
       click() { this.playTone(1400, 'triangle', 0.02, 0.025); }
+
+      coin() {
+        this.playTone(1320, 'sine', 0.05, 0.025);
+        setTimeout(() => this.playTone(1760, 'sine', 0.08, 0.03), 60);
+      }
+
+      vendDrop() {
+        this.playTone(280, 'sawtooth', 0.12, 0.02);
+        setTimeout(() => this.playTone(85, 'triangle', 0.22, 0.08), 120);
+      }
+
+      kick() {
+        this.playTone(110, 'square', 0.08, 0.06);
+        setTimeout(() => this.playTone(55, 'triangle', 0.16, 0.08), 30);
+      }
+
+      slurp() {
+        [523, 659, 784, 1046].forEach((f, idx) => {
+          setTimeout(() => this.playTone(f, 'sine', 0.09, 0.03), idx * 65);
+        });
+      }
 
       scan() {
         if (this.muted) return;
@@ -1253,19 +1286,47 @@
       mug.position.set(0.7, 0.98, 0.3);
       confTableGroup.add(mug);
 
-      // C) Cafeteria Vending Machine & Potted Plants
+      // C) Cafeteria Vending Machine (Interactive 3D Neon Automat)
       const vendingGroup = new THREE.Group();
       vendingGroup.position.set(-12.5, 0, 6);
       officeGroup.add(vendingGroup);
 
       const vendBox = new THREE.Mesh(new THREE.BoxGeometry(1.6, 2.4, 1.2), mat(0xDC2626, 0.4, 0.2));
       vendBox.position.y = 1.2;
-      vendBox.castShadow = true;
       vendingGroup.add(vendBox);
 
-      const vendGlass = new THREE.Mesh(new THREE.BoxGeometry(1.3, 1.2, 0.05), new THREE.MeshBasicMaterial({ color: 0x38BDF8 }));
-      vendGlass.position.set(0, 1.4, 0.61);
+      // Glowing Neon Header Marquee
+      const marqueeMesh = new THREE.Mesh(new THREE.BoxGeometry(1.4, 0.24, 0.1), new THREE.MeshBasicMaterial({ color: 0x38BDF8 }));
+      marqueeMesh.position.set(0, 2.22, 0.58);
+      vendingGroup.add(marqueeMesh);
+
+      // Glass Display Window
+      const vendGlass = new THREE.Mesh(new THREE.BoxGeometry(1.25, 1.2, 0.05), new THREE.MeshBasicMaterial({ color: 0x0284C7, transparent: true, opacity: 0.6 }));
+      vendGlass.position.set(0, 1.38, 0.61);
       vendingGroup.add(vendGlass);
+
+      // Mini Neon Soda Cans on Display Inside
+      const canColors = [0x38BDF8, 0x10B981, 0xF59E0B, 0xF43F5E];
+      for (let r = 0; r < 2; r++) {
+        for (let c = 0; c < 3; c++) {
+          const miniCan = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.08, 0.08, 0.2, 8),
+            new THREE.MeshBasicMaterial({ color: canColors[(r * 3 + c) % canColors.length] })
+          );
+          miniCan.position.set(-0.35 + c * 0.35, 1.15 + r * 0.4, 0.38);
+          vendingGroup.add(miniCan);
+        }
+      }
+
+      // Dispenser Chute Door at bottom
+      const trayBox = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.35, 0.12), mat(0x0F172A));
+      trayBox.position.set(0, 0.35, 0.58);
+      vendingGroup.add(trayBox);
+
+      // Keypad & Coin Slot on Right Side
+      const keypad = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.32, 0.05), new THREE.MeshBasicMaterial({ color: 0xFBBF24 }));
+      keypad.position.set(0.62, 1.4, 0.61);
+      vendingGroup.add(keypad);
 
       // Potted Plant (Sprout Lands 3D Bush)
       const plantGroup = new THREE.Group();
@@ -1318,7 +1379,7 @@
         colliders.push({ minX: rx - 0.6, maxX: rx + 0.6, minZ: -12.2, maxZ: -10.8 }); // Server Racks
       }
 
-      return { officeGroup, serverRacks, pedestalMeshes, doors, colliders };
+      return { officeGroup, serverRacks, pedestalMeshes, doors, colliders, vendingGroup };
     }
 
     // ==========================================
@@ -1438,6 +1499,527 @@
     }
 
     // ==========================================
+    // 5.5 VENDING MACHINE MINI-GAME COMPONENT
+    // ==========================================
+    const VENDING_DRINKS = [
+      {
+        id: 'glitch',
+        name: 'Quantum Glitch Soda',
+        flavor: 'Liquid Nitrogen & Neural Overclock Peptides',
+        effectText: '+2 AP Overclock Refill',
+        apGain: 2,
+        targetMin: 44,
+        targetMax: 56,
+        speed: 2.7,
+        accentColor: '#38BDF8',
+        tagBg: 'bg-cyan-950 text-cyan-300 border-cyan-500',
+        badge: '⚡ HIGH VOLTAGE',
+        icon: '⚡'
+      },
+      {
+        id: 'coldbrew',
+        name: 'SecOps Dark Cold Brew',
+        flavor: 'Coolant-Filtered Slow Roast (Server Exhaust Steeper)',
+        effectText: '+1 AP Steady Focus Refill',
+        apGain: 1,
+        targetMin: 35,
+        targetMax: 65,
+        speed: 1.6,
+        accentColor: '#F59E0B',
+        tagBg: 'bg-amber-950 text-amber-300 border-amber-500',
+        badge: '☕ STEADY FOCUS',
+        icon: '☕'
+      },
+      {
+        id: 'mystery',
+        name: 'Slot 404: Whistleblower USB Can',
+        flavor: 'Encrypted Thumb Drive Taped to Can Base',
+        effectText: '+1 AP + Whistleblower Intel Leak',
+        apGain: 1,
+        targetMin: 41,
+        targetMax: 59,
+        speed: 2.1,
+        accentColor: '#10B981',
+        tagBg: 'bg-emerald-950 text-emerald-300 border-emerald-500',
+        badge: '🕵️ SECRET INTEL',
+        icon: '💾'
+      }
+    ];
+
+    function VendingMiniGameModal({
+      tokens,
+      setTokens,
+      ap,
+      setAp,
+      maxAp,
+      caseData,
+      setCaseData,
+      onClose,
+      showToast,
+      setShakeScreen
+    }) {
+      const [selectedDrink, setSelectedDrink] = useState(VENDING_DRINKS[0]);
+      const [phase, setPhase] = useState('idle'); // 'idle' | 'dispensing' | 'jammed' | 'success'
+      const [laserPos, setLaserPos] = useState(50);
+      const [kicksLeft, setKicksLeft] = useState(3);
+      const [isKicking, setIsKicking] = useState(false);
+      const [secretIntel, setSecretIntel] = useState(null);
+      const [lastGain, setLastGain] = useState(0);
+
+      const animRef = useRef(null);
+      const posRef = useRef(10);
+      const dirRef = useRef(1);
+
+      // Reflex timing laser oscillation loop
+      useEffect(() => {
+        if (phase !== 'dispensing') return;
+
+        let lastTime = performance.now();
+        const loop = (currentTime) => {
+          const dt = Math.min(0.04, (currentTime - lastTime) / 1000);
+          lastTime = currentTime;
+
+          posRef.current += dirRef.current * selectedDrink.speed * 42 * dt;
+          if (posRef.current >= 98) {
+            posRef.current = 98;
+            dirRef.current = -1;
+          } else if (posRef.current <= 2) {
+            posRef.current = 2;
+            dirRef.current = 1;
+          }
+
+          setLaserPos(posRef.current);
+          animRef.current = requestAnimationFrame(loop);
+        };
+
+        animRef.current = requestAnimationFrame(loop);
+        return () => {
+          if (animRef.current) cancelAnimationFrame(animRef.current);
+        };
+      }, [phase, selectedDrink]);
+
+      // Keyboard spacebar listener for timing drop or kicking
+      useEffect(() => {
+        const handleKeyDown = (e) => {
+          if (e.code === 'Space') {
+            e.preventDefault();
+            if (phase === 'dispensing') {
+              pushDispense();
+            } else if (phase === 'jammed') {
+              kickMachine();
+            } else if (phase === 'idle') {
+              startVending();
+            }
+          }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+      }, [phase, laserPos, kicksLeft, selectedDrink, tokens]);
+
+      const startVending = () => {
+        if (tokens <= 0) {
+          showToast('🪙 Out of tokens! Click FREE REFILL to restock breakroom tokens!');
+          audio.alert();
+          return;
+        }
+        audio.coin();
+        setPhase('dispensing');
+        setSecretIntel(null);
+        posRef.current = Math.random() > 0.5 ? 5 : 95;
+        dirRef.current = posRef.current < 50 ? 1 : -1;
+      };
+
+      const pushDispense = () => {
+        if (phase !== 'dispensing') return;
+        if (animRef.current) cancelAnimationFrame(animRef.current);
+
+        const currentP = posRef.current;
+        const inZone = currentP >= selectedDrink.targetMin && currentP <= selectedDrink.targetMax;
+
+        if (inZone) {
+          // Success! Drop the can
+          audio.coin();
+          setTimeout(() => audio.vendDrop(), 180);
+          setTimeout(() => audio.slurp(), 520);
+
+          setTokens(t => Math.max(0, t - 1));
+          setAp(curr => Math.min(maxAp, curr + selectedDrink.apGain));
+          setLastGain(selectedDrink.apGain);
+
+          if (selectedDrink.id === 'mystery') {
+            grantWhistleblowerIntel();
+          }
+
+          setPhase('success');
+          showToast(`🎉 CHUTE OPEN! ${selectedDrink.name} dispensed (+${selectedDrink.apGain} AP)!`);
+        } else {
+          // Mechanical Jam!
+          audio.playTone(180, 'sawtooth', 0.22, 0.08);
+          setShakeScreen(true);
+          setTimeout(() => setShakeScreen(false), 300);
+
+          setPhase('jammed');
+          setKicksLeft(3);
+          showToast('⚠️ CLUNK! CAN JAMMED IN DISPENSER CHUTE!');
+        }
+      };
+
+      const kickMachine = () => {
+        if (phase !== 'jammed') return;
+        audio.kick();
+        setIsKicking(true);
+        setTimeout(() => setIsKicking(false), 160);
+
+        setShakeScreen(true);
+        setTimeout(() => setShakeScreen(false), 200);
+
+        const nextKicks = kicksLeft - 1;
+        setKicksLeft(nextKicks);
+
+        if (nextKicks <= 0) {
+          // Percussive maintenance victory!
+          setTimeout(() => audio.vendDrop(), 150);
+          setTimeout(() => audio.slurp(), 450);
+
+          setTokens(t => Math.max(0, t - 1));
+          setAp(curr => Math.min(maxAp, curr + 1));
+          setLastGain(1);
+
+          if (selectedDrink.id === 'mystery') {
+            grantWhistleblowerIntel();
+          }
+
+          setPhase('success');
+          showToast('💥 *CLANG!* Percussive maintenance dislodged the can (+1 AP)!');
+        }
+      };
+
+      const grantWhistleblowerIntel = () => {
+        const innocentSuspect = caseData.suspects.find(s => !s.isCulprit && s.userTag !== 'INNOCENT') ||
+                               caseData.suspects.find(s => !s.isCulprit) ||
+                               caseData.suspects[0];
+
+        const intelMsg = `CONFIDENTIAL FLASH DRIVE EXTRACTED: Cafeteria surveillance footage timestamped ${caseData.crime.incidentTime} verifies ${innocentSuspect.name} (${innocentSuspect.role}) was drinking coffee at the break table. They are 100% INNOCENT!`;
+
+        setSecretIntel({
+          suspectName: innocentSuspect.name,
+          suspectId: innocentSuspect.id,
+          text: intelMsg
+        });
+
+        // Tag suspect as INNOCENT in case data
+        setCaseData(prev => ({
+          ...prev,
+          suspects: prev.suspects.map(s => s.id === innocentSuspect.id ? { ...s, userTag: 'INNOCENT' } : s)
+        }));
+      };
+
+      const freeRefillTokens = () => {
+        audio.coin();
+        setTokens(3);
+        showToast('🪙 3 Emergency tokens retrieved from the breakroom coin tray!');
+      };
+
+      const inZoneNow = laserPos >= selectedDrink.targetMin && laserPos <= selectedDrink.targetMax;
+
+      return (
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-2 sm:p-4">
+          <div className={`cyber-card border-2 border-cyan-400 rounded-xl max-w-xl w-full p-4 sm:p-5 shadow-2xl relative flex flex-col gap-3 max-h-[95vh] overflow-y-auto ${isKicking ? 'kick-anim border-rose-500' : ''}`}>
+            
+            {/* Modal Header */}
+            <div className="flex justify-between items-center pb-2.5 border-b border-[#223449]">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl animate-pulse">🎰</span>
+                <div>
+                  <div className="font-pixel text-xs text-white tracking-wider flex items-center gap-2">
+                    <span>CYBER DRIP // REFRESHMENT DISPENSER</span>
+                    <span className="text-[9px] bg-cyan-950 text-cyan-300 border border-cyan-700 px-1.5 py-0.5 rounded font-mono">v3.4</span>
+                  </div>
+                  <div className="text-[10px] text-slate-400 font-mono">
+                    Cafeteria Breakroom Unit • Reflex Drop & AP Refill
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="bg-[#070B10] px-2.5 py-1 rounded border border-amber-500/60 text-amber-300 text-xs font-bold font-mono">
+                  🪙 x{tokens}
+                </span>
+                <span className="bg-[#070B10] px-2.5 py-1 rounded border border-cyan-500/60 text-cyan-300 text-xs font-bold font-mono">
+                  ⚡ {ap}/{maxAp} AP
+                </span>
+                <button
+                  onClick={onClose}
+                  className="text-slate-400 hover:text-white text-xs font-bold px-2 py-1 bg-[#0A0F15] rounded border border-[#223449] hover:border-cyan-400 transition ml-1"
+                >
+                  [✕] (ESC/E)
+                </button>
+              </div>
+            </div>
+
+            {/* Drink Selection Cards (when idle or success) */}
+            <div className="space-y-1.5">
+              <div className="flex justify-between items-center text-[10px] text-slate-400 font-pixel">
+                <span>SELECT BEVERAGE RECIPE:</span>
+                <span className="text-cyan-400">COST: 1 TOKEN</span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                {VENDING_DRINKS.map(drink => {
+                  const isSelected = selectedDrink.id === drink.id;
+                  return (
+                    <div
+                      key={drink.id}
+                      onClick={() => {
+                        if (phase === 'dispensing' || phase === 'jammed') return;
+                        setSelectedDrink(drink);
+                        audio.click();
+                      }}
+                      className={`p-2 rounded-lg border cursor-pointer transition flex flex-col justify-between ${
+                        isSelected
+                          ? 'bg-[#152336] border-cyan-400 shadow-[0_0_12px_rgba(56,189,248,0.35)] scale-[1.01]'
+                          : 'bg-[#0A0F15] border-[#223449] hover:border-slate-500 opacity-80 hover:opacity-100'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-lg">{drink.icon}</span>
+                        <span className={`text-[8px] font-mono font-bold px-1 py-0.5 rounded border ${drink.tagBg}`}>
+                          {drink.badge}
+                        </span>
+                      </div>
+                      <div className="font-bold text-white text-[11px] leading-tight mb-0.5">{drink.name}</div>
+                      <div className="text-[9px] text-slate-400 leading-tight mb-1.5">{drink.flavor}</div>
+                      <div className="text-[9px] font-bold text-cyan-300 border-t border-[#1E293B] pt-1 flex justify-between items-center">
+                        <span>{drink.effectText}</span>
+                        <span className="text-[8px] text-slate-400">Zone: ±{Math.round((drink.targetMax - drink.targetMin) / 2)}%</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Vending Dispensing Chamber */}
+            <div className="bg-[#070B10] border-2 border-[#223449] p-3 sm:p-3.5 rounded-xl relative overflow-hidden flex flex-col items-center">
+              {/* Scanline backdrop in machine */}
+              <div className="absolute inset-0 scanlines opacity-30 pointer-events-none"></div>
+
+              {/* Status Header */}
+              <div className="w-full flex justify-between items-center text-[10px] font-mono text-slate-400 mb-1.5 border-b border-[#1E293B] pb-1 z-10">
+                <span className="flex items-center gap-1.5">
+                  <span className={`w-2 h-2 rounded-full ${phase === 'dispensing' ? 'bg-cyan-400 animate-ping' : phase === 'jammed' ? 'bg-rose-500 animate-ping' : 'bg-emerald-400'}`}></span>
+                  <span>STATUS: {phase === 'dispensing' ? 'CHUTE TIMING SYNCHRONIZING...' : phase === 'jammed' ? 'MECHANICAL JAM DETECTED' : phase === 'success' ? 'DISPENSED READY FOR CONSUMPTION' : 'READY FOR COIN INSERTION'}</span>
+                </span>
+                <span className="font-pixel text-[9px] text-cyan-300">DISPENSER #04</span>
+              </div>
+
+              {/* Can Graphic Preview */}
+              <div className="relative my-1 flex items-center justify-center">
+                <div className={`w-16 h-22 rounded-xl border-2 flex flex-col items-center justify-between p-1.5 shadow-2xl transition-all duration-300 ${
+                  phase === 'jammed'
+                    ? 'bg-rose-950/80 border-rose-500 rotate-12 shadow-[0_0_20px_rgba(244,63,94,0.6)]'
+                    : phase === 'success'
+                    ? 'bg-emerald-950/80 border-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.6)] animate-bounce'
+                    : 'bg-gradient-to-b from-[#1E293B] to-[#0F172A] border-cyan-400/80 shadow-[0_0_15px_rgba(56,189,248,0.3)]'
+                }`}>
+                  <div className="w-8 h-1 bg-slate-300 rounded-full opacity-60"></div>
+                  <span className="text-2xl my-0.5">{selectedDrink.icon}</span>
+                  <div className="text-[8px] font-pixel text-center text-white leading-tight font-bold">
+                    {selectedDrink.id === 'glitch' ? 'GLITCH' : selectedDrink.id === 'coldbrew' ? 'ROAST' : 'USB 404'}
+                  </div>
+                  <div className="w-10 h-1 bg-slate-400 rounded-full opacity-40"></div>
+                </div>
+
+                {phase === 'jammed' && (
+                  <div className="absolute -top-2.5 -right-5 bg-rose-600 text-white font-pixel text-[8px] px-2 py-0.5 rounded shadow-lg animate-pulse border border-white">
+                    ⚠️ JAMMED!
+                  </div>
+                )}
+              </div>
+
+              {/* Reflex Drop Oscillating Track */}
+              <div className="w-full my-1.5 z-10">
+                <div className="flex justify-between items-center text-[10px] font-mono text-slate-300 mb-1">
+                  <span>DISPENSE SENSOR TRACK:</span>
+                  <span className="font-bold text-amber-400 font-pixel text-[9px]">
+                    TARGET ZONE: [{selectedDrink.targetMin}% - {selectedDrink.targetMax}%]
+                  </span>
+                </div>
+
+                {/* The Bar */}
+                <div className="w-full h-8 bg-[#030609] rounded-lg border-2 border-[#1E293B] relative overflow-hidden shadow-inner flex items-center">
+                  {/* Grid tick marks */}
+                  <div className="absolute inset-0 flex justify-between px-2 pointer-events-none opacity-20">
+                    {Array.from({ length: 11 }).map((_, i) => (
+                      <div key={i} className="w-[1px] h-full bg-slate-400"></div>
+                    ))}
+                  </div>
+
+                  {/* Target Zone Highlight */}
+                  <div
+                    className="absolute top-0 bottom-0 bg-emerald-500/25 border-x-2 border-emerald-400/80 flex items-center justify-center pointer-events-none shadow-[0_0_10px_rgba(16,185,129,0.3)]"
+                    style={{
+                      left: `${selectedDrink.targetMin}%`,
+                      width: `${selectedDrink.targetMax - selectedDrink.targetMin}%`
+                    }}
+                  >
+                    <span className="text-[8px] font-pixel text-emerald-300 opacity-80 whitespace-nowrap hidden sm:inline">
+                      DROP ZONE
+                    </span>
+                  </div>
+
+                  {/* Oscillating Laser Needle */}
+                  <div
+                    className={`absolute top-0 bottom-0 w-1 pointer-events-none transition-none shadow-[0_0_12px_#38BDF8] ${
+                      inZoneNow ? 'bg-emerald-300 shadow-[0_0_16px_#10B981]' : 'bg-cyan-400'
+                    }`}
+                    style={{ left: `${laserPos}%` }}
+                  >
+                    {/* Top Marker */}
+                    <div className="absolute -top-1 -left-1.5 w-4 h-2 bg-cyan-400 clip-triangle"></div>
+                    {/* Hovering Position Tooltip */}
+                    <div
+                      className={`absolute -bottom-5 -left-3.5 text-[8px] font-mono font-bold px-1 rounded border shadow whitespace-nowrap ${
+                        inZoneNow
+                          ? 'bg-emerald-950 text-emerald-300 border-emerald-500'
+                          : 'bg-black text-cyan-300 border-cyan-500'
+                      }`}
+                    >
+                      {Math.round(laserPos)}%
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Controls & Interactive States */}
+              <div className="w-full mt-3 z-10">
+                {phase === 'idle' && (
+                  <button
+                    onClick={startVending}
+                    className="w-full py-2.5 bg-cyan-600 hover:bg-cyan-500 text-black font-pixel text-xs rounded-lg font-bold shadow-[0_0_15px_rgba(56,189,248,0.6)] flex items-center justify-center gap-2 transition hover:scale-[1.01] active:scale-[0.99]"
+                  >
+                    <span>🪙</span>
+                    <span>INSERT TOKEN & START REFLEX DROP [SPACE]</span>
+                  </button>
+                )}
+
+                {phase === 'dispensing' && (
+                  <button
+                    onClick={pushDispense}
+                    className={`w-full py-3 font-pixel text-xs rounded-lg font-bold shadow-2xl flex items-center justify-center gap-2 transition hover:scale-[1.01] active:scale-[0.98] ${
+                      inZoneNow
+                        ? 'bg-emerald-500 hover:bg-emerald-400 text-black shadow-[0_0_25px_rgba(16,185,129,0.85)] animate-pulse'
+                        : 'bg-cyan-600 hover:bg-cyan-500 text-black shadow-[0_0_15px_rgba(56,189,248,0.5)]'
+                    }`}
+                  >
+                    <span className="text-base">🎯</span>
+                    <span>{inZoneNow ? 'DROP NOW! IN TARGET ZONE! [SPACE]' : 'PUSH DISPENSE BUTTON [SPACEBAR / CLICK]'}</span>
+                  </button>
+                )}
+
+                {phase === 'jammed' && (
+                  <div className="space-y-2.5">
+                    <div className="bg-rose-950/60 border border-rose-500/80 p-2.5 rounded-lg text-rose-300 text-xs text-center font-mono">
+                      <div className="font-pixel text-[10px] text-white mb-0.5">⚠️ CAN JAMMED IN DISPENSER CHUTE!</div>
+                      <div>Percussive maintenance required to dislodge beverage tray!</div>
+                      <div className="mt-1 flex items-center justify-center gap-2">
+                        <span>FORCE APPLIED:</span>
+                        <span className="font-pixel text-amber-300">
+                          {'💥 '.repeat(3 - kicksLeft)}
+                          {'▫️ '.repeat(kicksLeft)}
+                        </span>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={kickMachine}
+                      className="w-full py-3 bg-rose-600 hover:bg-rose-500 text-white font-pixel text-xs rounded-lg font-bold shadow-[0_0_20px_rgba(244,63,94,0.7)] flex items-center justify-center gap-2 transition active:scale-95"
+                    >
+                      <span className="text-xl">💥</span>
+                      <span>KICK VENDING MACHINE! ({kicksLeft}/3 Kicks Left) [SPACE]</span>
+                    </button>
+                  </div>
+                )}
+
+                {phase === 'success' && (
+                  <div className="space-y-2.5">
+                    <div className="bg-emerald-950/60 border border-emerald-500/80 p-2.5 rounded-lg text-emerald-300 text-xs font-mono">
+                      <div className="font-pixel text-[10px] text-white mb-1 flex items-center gap-2">
+                        <span>🎉</span>
+                        <span>BEVERAGE DISPENSED SUCCESSFULLY! (+{lastGain} AP)</span>
+                      </div>
+                      <p className="text-slate-300 text-[10px] leading-relaxed">
+                        Refreshed detective neural circuits! Compute AP restored to <strong>{ap}/{maxAp}</strong>.
+                      </p>
+
+                      {secretIntel && (
+                        <div className="mt-2 bg-[#0A0F15] p-2.5 rounded-lg border-2 border-emerald-400 shadow-lg text-white">
+                          <div className="font-pixel text-[9px] text-emerald-400 mb-1 flex items-center gap-1.5">
+                            <span>💾</span>
+                            <span>WHISTLEBLOWER ENCRYPTED DRIVE DECRYPTED:</span>
+                          </div>
+                          <p className="text-slate-200 text-xs leading-relaxed mb-1.5 font-mono">
+                            {secretIntel.text}
+                          </p>
+                          <div className="inline-block bg-emerald-950 text-emerald-300 border border-emerald-600 px-2 py-0.5 rounded text-[9px] font-bold">
+                            ✓ {secretIntel.suspectName} AUTO-MARKED INNOCENT IN DOSSIER
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          setPhase('idle');
+                          setSecretIntel(null);
+                        }}
+                        className="flex-1 py-2 cyber-btn text-cyan-300 font-pixel text-[9px] hover:border-cyan-400"
+                      >
+                        🎰 VEND ANOTHER DRINK
+                      </button>
+                      <button
+                        onClick={onClose}
+                        className="flex-1 py-2 bg-cyan-600 hover:bg-cyan-500 text-black font-pixel text-[9px] font-bold rounded-lg"
+                      >
+                        DONE & RESUME CASE ➔
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Bottom Actions & Token Recovery */}
+            <div className="flex justify-between items-center text-xs pt-1 border-t border-[#223449]">
+              {tokens <= 0 ? (
+                <button
+                  onClick={freeRefillTokens}
+                  className="px-3 py-1.5 bg-amber-600 hover:bg-amber-500 text-black font-bold font-pixel text-[9px] rounded flex items-center gap-1.5 animate-bounce"
+                >
+                  <span>🪙</span>
+                  <span>SEARCH COIN RETURN (+3 FREE TOKENS)</span>
+                </button>
+              ) : (
+                <button
+                  onClick={freeRefillTokens}
+                  className="text-slate-400 hover:text-amber-300 text-[10px] font-mono flex items-center gap-1"
+                >
+                  <span>🪙</span>
+                  <span>Coin Return Tray (Restock Tokens)</span>
+                </button>
+              )}
+
+              <span className="text-[10px] text-slate-500 font-mono">
+                PRESS [ESC] OR [E] TO EXIT
+              </span>
+            </div>
+
+          </div>
+        </div>
+      );
+    }
+
+    // ==========================================
     // 5. MAIN REACT APP (FULL 3D ENGINE)
     // ==========================================
     function App() {
@@ -1493,6 +2075,8 @@
       const [selectedAccusedSuspectId, setSelectedAccusedSuspectId] = useState('');
       const [verdictData, setVerdictData] = useState(null);
       const [shakeScreen, setShakeScreen] = useState(false);
+      const [vendingModalOpen, setVendingModalOpen] = useState(false);
+      const [vendingTokens, setVendingTokens] = useState(3);
 
       const [career, setCareer] = useState({ xp: 220, streak: 0, rankTitle: "Senior SecOps Investigator" });
       const [bossMode, setBossMode] = useState(false);
@@ -1636,6 +2220,8 @@
           if (node.id === 'node_badge') setActiveTab('badge');
           else if (node.id === 'node_chat') setActiveTab('chat');
           else if (node.id === 'node_net') setActiveTab('network');
+        } else if (target.type === 'vending') {
+          setVendingModalOpen(true);
         }
       };
       executeInteractionRef.current = executeInteraction;
@@ -1679,6 +2265,13 @@
           }
         }
 
+        // Check Cafeteria Vending Machine proximity (-12.5, 6.0)
+        const distVend = Math.hypot(-12.5 - p.x, 6.0 - p.z);
+        if (distVend < minDist) {
+          minDist = distVend;
+          closest = { type: 'vending', label: `🎰 [E] USE VENDING MACHINE [MINI-GAME]` };
+        }
+
         if (closest) {
           executeInteraction(closest);
           return;
@@ -1686,13 +2279,14 @@
 
         // 4. Feedback when player presses [E] but is not near anything
         audio.playTone(320, 'sine', 0.08, 0.03);
-        showToast("🔍 Walk closer to a suspect or terminal to interact [E]");
+        showToast("🔍 Walk closer to a suspect, terminal, or vending machine [E]");
       };
 
       // Keyboard Controls
       useEffect(() => {
         const handleKeyDown = (e) => {
           if (e.key === 'Escape') {
+            if (vendingModalOpen) { setVendingModalOpen(false); return; }
             if (activeSuspectModal) { setActiveSuspectModal(null); return; }
             if (activeNodeModal) { setActiveNodeModal(null); return; }
             if (liveLeakModal) { setLiveLeakModal(null); return; }
@@ -1700,9 +2294,10 @@
             setBossMode(prev => !prev);
             return;
           }
-          if (activeSuspectModal || activeNodeModal || accusationModalOpen || liveLeakModal) {
+          if (activeSuspectModal || activeNodeModal || accusationModalOpen || liveLeakModal || vendingModalOpen) {
             if (e.key.toLowerCase() === 'e') {
               if (activeNodeModal) setActiveNodeModal(null);
+              if (vendingModalOpen) setVendingModalOpen(false);
             }
             return;
           }
@@ -1740,7 +2335,7 @@
           window.removeEventListener('keydown', handleKeyDown);
           window.removeEventListener('keyup', handleKeyUp);
         };
-      }, [activeSuspectModal, activeNodeModal, accusationModalOpen, liveLeakModal]);
+      }, [activeSuspectModal, activeNodeModal, accusationModalOpen, liveLeakModal, vendingModalOpen]);
 
       // ==========================================
       // 6. THREE.JS 3D WORLD LIFECYCLE
@@ -1814,7 +2409,7 @@
         scene.add(concourseLight);
 
         // 3. Build Office Environment
-        const { officeGroup, serverRacks, pedestalMeshes, doors, colliders } = build3DOfficeScene(scene);
+        const { officeGroup, serverRacks, pedestalMeshes, doors, colliders, vendingGroup } = build3DOfficeScene(scene);
 
         // 4. Create Detective Mesh
         const playerMesh = createLowPolyChibiCharacter(DETECTIVE_THEME, true);
@@ -1845,6 +2440,7 @@
           playerMesh,
           suspectMeshes,
           pedestals: pedestalMeshes,
+          vendingMachine: vendingGroup,
           radarMesh,
           serverRacks,
           doors,
@@ -1910,7 +2506,20 @@
             }
           }
 
-          // 3. Otherwise glide / walk to clicked floor coordinate
+          // 3. Raycast direct click on Vending Machine (Cafeteria)
+          if (threeRef.current && threeRef.current.vendingMachine) {
+            const hits = raycaster.intersectObject(threeRef.current.vendingMachine, true);
+            if (hits.length > 0) {
+              playerRef.current.targetX = -11.0;
+              playerRef.current.targetZ = 6.0;
+              if (executeInteractionRef.current) {
+                executeInteractionRef.current({ type: 'vending', label: '🎰 [E] USE VENDING MACHINE [MINI-GAME]' });
+              }
+              return;
+            }
+          }
+
+          // 4. Otherwise glide / walk to clicked floor coordinate
           const targetPoint = new THREE.Vector3();
           if (raycaster.ray.intersectPlane(floorPlane, targetPoint)) {
             playerRef.current.targetX = Math.max(-13, Math.min(13, targetPoint.x));
@@ -2110,6 +2719,15 @@
                   foundId = ped.id;
                   break;
                 }
+              }
+            }
+
+            // Check Vending Machine in Cafeteria at (-12.5, 6.0) (3.8-unit radius)
+            if (!found) {
+              const distVend = Math.hypot(-12.5 - p.x, 6.0 - p.z);
+              if (distVend < 3.8) {
+                found = { type: 'vending', label: '🎰 [E] USE VENDING MACHINE [MINI-GAME]' };
+                foundId = 'vending_machine';
               }
             }
 
@@ -2425,6 +3043,26 @@
                       >
                         <span className="text-base">🔓</span>
                         <span className="text-[10px]">DECRYPTOR (1 AP)</span>
+                      </button>
+
+                      {/* Cafeteria Vending Machine Mini-Game Shortcut */}
+                      <button
+                        onClick={() => {
+                          setVendingModalOpen(true);
+                          audio.click();
+                        }}
+                        className="p-2 cyber-btn text-amber-300 font-bold flex items-center justify-between col-span-2 border-amber-500/50 hover:border-amber-400 mt-1"
+                      >
+                        <div className="flex items-center gap-2 text-left">
+                          <span className="text-lg">🎰</span>
+                          <div>
+                            <div className="text-[10px] text-white font-pixel">CAFETERIA VENDING [MINI-GAME]</div>
+                            <div className="text-[9px] text-slate-400 font-mono">Refill AP • Timing Drop • Kick Unjam</div>
+                          </div>
+                        </div>
+                        <span className="bg-amber-950 text-amber-300 border border-amber-600 px-2 py-0.5 rounded text-[10px] font-mono font-bold">
+                          🪙 x{vendingTokens}
+                        </span>
                       </button>
                     </div>
                   </div>
@@ -2747,6 +3385,22 @@
                 )}
               </div>
             </div>
+          )}
+
+          {/* VENDING MACHINE MINI-GAME MODAL */}
+          {vendingModalOpen && (
+            <VendingMiniGameModal
+              tokens={vendingTokens}
+              setTokens={setVendingTokens}
+              ap={ap}
+              setAp={setAp}
+              maxAp={maxAp}
+              caseData={caseData}
+              setCaseData={setCaseData}
+              onClose={() => setVendingModalOpen(false)}
+              showToast={showToast}
+              setShakeScreen={setShakeScreen}
+            />
           )}
 
           <footer className="bg-[#0F1722] border-t border-[#223449] px-4 py-2 flex items-center justify-between text-[11px] text-slate-400">
