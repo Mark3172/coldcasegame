@@ -47,6 +47,15 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <!-- Babel Standalone for JSX -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script>
+    if (window.Babel) {
+      Babel.registerPreset('classic-react', {
+        presets: [
+          [Babel.availablePresets['react'], { runtime: 'classic' }]
+        ]
+      });
+    }
+  </script>
 
   <style>
     body {
@@ -164,7 +173,7 @@
   <div id="root"></div>
 
   <!-- MAIN REACT + 3D ENGINE SCRIPT -->
-  <script type="text/babel">
+  <script type="text/babel" data-presets="classic-react">
     const { useState, useEffect, useRef, useMemo, Component } = React;
 
     // React Error Boundary Component
@@ -1151,7 +1160,7 @@
 
       // 3D Camera Controls
       const cameraAngleRef = useRef(0); // Orbit angle in radians
-      const cameraZoomRef = useRef(19);  // Distance
+      const cameraZoomRef = useRef(23); // Default distance for full diorama overview
 
       // Decoupled Interaction Target
       const currentTargetIdRef = useRef(null);
@@ -1329,13 +1338,12 @@
           container.removeChild(container.firstChild);
         }
 
-        const width = container.clientWidth || 800;
+        const width = container.clientWidth || 820;
         const height = container.clientHeight || 560;
 
         // 1. Scene, Camera, Renderer
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x070B10);
-        scene.fog = new THREE.FogExp2(0x070B10, 0.022);
+        scene.background = new THREE.Color(0x0C141F);
 
         const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
         camera.position.set(0, 16, 20);
@@ -1345,13 +1353,17 @@
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.domElement.style.width = '100%';
+        renderer.domElement.style.height = '100%';
+        renderer.domElement.style.display = 'block';
+        renderer.domElement.style.borderRadius = '6px';
         container.appendChild(renderer.domElement);
 
-        // 2. Lighting
-        const ambientLight = new THREE.AmbientLight(0x3B485A, 0.7);
+        // 2. Lighting - Bright, vibrant, crisp low-poly lighting
+        const ambientLight = new THREE.AmbientLight(0xE2E8F0, 0.88);
         scene.add(ambientLight);
 
-        const dirLight = new THREE.DirectionalLight(0xE2E8F0, 0.9);
+        const dirLight = new THREE.DirectionalLight(0xFFFFFF, 0.95);
         dirLight.position.set(12, 24, 15);
         dirLight.castShadow = true;
         dirLight.shadow.mapSize.width = 1024;
@@ -1556,14 +1568,14 @@
               sm.mesh.userData.animate(dt, false, 0, currentTime / 1000);
             });
 
-            // Smooth 3D Camera Tracking
+            // Smooth 3D Camera Tracking with Isometric Perspective
             const camDist = cameraZoomRef.current;
             const targetCamX = p.x + Math.sin(orbit) * camDist;
             const targetCamZ = p.z + Math.cos(orbit) * camDist;
-            const targetCamY = 12 + camDist * 0.35;
+            const targetCamY = 14 + camDist * 0.35;
 
             three.camera.position.lerp(new THREE.Vector3(targetCamX, targetCamY, targetCamZ), dt * 7);
-            three.camera.lookAt(p.x, 1.0, p.z);
+            three.camera.lookAt(p.x, 0.8, p.z);
 
             // 2. Proximity Check for Interactions
             let found = null;
@@ -1665,23 +1677,44 @@
               </div>
             </div>
 
-            <div className="flex items-center gap-2.5">
-              {/* Camera Orbit Buttons */}
+            <div className="flex items-center gap-2">
+              {/* Camera Orbit & Zoom Controls */}
               <div className="flex items-center gap-1 border border-[#223449] rounded px-1.5 py-1 bg-[#070B10]">
-                <span className="text-[9px] text-slate-400 font-pixel mr-1">CAM:</span>
+                <span className="text-[9px] text-slate-400 font-pixel mr-0.5">CAM:</span>
                 <button
-                  onClick={() => { cameraAngleRef.current -= 0.4; audio.click(); }}
-                  className="px-2 py-0.5 bg-[#1A2636] hover:bg-cyan-600 rounded text-white text-xs font-bold"
-                  title="Rotate Camera Left (Q)"
+                  onClick={() => { cameraAngleRef.current -= 0.35; audio.click(); }}
+                  className="px-1.5 py-0.5 bg-[#1A2636] hover:bg-cyan-600 rounded text-white text-[10px] font-bold"
+                  title="Rotate Left (Q)"
                 >
                   ↺ Q
                 </button>
                 <button
-                  onClick={() => { cameraAngleRef.current += 0.4; audio.click(); }}
-                  className="px-2 py-0.5 bg-[#1A2636] hover:bg-cyan-600 rounded text-white text-xs font-bold"
-                  title="Rotate Camera Right (R)"
+                  onClick={() => { cameraAngleRef.current += 0.35; audio.click(); }}
+                  className="px-1.5 py-0.5 bg-[#1A2636] hover:bg-cyan-600 rounded text-white text-[10px] font-bold"
+                  title="Rotate Right (R)"
                 >
                   R ↻
+                </button>
+                <button
+                  onClick={() => { cameraZoomRef.current = Math.max(14, cameraZoomRef.current - 2.5); audio.click(); }}
+                  className="px-1.5 py-0.5 bg-[#1A2636] hover:bg-cyan-600 rounded text-white text-[10px] font-bold"
+                  title="Zoom In"
+                >
+                  +
+                </button>
+                <button
+                  onClick={() => { cameraZoomRef.current = Math.min(28, cameraZoomRef.current + 2.5); audio.click(); }}
+                  className="px-1.5 py-0.5 bg-[#1A2636] hover:bg-cyan-600 rounded text-white text-[10px] font-bold"
+                  title="Zoom Out"
+                >
+                  −
+                </button>
+                <button
+                  onClick={() => { cameraAngleRef.current = 0; cameraZoomRef.current = 23; audio.click(); }}
+                  className="px-1.5 py-0.5 bg-[#1A2636] hover:bg-cyan-600 rounded text-cyan-300 text-[10px] font-bold"
+                  title="Reset Camera View"
+                >
+                  ⌖ RESET
                 </button>
               </div>
 
@@ -1757,7 +1790,8 @@
                   {/* 3D Container */}
                   <div
                     ref={canvasContainerRef}
-                    className="w-full flex-1 relative rounded overflow-hidden cursor-crosshair min-h-[520px]"
+                    style={{ width: '100%', height: '560px', minHeight: '520px' }}
+                    className="w-full relative rounded overflow-hidden cursor-crosshair"
                   />
 
                   {/* Floating Proximity Pill */}
