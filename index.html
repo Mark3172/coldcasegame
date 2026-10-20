@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>THE COLD FILE // 2D PIXEL CYBER MYSTERY</title>
+  <title>THE COLD FILE // 3D LOW-POLY CYBER MYSTERY</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🕵️</text></svg>">
 
   <!-- Tailwind CSS CDN -->
@@ -39,6 +39,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@400;600;700;800&display=swap" rel="stylesheet">
 
+  <!-- Three.js r128 for 3D Low-Poly World -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
   <!-- React 18 & ReactDOM -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -71,7 +74,7 @@
     .scanlines {
       background: linear-gradient(
         rgba(18, 16, 16, 0) 50%, 
-        rgba(0, 0, 0, 0.22) 50%
+        rgba(0, 0, 0, 0.18) 50%
       );
       background-size: 100% 4px;
       pointer-events: none;
@@ -160,7 +163,7 @@
 <body class="bg-[#070B10] text-slate-200 antialiased min-h-screen">
   <div id="root"></div>
 
-  <!-- MAIN REACT + 2D ENGINE SCRIPT -->
+  <!-- MAIN REACT + 3D ENGINE SCRIPT -->
   <script type="text/babel">
     const { useState, useEffect, useRef, useMemo, Component } = React;
 
@@ -423,7 +426,7 @@
     const audio = new SoundEngine();
 
     // ==========================================
-    // 2. CHARACTER THEMES & ROOMS
+    // 2. CHARACTER THEMES & ROOM LOCATIONS
     // ==========================================
     const FIRST_NAMES = ["Elena", "Marcus", "Priya", "Devon", "Alistair", "Samantha", "Victor", "Naomi"];
     const LAST_NAMES = ["Vance", "Thorne", "Sharma", "Cruz", "Sterling", "Kowalski", "Chen", "Sinclair"];
@@ -433,60 +436,65 @@
       {
         id: "theme_white", // Direct match to Reference 1!
         name: "White Fluffy Hair / Slate Vest",
-        hair: "#F5F8FA", hairShadow: "#D0D9E2", hairOutline: "#1E293B",
-        skin: "#FFE5D0", skinShadow: "#FDBA74", eye: "#1E293B",
-        vest: "#58677C", vestShadow: "#3E4C60", shirt: "#FFFFFF",
-        cuffGold: "#F59E0B", gloves: "#2D3748", pants: "#2D3748",
-        boots: "#1A202C", bootCuffs: "#58677C"
+        hairHex: 0xF5F8FA, hairShadowHex: 0xD0D9E2,
+        skinHex: 0xFFE5D0, skinShadowHex: 0xFDBA74,
+        vestHex: 0x58677C, vestShadowHex: 0x3E4C60,
+        shirtHex: 0xFFFFFF, cuffGoldHex: 0xF59E0B,
+        glovesHex: 0x2D3748, pantsHex: 0x2D3748,
+        bootsHex: 0x1A202C, bootCuffsHex: 0x58677C
       },
       {
         id: "theme_dark",
         name: "Raven Black / Navy Vest",
-        hair: "#1E293B", hairShadow: "#0F172A", hairOutline: "#020617",
-        skin: "#FFE5D0", skinShadow: "#FDBA74", eye: "#0F172A",
-        vest: "#1E3A8A", vestShadow: "#172554", shirt: "#F8FAFC",
-        cuffGold: "#38BDF8", gloves: "#0F172A", pants: "#1E293B",
-        boots: "#0F172A", bootCuffs: "#334155"
+        hairHex: 0x1E293B, hairShadowHex: 0x0F172A,
+        skinHex: 0xFFE5D0, skinShadowHex: 0xFDBA74,
+        vestHex: 0x1E3A8A, vestShadowHex: 0x172554,
+        shirtHex: 0xF8FAFC, cuffGoldHex: 0x38BDF8,
+        glovesHex: 0x0F172A, pantsHex: 0x1E293B,
+        bootsHex: 0x0F172A, bootCuffsHex: 0x334155
       },
       {
         id: "theme_amber",
         name: "Amber Braid / Tech Vest",
-        hair: "#D97706", hairShadow: "#B45309", hairOutline: "#451A03",
-        skin: "#FFEDD5", skinShadow: "#FED7AA", eye: "#451A03",
-        vest: "#047857", vestShadow: "#064E3B", shirt: "#ECFDF5",
-        cuffGold: "#F59E0B", gloves: "#064E3B", pants: "#1E293B",
-        boots: "#064E3B", bootCuffs: "#047857"
+        hairHex: 0xD97706, hairShadowHex: 0xB45309,
+        skinHex: 0xFFEDD5, skinShadowHex: 0xFED7AA,
+        vestHex: 0x047857, vestShadowHex: 0x064E3B,
+        shirtHex: 0xECFDF5, cuffGoldHex: 0xF59E0B,
+        glovesHex: 0x064E3B, pantsHex: 0x1E293B,
+        bootsHex: 0x064E3B, bootCuffsHex: 0x047857
       },
       {
         id: "theme_crimson",
         name: "Copper Tousled / Crimson Vest",
-        hair: "#EA580C", hairShadow: "#C2410C", hairOutline: "#431407",
-        skin: "#FFE5D0", skinShadow: "#FDBA74", eye: "#1E293B",
-        vest: "#991B1B", vestShadow: "#7F1D1D", shirt: "#FEF2F2",
-        cuffGold: "#F59E0B", gloves: "#1F2937", pants: "#1E293B",
-        boots: "#18181B", bootCuffs: "#7F1D1D"
+        hairHex: 0xEA580C, hairShadowHex: 0xC2410C,
+        skinHex: 0xFFE5D0, skinShadowHex: 0xFDBA74,
+        vestHex: 0x991B1B, vestShadowHex: 0x7F1D1D,
+        shirtHex: 0xFEF2F2, cuffGoldHex: 0xF59E0B,
+        glovesHex: 0x1F2937, pantsHex: 0x1E293B,
+        bootsHex: 0x18181B, bootCuffsHex: 0x7F1D1D
       }
     ];
 
     const DETECTIVE_THEME = {
-      hair: "#475569", hairShadow: "#334155", hairOutline: "#0F172A",
-      skin: "#FFE5D0", skinShadow: "#FDBA74", eye: "#0F172A",
-      vest: "#2563EB", vestShadow: "#1D4ED8", shirt: "#FFFFFF",
-      cuffGold: "#EAB308", gloves: "#1E293B", pants: "#1E293B",
-      boots: "#0F172A", bootCuffs: "#2563EB"
+      hairHex: 0x475569, hairShadowHex: 0x334155,
+      skinHex: 0xFFE5D0, skinShadowHex: 0xFDBA74,
+      vestHex: 0x2563EB, vestShadowHex: 0x1D4ED8,
+      shirtHex: 0xFFFFFF, cuffGoldHex: 0xEAB308,
+      glovesHex: 0x1E293B, pantsHex: 0x1E293B,
+      bootsHex: 0x0F172A, bootCuffsHex: 0x2563EB
     };
 
     const ROOM_LOCATIONS = [
-      { name: "Conference Room 4A", tileX: 24, tileY: 5, color: "#38BDF8", act: "typing" },
-      { name: "Executive 7th Floor Lounge", tileX: 24, tileY: 17, color: "#F43F5E", act: "relaxing" },
-      { name: "Cafeteria & Breakroom", tileX: 6, tileY: 17, color: "#10B981", act: "drinking" },
-      { name: "Engineering Pod Alpha", tileX: 15, tileY: 11, color: "#F59E0B", act: "inspecting" }
+      { name: "Conference Room 4A", posX: 9.5, posZ: -7.5, color: "#38BDF8" },
+      { name: "Executive 7th Floor Lounge", posX: 9.5, posZ: 7.5, color: "#F43F5E" },
+      { name: "Cafeteria & Breakroom", posX: -9.5, posZ: 7.5, color: "#10B981" },
+      { name: "Engineering Pod Alpha", posX: 0, posZ: 0, color: "#F59E0B" }
     ];
 
     const RESTRICTED_ROOM = {
       name: "Sublevel 2 - Core Server Vault",
-      tileX: 6,
-      tileY: 5,
+      posX: -9.5,
+      posZ: -7.5,
       color: "#F85149"
     };
 
@@ -551,9 +559,8 @@
           badgeId,
           statedRoom: assignedRoom.name,
           actualRoom: assignedRoom.name,
-          mapX: assignedRoom.tileX,
-          mapY: assignedRoom.tileY,
-          currentActivity: assignedRoom.act,
+          posX: assignedRoom.posX,
+          posZ: assignedRoom.posZ,
           spriteTheme: SPRITE_THEMES[i % SPRITE_THEMES.length],
           isCulprit: false,
           userTag: "UNVERIFIED",
@@ -668,398 +675,450 @@
     }
 
     // ==========================================
-    // 3. HANDCRAFTED CHIBI DIALOGUE BUST PORTRAIT
-    // (Detailed pixel art matching Reference 1)
+    // 3. 3D PROCEDURAL LOW-POLY CHARACTER MESH
+    // (Faithful to Reference Image 1)
     // ==========================================
-    function drawChibiDialoguePortrait(ctx, theme, stressLevel = 25) {
-      if (!ctx) return;
+    function createLowPolyChibiCharacter(theme, isDetective = false) {
       const t = theme || SPRITE_THEMES[0];
-      ctx.clearRect(0, 0, 96, 120);
+      const charGroup = new THREE.Group();
+      const bodyGroup = new THREE.Group();
+      charGroup.add(bodyGroup);
 
-      const p = (px, py, w, h, color) => {
-        ctx.fillStyle = color || "#FFF";
-        ctx.fillRect(px, py, w, h);
-      };
+      // Helper material creator
+      const mat = (color, roughness = 0.5, metalness = 0.1) => 
+        new THREE.MeshStandardMaterial({ color, roughness, metalness, flatShading: true });
 
-      // 1. Shoulders & Vest
-      p(20, 80, 56, 40, t.shirt);
-      p(26, 82, 44, 38, t.vest);
-      p(26, 100, 44, 20, t.vestShadow);
-      // Gold Buttons
-      p(46, 88, 4, 4, t.cuffGold);
-      p(46, 102, 4, 4, t.cuffGold);
-      // Sleeves & Cuffs
-      p(10, 86, 12, 34, t.shirt);
-      p(74, 86, 12, 34, t.shirt);
-      p(12, 110, 10, 5, t.cuffGold);
-      p(74, 110, 10, 5, t.cuffGold);
+      const skinMat = mat(t.skinHex);
+      const hairMat = mat(t.hairHex);
+      const vestMat = mat(t.vestHex);
+      const shirtMat = mat(t.shirtHex);
+      const pantsMat = mat(t.pantsHex);
+      const bootMat = mat(t.bootsHex);
+      const cuffGoldMat = mat(t.cuffGoldHex, 0.3, 0.6);
+      const eyeMat = mat(0x0F172A);
+      const blushMat = mat(0xF472B6);
 
-      // 2. Neck & Face
-      p(40, 70, 16, 14, t.skinShadow);
-      p(24, 36, 48, 38, t.skin);
-      p(18, 44, 6, 20, t.skin); // Ears
-      p(72, 44, 6, 20, t.skin);
+      // 1. LEGS (Left & Right) with hip pivot for smooth walking swing
+      const legLeftGroup = new THREE.Group();
+      const legRightGroup = new THREE.Group();
+      legLeftGroup.position.set(-0.16, 0.52, 0);
+      legRightGroup.position.set(0.16, 0.52, 0);
+      bodyGroup.add(legLeftGroup);
+      bodyGroup.add(legRightGroup);
 
-      // Expressive Anime Eyes (Large pixel eyes with specular shine!)
-      const eyeOpen = stressLevel > 70 ? 12 : 10;
-      p(32, 46, 10, eyeOpen, t.eye);
-      p(32, 46, 5, 5, "#FFFFFF"); // Main highlight
-      p(37, 52, 3, 3, "#FFFFFF");
+      // Pants upper
+      const pantsGeom = new THREE.BoxGeometry(0.16, 0.28, 0.18);
+      const legLMesh = new THREE.Mesh(pantsGeom, pantsMat);
+      legLMesh.position.y = -0.12;
+      legLMesh.castShadow = true;
+      legLeftGroup.add(legLMesh);
 
-      p(54, 46, 10, eyeOpen, t.eye);
-      p(54, 46, 5, 5, "#FFFFFF");
-      p(59, 52, 3, 3, "#FFFFFF");
+      const legRMesh = new THREE.Mesh(pantsGeom, pantsMat);
+      legRMesh.position.y = -0.12;
+      legRMesh.castShadow = true;
+      legRightGroup.add(legRMesh);
 
-      // Soft Blush
-      p(28, 58, 8, 4, "#F472B6");
-      p(60, 58, 8, 4, "#F472B6");
+      // Fold-over Boots with gold button (Reference 1)
+      const bootGeom = new THREE.BoxGeometry(0.18, 0.22, 0.24);
+      const bootL = new THREE.Mesh(bootGeom, bootMat);
+      bootL.position.set(0, -0.28, 0.02);
+      bootL.castShadow = true;
+      legLeftGroup.add(bootL);
 
-      // Mouth
-      if (stressLevel > 60) {
-        // Nervous wavy mouth
-        p(45, 64, 6, 2, "#991B1B");
-      } else {
-        p(46, 64, 4, 2, "#991B1B");
-      }
+      const bootR = new THREE.Mesh(bootGeom, bootMat);
+      bootR.position.set(0, -0.28, 0.02);
+      bootR.castShadow = true;
+      legRightGroup.add(bootR);
 
-      // Nervous Sweat Drop if stressed!
-      if (stressLevel > 50) {
-        p(22, 40, 4, 7, "#38BDF8");
-        p(23, 38, 2, 2, "#FFFFFF");
-      }
+      // Gold buttons on boot fold
+      const bootBtnGeom = new THREE.BoxGeometry(0.04, 0.04, 0.04);
+      const bootBtnL = new THREE.Mesh(bootBtnGeom, cuffGoldMat);
+      bootBtnL.position.set(-0.1, -0.25, 0.02);
+      legLeftGroup.add(bootBtnL);
 
-      // 3. Voluminous Fluffy Anime Hair (From Reference 1)
-      p(14, 14, 68, 28, t.hair);
-      p(10, 24, 10, 34, t.hair);
-      p(76, 24, 10, 34, t.hair);
-
-      // Angled side tufts (Signature chibi shape)
-      p(6, 32, 10, 18, t.hair);
-      p(4, 44, 8, 14, t.hairShadow);
-      p(80, 32, 10, 18, t.hair);
-      p(84, 44, 8, 14, t.hairShadow);
-
-      // Bangs
-      p(22, 22, 52, 18, t.hair);
-      p(26, 34, 12, 12, t.hair);
-      p(42, 34, 12, 10, t.hair);
-      p(58, 34, 12, 12, t.hair);
-
-      // Highlights
-      p(32, 18, 32, 5, "#FFFFFF");
-      p(16, 36, 6, 10, t.hairShadow);
-      p(74, 36, 6, 10, t.hairShadow);
-    }
-
-    // In-game 24x32 Sprite Renderer (Matching Reference Image 1 with Fluid Animation)
-    function drawPixelChibiCharacter(ctx, x, y, theme, facing = 'down', walkProgress = 0, isWalking = false, isBlinking = false) {
-      if (!ctx) return;
-      const t = theme || SPRITE_THEMES[0] || DETECTIVE_THEME;
-      const drawX = Math.floor(x);
-      const drawY = Math.floor(y);
-
-      ctx.save();
-      ctx.translate(drawX, drawY);
-
-      // Continuous Fluid Stride & Arm Swing (Sinusoidal Lerp)
-      const strideSin = isWalking ? Math.sin(walkProgress) : 0;
-      const legStride = Math.round(strideSin * 3);
-      const armStride = Math.round(-strideSin * 2.5);
-      const bobY = isWalking ? -Math.abs(Math.sin(walkProgress)) * 2 : Math.sin(Date.now() / 360) * 0.8;
-
-      // Drop shadow (Soft ambient oval)
-      ctx.fillStyle = "rgba(0, 0, 0, 0.45)";
-      ctx.beginPath();
-      ctx.ellipse(12, 29, isWalking ? 8 : 9, 3.5, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      const p = (px, py, w, h, color) => {
-        ctx.fillStyle = color || "#FFF";
-        ctx.fillRect(px, py + bobY, w, h);
-      };
-
-      // 1. BOOTS & LEGS (Fold-over cuffs with gold buttons)
-      p(6 - legStride, 20, 4, 7, t.pants);
-      p(5 - legStride, 22, 5, 6, t.boots);
-      p(5 - legStride, 21, 5, 2, t.bootCuffs);
-      p(6 - legStride, 24, 1, 2, t.cuffGold);
-
-      p(14 + legStride, 20, 4, 7, t.pants);
-      p(14 + legStride, 22, 5, 6, t.boots);
-      p(14 + legStride, 21, 5, 2, t.bootCuffs);
-      p(15 + legStride, 24, 1, 2, t.cuffGold);
+      const bootBtnR = new THREE.Mesh(bootBtnGeom, cuffGoldMat);
+      bootBtnR.position.set(0.1, -0.25, 0.02);
+      legRightGroup.add(bootBtnR);
 
       // 2. TORSO & VEST
-      p(7, 13, 10, 8, t.shirt);
-      p(8, 14, 8, 7, t.vest);
-      p(8, 17, 8, 4, t.vestShadow);
-      p(11, 15, 2, 1, t.cuffGold);
-      p(11, 17, 2, 1, t.cuffGold);
-      p(11, 19, 2, 1, t.cuffGold);
+      const torsoGeom = new THREE.BoxGeometry(0.48, 0.48, 0.3);
+      const torsoMesh = new THREE.Mesh(torsoGeom, vestMat);
+      torsoMesh.position.y = 0.76;
+      torsoMesh.castShadow = true;
+      bodyGroup.add(torsoMesh);
 
-      // Puffy Sleeves & Gloves
-      p(4, 14 + armStride, 3, 5, t.shirt);
-      p(4, 18 + armStride, 3, 3, t.gloves);
-      p(4, 17 + armStride, 3, 1, t.cuffGold);
+      // White shirt collar showing at chest
+      const collarGeom = new THREE.BoxGeometry(0.22, 0.16, 0.32);
+      const collarMesh = new THREE.Mesh(collarGeom, shirtMat);
+      collarMesh.position.set(0, 0.94, 0.01);
+      bodyGroup.add(collarMesh);
 
-      p(17, 14 - armStride, 3, 5, t.shirt);
-      p(17, 18 - armStride, 3, 3, t.gloves);
-      p(17, 17 - armStride, 3, 1, t.cuffGold);
+      // Gold buttons down vest
+      const btnGeom = new THREE.BoxGeometry(0.05, 0.05, 0.04);
+      for (let b = 0; b < 3; b++) {
+        const btn = new THREE.Mesh(btnGeom, cuffGoldMat);
+        btn.position.set(0, 0.68 + b * 0.1, 0.16);
+        bodyGroup.add(btn);
+      }
 
-      // 3. HEAD & FACE
-      p(10, 11, 4, 2, t.skinShadow);
-      p(6, 6, 12, 6, t.skin);
-      p(5, 7, 1, 4, t.skin);
-      p(18, 7, 1, 4, t.skin);
+      // 3. ARMS with shoulder pivot
+      const armLeftGroup = new THREE.Group();
+      const armRightGroup = new THREE.Group();
+      armLeftGroup.position.set(-0.31, 0.92, 0);
+      armRightGroup.position.set(0.31, 0.92, 0);
+      bodyGroup.add(armLeftGroup);
+      bodyGroup.add(armRightGroup);
 
-      if (facing !== 'up') {
-        const eyeOffset = facing === 'left' ? -1 : facing === 'right' ? 1 : 0;
-        if (isBlinking) {
-          // Closed eye slit
-          p(8 + eyeOffset, 9, 3, 1, t.eye);
-          p(14 + eyeOffset, 9, 3, 1, t.eye);
+      // Sleeve + Glove
+      const armGeom = new THREE.BoxGeometry(0.14, 0.38, 0.16);
+      const armL = new THREE.Mesh(armGeom, shirtMat);
+      armL.position.y = -0.16;
+      armL.castShadow = true;
+      armLeftGroup.add(armL);
+
+      const armR = new THREE.Mesh(armGeom, shirtMat);
+      armR.position.y = -0.16;
+      armR.castShadow = true;
+      armRightGroup.add(armR);
+
+      // Glove Cuffs
+      const gloveGeom = new THREE.BoxGeometry(0.15, 0.12, 0.17);
+      const gloveL = new THREE.Mesh(gloveGeom, mat(t.glovesHex));
+      gloveL.position.y = -0.28;
+      armLeftGroup.add(gloveL);
+
+      const gloveR = new THREE.Mesh(gloveGeom, mat(t.glovesHex));
+      gloveR.position.y = -0.28;
+      armRightGroup.add(gloveR);
+
+      // 4. HEAD & FLUFFY ANIME HAIR (Reference 1)
+      const headGeom = new THREE.BoxGeometry(0.66, 0.58, 0.62);
+      const headMesh = new THREE.Mesh(headGeom, skinMat);
+      headMesh.position.y = 1.32;
+      headMesh.castShadow = true;
+      bodyGroup.add(headMesh);
+
+      // Big Anime Eyes with specular shine
+      const eyeGeom = new THREE.BoxGeometry(0.12, 0.14, 0.04);
+      const eyeL = new THREE.Mesh(eyeGeom, eyeMat);
+      eyeL.position.set(-0.16, 1.32, 0.32);
+      bodyGroup.add(eyeL);
+
+      const eyeR = new THREE.Mesh(eyeGeom, eyeMat);
+      eyeR.position.set(0.16, 1.32, 0.32);
+      bodyGroup.add(eyeR);
+
+      // Specular Eye Highlight
+      const glintGeom = new THREE.BoxGeometry(0.04, 0.05, 0.05);
+      const glintL = new THREE.Mesh(glintGeom, mat(0xFFFFFF));
+      glintL.position.set(-0.18, 1.35, 0.33);
+      bodyGroup.add(glintL);
+
+      const glintR = new THREE.Mesh(glintGeom, mat(0xFFFFFF));
+      glintR.position.set(0.14, 1.35, 0.33);
+      bodyGroup.add(glintR);
+
+      // Pink Blush cheeks
+      const blushGeom = new THREE.BoxGeometry(0.1, 0.05, 0.02);
+      const blushL = new THREE.Mesh(blushGeom, blushMat);
+      blushL.position.set(-0.2, 1.22, 0.32);
+      bodyGroup.add(blushL);
+
+      const blushR = new THREE.Mesh(blushGeom, blushMat);
+      blushR.position.set(0.2, 1.22, 0.32);
+      bodyGroup.add(blushR);
+
+      // 5. VOLUMINOUS FLUFFY HAIR (Reference 1 Chibi crown & bangs)
+      const hairCrownGeom = new THREE.BoxGeometry(0.74, 0.35, 0.74);
+      const hairCrown = new THREE.Mesh(hairCrownGeom, hairMat);
+      hairCrown.position.set(0, 1.62, 0.02);
+      hairCrown.castShadow = true;
+      bodyGroup.add(hairCrown);
+
+      // Front Bangs
+      const bangGeom = new THREE.BoxGeometry(0.68, 0.22, 0.16);
+      const bangMesh = new THREE.Mesh(bangGeom, hairMat);
+      bangMesh.position.set(0, 1.52, 0.32);
+      bodyGroup.add(bangMesh);
+
+      // Signature Angled Side Tufts
+      const tuftGeom = new THREE.BoxGeometry(0.16, 0.42, 0.25);
+      const tuftL = new THREE.Mesh(tuftGeom, hairMat);
+      tuftL.position.set(-0.38, 1.36, 0.1);
+      tuftL.rotation.z = 0.15;
+      bodyGroup.add(tuftL);
+
+      const tuftR = new THREE.Mesh(tuftGeom, hairMat);
+      tuftR.position.set(0.38, 1.36, 0.1);
+      tuftR.rotation.z = -0.15;
+      bodyGroup.add(tuftR);
+
+      // Soft Ground Ambient Shadow Disc
+      const shadowGeom = new THREE.CircleGeometry(0.42, 16);
+      const shadowMat = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.45 });
+      const shadowMesh = new THREE.Mesh(shadowGeom, shadowMat);
+      shadowMesh.rotation.x = -Math.PI / 2;
+      shadowMesh.position.y = 0.02;
+      charGroup.add(shadowMesh);
+
+      // Animation Method Attached to Group
+      charGroup.userData.animate = function(dt, isWalking, walkProgress, time) {
+        if (isWalking) {
+          legLeftGroup.rotation.x = Math.sin(walkProgress) * 0.72;
+          legRightGroup.rotation.x = -Math.sin(walkProgress) * 0.72;
+          armLeftGroup.rotation.x = -Math.sin(walkProgress) * 0.62;
+          armRightGroup.rotation.x = Math.sin(walkProgress) * 0.62;
+          bodyGroup.position.y = Math.abs(Math.sin(walkProgress)) * 0.08;
         } else {
-          // Big anime eyes with specular glint
-          p(8 + eyeOffset, 8, 2, 3, t.eye);
-          p(8 + eyeOffset, 8, 1, 1, "#FFFFFF");
-
-          p(14 + eyeOffset, 8, 2, 3, t.eye);
-          p(14 + eyeOffset, 8, 1, 1, "#FFFFFF");
-
-          p(7 + eyeOffset, 10, 1, 1, "#F472B6");
-          p(16 + eyeOffset, 10, 1, 1, "#F472B6");
+          legLeftGroup.rotation.x = 0;
+          legRightGroup.rotation.x = 0;
+          armLeftGroup.rotation.x = 0;
+          armRightGroup.rotation.x = 0;
+          bodyGroup.position.y = Math.sin(time * 3) * 0.025; // Gentle breathing bob
         }
-      }
-
-      // 4. BIG FLUFFY ANIME HAIR (Reference 1)
-      p(4, 3, 16, 5, t.hair);
-      p(3, 5, 2, 5, t.hair);
-      p(19, 5, 2, 5, t.hair);
-
-      p(5, 4, 14, 3, t.hair);
-      p(6, 7, 3, 2, t.hair);
-      p(11, 7, 2, 2, t.hair);
-      p(15, 7, 3, 2, t.hair);
-
-      p(2, 6, 3, 3, t.hair);
-      p(1, 8, 2, 3, t.hairShadow);
-      p(19, 6, 3, 3, t.hair);
-      p(21, 8, 2, 3, t.hairShadow);
-
-      p(7, 3, 10, 1, "#FFFFFF");
-      p(4, 7, 2, 2, t.hairShadow);
-      p(18, 7, 2, 2, t.hairShadow);
-
-      ctx.restore();
-    }
-
-    // ==========================================
-    // 4. TILEMAP & PRE-RENDERED SPROUT LANDS BUFFER
-    // ==========================================
-    const MAP_WIDTH = 32;
-    const MAP_HEIGHT = 24;
-    const TILE_SIZE = 24;
-
-    const INTERACTIVE_NODES = [
-      { id: "node_badge", name: "Keycard Security Gate", tileX: 16, tileY: 6, type: "badge", label: "[E] SWIPE TERMINAL", icon: "💳", color: "#38BDF8" },
-      { id: "node_chat", name: "SecOps Chat Relay", tileX: 14, tileY: 17, type: "chat", label: "[E] CHAT WIRETAP", icon: "💬", color: "#F59E0B" },
-      { id: "node_net", name: "Core Network PCAP Rack", tileX: 17, tileY: 17, type: "network", label: "[E] NETWORK SNIFFER", icon: "🌐", color: "#10B981" },
-      { id: "node_crime_tape", name: "Breached Vault Safe", tileX: 6, tileY: 4, type: "crime_scene", label: "[E] CRIME SCENE", icon: "🚨", color: "#F43F5E" }
-    ];
-
-    // Solid collision matrix
-    function isSolidTile(x, y) {
-      if (x <= 0 || y <= 0 || x >= MAP_WIDTH - 1 || y >= MAP_HEIGHT - 1) return true;
-
-      // Partition walls with 3-tile wide doorways
-      // Left vertical wall: x = 13 (doorway at y: 7, 8, 9)
-      if (x === 13) {
-        if (y < 7 || (y > 9 && y < 14) || y > 17) return true;
-      }
-      // Right vertical wall: x = 18 (doorway at y: 7, 8, 9)
-      if (x === 18) {
-        if (y < 7 || (y > 9 && y < 14) || y > 17) return true;
-      }
-      // Horizontal upper wall: y = 10 (doorway at x: 14, 15, 16, 17)
-      if (y === 10) {
-        if (x < 14 || x > 17) return true;
-      }
-      // Horizontal lower wall: y = 13 (doorway at x: 14, 15, 16, 17)
-      if (y === 13) {
-        if (x < 14 || x > 17) return true;
-      }
-
-      // Conference Table: x: 22..26, y: 4..6
-      if (x >= 22 && x <= 26 && y >= 4 && y <= 6) return true;
-
-      // Server Racks in Vault: x: 3..10, y: 3
-      if (x >= 3 && x <= 10 && y === 3) return true;
-
-      return false;
-    }
-
-    function checkCollision(px, py, width, height) {
-      const minX = Math.floor(px / TILE_SIZE);
-      const maxX = Math.floor((px + width - 1) / TILE_SIZE);
-      const minY = Math.floor(py / TILE_SIZE);
-      const maxY = Math.floor((py + height - 1) / TILE_SIZE);
-
-      for (let tx = minX; tx <= maxX; tx++) {
-        for (let ty = minY; ty <= maxY; ty++) {
-          if (isSolidTile(tx, ty)) return true;
-        }
-      }
-      return false;
-    }
-
-    let cachedMapCanvas = null;
-
-    function buildStaticMapBuffer() {
-      const buffer = document.createElement('canvas');
-      buffer.width = MAP_WIDTH * TILE_SIZE;
-      buffer.height = MAP_HEIGHT * TILE_SIZE;
-      const ctx = buffer.getContext('2d');
-
-      // 1. Cozy Floors (Warm wood parquet, soft cafeteria tiles, velvet rugs)
-      for (let y = 0; y < MAP_HEIGHT; y++) {
-        for (let x = 0; x < MAP_WIDTH; x++) {
-          const px = x * TILE_SIZE;
-          const py = y * TILE_SIZE;
-
-          // Outer Wall Border
-          if (x === 0 || y === 0 || x === MAP_WIDTH - 1 || y === MAP_HEIGHT - 1) {
-            ctx.fillStyle = "#121A24";
-            ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
-            ctx.fillStyle = "#1C2938";
-            ctx.fillRect(px + 1, py + 1, TILE_SIZE - 2, 3);
-            continue;
-          }
-
-          if (x < 13 && y < 10) {
-            // Server Vault (Cool Navy Slate with metal seams)
-            ctx.fillStyle = (x + y) % 2 === 0 ? "#111823" : "#16202C";
-            ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
-            ctx.strokeStyle = "#1A2634";
-            ctx.strokeRect(px, py, TILE_SIZE, TILE_SIZE);
-          } else if (x > 18 && y < 10) {
-            // Conference Room 4A (Sprout Lands Warm Honey Wood Planks)
-            ctx.fillStyle = (x + y) % 2 === 0 ? "#9A6635" : "#88582A";
-            ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
-            ctx.fillStyle = "#6F441E";
-            ctx.fillRect(px, py + TILE_SIZE - 2, TILE_SIZE, 2); // Wood plank groove
-          } else if (x < 13 && y > 13) {
-            // Cafeteria (Cozy Cream-Beige Tiles)
-            ctx.fillStyle = (x + y) % 2 === 0 ? "#EBE0CF" : "#DDD1BD";
-            ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
-            ctx.strokeStyle = "#C5B8A5";
-            ctx.strokeRect(px, py, TILE_SIZE, TILE_SIZE);
-          } else if (x > 18 && y > 13) {
-            // Executive Lounge (Rich Burgundy Velvet Rug with Gold Trim)
-            ctx.fillStyle = (x + y) % 2 === 0 ? "#591B2A" : "#692033";
-            ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
-            if (x === 19 || x === MAP_WIDTH - 2 || y === 14 || y === MAP_HEIGHT - 2) {
-              ctx.fillStyle = "#EAB308";
-              ctx.fillRect(px, py, TILE_SIZE, 2); // Gold fringe border
-            }
-          } else {
-            // Central Security Hallway (Warm Linoleum with soft grid)
-            ctx.fillStyle = (x + y) % 2 === 0 ? "#1E2A38" : "#243243";
-            ctx.fillRect(px, py, TILE_SIZE, TILE_SIZE);
-            ctx.strokeStyle = "#192330";
-            ctx.strokeRect(px, py, TILE_SIZE, TILE_SIZE);
-          }
-        }
-      }
-
-      // 2. Interior Walls (Sprout Lands style with depth and wood capping)
-      const drawWall = (wx, wy, ww, wh) => {
-        ctx.fillStyle = "#18222D";
-        ctx.fillRect(wx, wy, ww, wh);
-        ctx.fillStyle = "#2D3E52";
-        ctx.fillRect(wx, wy, ww, 3); // Highlight
-        ctx.fillStyle = "#0F161E";
-        ctx.fillRect(wx, wy + wh - 3, ww, 3); // Shadow
       };
 
-      // Draw walls respecting open doorways
-      drawWall(13 * TILE_SIZE, 1 * TILE_SIZE, 8, 6 * TILE_SIZE);
-      drawWall(13 * TILE_SIZE, 10 * TILE_SIZE, 8, 3 * TILE_SIZE);
-      drawWall(13 * TILE_SIZE, 18 * TILE_SIZE, 8, 5 * TILE_SIZE);
+      return charGroup;
+    }
 
-      drawWall(18 * TILE_SIZE, 1 * TILE_SIZE, 8, 6 * TILE_SIZE);
-      drawWall(18 * TILE_SIZE, 10 * TILE_SIZE, 8, 3 * TILE_SIZE);
-      drawWall(18 * TILE_SIZE, 18 * TILE_SIZE, 8, 5 * TILE_SIZE);
+    // ==========================================
+    // 4. 3D OFFICE ENVIRONMENT BUILDER
+    // ==========================================
+    function build3DOfficeScene(scene) {
+      const officeGroup = new THREE.Group();
+      scene.add(officeGroup);
 
-      drawWall(1 * TILE_SIZE, 10 * TILE_SIZE, 12 * TILE_SIZE, 8);
-      drawWall(19 * TILE_SIZE, 10 * TILE_SIZE, 12 * TILE_SIZE, 8);
-      drawWall(1 * TILE_SIZE, 13 * TILE_SIZE, 12 * TILE_SIZE, 8);
-      drawWall(19 * TILE_SIZE, 13 * TILE_SIZE, 12 * TILE_SIZE, 8);
+      const mat = (color, roughness = 0.6, metalness = 0.1) =>
+        new THREE.MeshStandardMaterial({ color, roughness, metalness, flatShading: true });
 
-      // 3. Furniture (Sprout Lands Detailing)
-      // A) Conference Mahogany Table with soft shadow
-      ctx.fillStyle = "rgba(0, 0, 0, 0.35)";
-      ctx.fillRect(22 * TILE_SIZE + 4, 4 * TILE_SIZE + 4, 5 * TILE_SIZE, 3 * TILE_SIZE);
-      ctx.fillStyle = "#582C13";
-      ctx.fillRect(22 * TILE_SIZE, 4 * TILE_SIZE, 5 * TILE_SIZE, 3 * TILE_SIZE);
-      ctx.fillStyle = "#723B1B";
-      ctx.fillRect(22 * TILE_SIZE + 2, 4 * TILE_SIZE + 2, 5 * TILE_SIZE - 4, 3 * TILE_SIZE - 4);
+      // 1. Distinct Cozy Room Floors
+      // A) Central Concourse (Polished Dark Slate)
+      const concourseFloor = new THREE.Mesh(
+        new THREE.BoxGeometry(6, 0.2, 28),
+        mat(0x1A2533, 0.3, 0.2)
+      );
+      concourseFloor.position.set(0, -0.1, 0);
+      concourseFloor.receiveShadow = true;
+      officeGroup.add(concourseFloor);
 
-      // Laptops & Mugs on table
-      ctx.fillStyle = "#94A3B8";
-      ctx.fillRect(23 * TILE_SIZE, 5 * TILE_SIZE, 12, 10);
-      ctx.fillRect(25 * TILE_SIZE, 5 * TILE_SIZE, 12, 10);
-      ctx.fillStyle = "#FFFFFF"; // Coffee mug
-      ctx.fillRect(24 * TILE_SIZE + 2, 5 * TILE_SIZE + 2, 5, 5);
+      const crossHall = new THREE.Mesh(
+        new THREE.BoxGeometry(28, 0.2, 5),
+        mat(0x1A2533, 0.3, 0.2)
+      );
+      crossHall.position.set(0, -0.1, 0);
+      crossHall.receiveShadow = true;
+      officeGroup.add(crossHall);
 
-      // B) Server Racks (Navy Metal Racks in Sublevel 2)
+      // B) Top-Left: Server Vault (Cool Navy Slate with metal seams)
+      const vaultFloor = new THREE.Mesh(
+        new THREE.BoxGeometry(11, 0.2, 11),
+        mat(0x0E1722, 0.4, 0.5)
+      );
+      vaultFloor.position.set(-9, -0.09, -8.5);
+      vaultFloor.receiveShadow = true;
+      officeGroup.add(vaultFloor);
+
+      // C) Top-Right: Conference Room 4A (Sprout Lands Warm Honey Wood Planks)
+      const confFloor = new THREE.Mesh(
+        new THREE.BoxGeometry(11, 0.2, 11),
+        mat(0x8C5A2B, 0.7, 0.05)
+      );
+      confFloor.position.set(9, -0.09, -8.5);
+      confFloor.receiveShadow = true;
+      officeGroup.add(confFloor);
+
+      // D) Bottom-Left: Cafeteria & Breakroom (Cozy Cream Tile)
+      const cafeFloor = new THREE.Mesh(
+        new THREE.BoxGeometry(11, 0.2, 11),
+        mat(0xDDD1BD, 0.5, 0.05)
+      );
+      cafeFloor.position.set(-9, -0.09, 8.5);
+      cafeFloor.receiveShadow = true;
+      officeGroup.add(cafeFloor);
+
+      // E) Bottom-Right: Executive Lounge (Burgundy Velvet Rug with Gold Trim)
+      const loungeFloor = new THREE.Mesh(
+        new THREE.BoxGeometry(11, 0.2, 11),
+        mat(0x5E1D2D, 0.85, 0.05)
+      );
+      loungeFloor.position.set(9, -0.09, 8.5);
+      loungeFloor.receiveShadow = true;
+      officeGroup.add(loungeFloor);
+
+      // 2. Interior & Exterior Low-Poly Walls (with generous 3-unit doorways)
+      const wallMat = mat(0x1F2C3D, 0.7, 0.1);
+      const wallCapMat = mat(0x33485E, 0.5, 0.1);
+
+      const addWall = (x, z, width, depth, height = 2.4) => {
+        const wall = new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), wallMat);
+        wall.position.set(x, height / 2, z);
+        wall.castShadow = true;
+        wall.receiveShadow = true;
+        officeGroup.add(wall);
+
+        const cap = new THREE.Mesh(new THREE.BoxGeometry(width + 0.06, 0.1, depth + 0.06), wallCapMat);
+        cap.position.set(x, height + 0.05, z);
+        officeGroup.add(cap);
+      };
+
+      // Perimeter Walls
+      addWall(0, -14.5, 30, 0.5); // North
+      addWall(0, 14.5, 30, 0.5);  // South
+      addWall(-14.5, 0, 0.5, 29); // West
+      addWall(14.5, 0, 0.5, 29);  // East
+
+      // Interior Dividing Walls (Leaving open central doors)
+      addWall(-3.5, -8.5, 0.5, 11);
+      addWall(3.5, -8.5, 0.5, 11);
+      addWall(-3.5, 8.5, 0.5, 11);
+      addWall(3.5, 8.5, 0.5, 11);
+
+      addWall(-9, -3, 11, 0.5);
+      addWall(9, -3, 11, 0.5);
+      addWall(-9, 3, 11, 0.5);
+      addWall(9, 3, 11, 0.5);
+
+      // 3. 3D Furniture & Atmosphere
+      // A) Server Vault Racks (with emissive LED blinking strips)
+      const serverRacks = [];
       for (let r = 0; r < 4; r++) {
-        const rx = (3 + r * 2) * TILE_SIZE;
-        const ry = 3 * TILE_SIZE;
-        ctx.fillStyle = "#090E14";
-        ctx.fillRect(rx, ry, 36, 48);
-        ctx.strokeStyle = "#1E2C3D";
-        ctx.strokeRect(rx, ry, 36, 48);
+        const rackGroup = new THREE.Group();
+        rackGroup.position.set(-12 + r * 1.8, 0, -11.5);
+        officeGroup.add(rackGroup);
+
+        const rackBox = new THREE.Mesh(new THREE.BoxGeometry(1.2, 2.2, 1.4), mat(0x090E14, 0.4, 0.6));
+        rackBox.position.y = 1.1;
+        rackBox.castShadow = true;
+        rackGroup.add(rackBox);
+
+        // LED Blinking Panels
+        const ledMat = new THREE.MeshBasicMaterial({ color: 0x10B981 });
+        const led = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.08, 0.04), ledMat);
+        led.position.set(0, 1.6, 0.72);
+        rackGroup.add(led);
+        serverRacks.push(ledMat);
       }
 
-      // C) Potted Plants (Cute Sprout Lands Bushes)
-      const drawPlant = (px, py) => {
-        ctx.fillStyle = "#B45309"; // Terracotta pot
-        ctx.fillRect(px + 4, py + 10, 16, 14);
-        ctx.fillStyle = "#16A34A"; // Green bush
-        ctx.beginPath();
-        ctx.arc(px + 12, py + 8, 10, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = "#4ADE80"; // Highlight leaf
-        ctx.beginPath();
-        ctx.arc(px + 9, py + 6, 4, 0, Math.PI * 2);
-        ctx.fill();
-      };
-      drawPlant(19 * TILE_SIZE, 14 * TILE_SIZE);
-      drawPlant(29 * TILE_SIZE, 14 * TILE_SIZE);
-      drawPlant(19 * TILE_SIZE, 21 * TILE_SIZE);
-      drawPlant(29 * TILE_SIZE, 21 * TILE_SIZE);
+      // Breached Safe in Vault (CRIME SCENE)
+      const safeGroup = new THREE.Group();
+      safeGroup.position.set(-7, 0, -11.5);
+      officeGroup.add(safeGroup);
 
-      // D) Soft Room Sign Headers
-      ctx.font = "bold 8px 'Press Start 2P', monospace";
-      ctx.fillStyle = "#F87171";
-      ctx.fillText("SERVER VAULT (RESTRICTED)", 2 * TILE_SIZE, 2.2 * TILE_SIZE);
-      ctx.fillStyle = "#38BDF8";
-      ctx.fillText("CONFERENCE ROOM 4A", 20 * TILE_SIZE, 2.2 * TILE_SIZE);
-      ctx.fillStyle = "#34D399";
-      ctx.fillText("BREAKROOM & CAFETERIA", 2 * TILE_SIZE, 14.8 * TILE_SIZE);
-      ctx.fillStyle = "#F472B6";
-      ctx.fillText("EXECUTIVE LOUNGE", 20 * TILE_SIZE, 14.8 * TILE_SIZE);
+      const safeBox = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.4, 1.4), mat(0x223040, 0.3, 0.8));
+      safeBox.position.y = 0.7;
+      safeBox.castShadow = true;
+      safeGroup.add(safeBox);
 
-      return buffer;
+      // Vault door ajar
+      const doorMesh = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.3, 0.15), mat(0x384B60, 0.3, 0.8));
+      doorMesh.position.set(0.6, 0.7, 0.8);
+      doorMesh.rotation.y = 0.8;
+      safeGroup.add(doorMesh);
+
+      // B) Conference Room 4A Mahogany Table & Chairs
+      const confTableGroup = new THREE.Group();
+      confTableGroup.position.set(9, 0, -8.5);
+      officeGroup.add(confTableGroup);
+
+      const tableTop = new THREE.Mesh(new THREE.BoxGeometry(4.8, 0.15, 2.4), mat(0x582C13, 0.4, 0.1));
+      tableTop.position.y = 0.85;
+      tableTop.castShadow = true;
+      confTableGroup.add(tableTop);
+
+      // Table legs
+      const legMat = mat(0x1F1610);
+      [-2.1, 2.1].forEach(lx => {
+        [-0.9, 0.9].forEach(lz => {
+          const tLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.85), legMat);
+          tLeg.position.set(lx, 0.42, lz);
+          tLeg.castShadow = true;
+          confTableGroup.add(tLeg);
+        });
+      });
+
+      // Laptops on Conference Table
+      [-1.4, 0, 1.4].forEach(lx => {
+        const laptop = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.04, 0.4), mat(0x94A3B8, 0.2, 0.7));
+        laptop.position.set(lx, 0.95, -0.3);
+        confTableGroup.add(laptop);
+
+        const screen = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.35, 0.03), new THREE.MeshBasicMaterial({ color: 0x38BDF8 }));
+        screen.position.set(lx, 1.12, -0.48);
+        screen.rotation.x = -0.2;
+        confTableGroup.add(screen);
+      });
+
+      // Coffee Mug
+      const mug = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.14), mat(0xFFFFFF));
+      mug.position.set(0.7, 0.98, 0.3);
+      confTableGroup.add(mug);
+
+      // C) Cafeteria Vending Machine & Potted Plants
+      const vendingGroup = new THREE.Group();
+      vendingGroup.position.set(-12.5, 0, 6);
+      officeGroup.add(vendingGroup);
+
+      const vendBox = new THREE.Mesh(new THREE.BoxGeometry(1.6, 2.4, 1.2), mat(0xDC2626, 0.4, 0.2));
+      vendBox.position.y = 1.2;
+      vendBox.castShadow = true;
+      vendingGroup.add(vendBox);
+
+      const vendGlass = new THREE.Mesh(new THREE.BoxGeometry(1.3, 1.2, 0.05), new THREE.MeshBasicMaterial({ color: 0x38BDF8 }));
+      vendGlass.position.set(0, 1.4, 0.61);
+      vendingGroup.add(vendGlass);
+
+      // Potted Plant (Sprout Lands 3D Bush)
+      const plantGroup = new THREE.Group();
+      plantGroup.position.set(-6, 0, 12);
+      officeGroup.add(plantGroup);
+
+      const pot = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.3, 0.6), mat(0xB45309));
+      pot.position.y = 0.3;
+      plantGroup.add(pot);
+
+      const bush = new THREE.Mesh(new THREE.SphereGeometry(0.55, 8, 8), mat(0x16A34A));
+      bush.position.y = 0.85;
+      plantGroup.add(bush);
+
+      // D) Interactive 3D Hologram Terminal Pedestals
+      const pedestals = [
+        { id: "node_badge", name: "Keycard Terminal", pos: [0, 0, -4.5], color: 0x38BDF8, icon: "💳" },
+        { id: "node_chat", name: "Chat Wiretap", pos: [-1.8, 0, 4.5], color: 0xF59E0B, icon: "💬" },
+        { id: "node_net", name: "PCAP Sniffer", pos: [1.8, 0, 4.5], color: 0x10B981, icon: "🌐" },
+        { id: "node_crime_tape", name: "Breached Safe", pos: [-7, 0, -9.5], color: 0xF43F5E, icon: "🚨" }
+      ];
+
+      const pedestalMeshes = pedestals.map(p => {
+        const pedGroup = new THREE.Group();
+        pedGroup.position.set(p.pos[0], p.pos[1], p.pos[2]);
+        officeGroup.add(pedGroup);
+
+        const base = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.55, 0.85), mat(0x1E293B, 0.3, 0.5));
+        base.position.y = 0.42;
+        base.castShadow = true;
+        pedGroup.add(base);
+
+        // Glowing Holographic Display Pad
+        const holoDisc = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.38, 0.38, 0.08),
+          new THREE.MeshBasicMaterial({ color: p.color })
+        );
+        holoDisc.position.y = 0.88;
+        pedGroup.add(holoDisc);
+
+        return { ...p, group: pedGroup };
+      });
+
+      return { officeGroup, serverRacks, pedestalMeshes };
     }
 
     // ==========================================
-    // 5. MAIN REACT APP (SILKY SMOOTH + HIGH TECH)
+    // 5. MAIN REACT APP (FULL 3D ENGINE)
     // ==========================================
     function App() {
       const [caseData, setCaseData] = useState(() => {
         try {
-          const saved = localStorage.getItem('THE_COLD_FILE_STATE_V3');
+          const saved = localStorage.getItem('THE_COLD_FILE_STATE_3D');
           if (saved) {
             const parsed = JSON.parse(saved);
             if (parsed.caseData && parsed.caseData.suspects && parsed.caseData.suspects[0]?.spriteTheme) {
@@ -1072,30 +1131,27 @@
 
       const [ap, setAp] = useState(8);
       const [maxAp, setMaxAp] = useState(8);
-      const [viewMode, setViewMode] = useState('map');
+      const [viewMode, setViewMode] = useState('3d');
       const [activeTab, setActiveTab] = useState('badge');
       const [pinnedLogIds, setPinnedLogIds] = useState([]);
       const [bgmActive, setBgmActive] = useState(false);
 
-      // KINEMATICS REF (SILKY SMOOTH MOMENTUM)
+      // KINEMATICS REF (SILKY 3D MOMENTUM)
       const playerRef = useRef({
-        x: 15.5 * TILE_SIZE,
-        y: 11.5 * TILE_SIZE,
+        x: 0,
+        z: 0,
         vx: 0,
-        vy: 0,
+        vz: 0,
+        rotationY: 0,
         targetX: null,
-        targetY: null,
-        facing: 'down',
+        targetZ: null,
         walkProgress: 0,
-        isWalking: false,
-        lastBlinkTime: 0
+        isWalking: false
       });
 
-      // Particles & Radar Beacons
-      const dustParticlesRef = useRef([]);
-      const targetCursorRef = useRef(null);
-      const [radarBeacon, setRadarBeacon] = useState(null);
-      const [radarSweepAngle, setRadarSweepAngle] = useState(0);
+      // 3D Camera Controls
+      const cameraAngleRef = useRef(0); // Orbit angle in radians
+      const cameraZoomRef = useRef(19);  // Distance
 
       // Decoupled Interaction Target
       const currentTargetIdRef = useRef(null);
@@ -1108,18 +1164,28 @@
       const [liveLeakModal, setLiveLeakModal] = useState(null);
       const [accusationModalOpen, setAccusationModalOpen] = useState(false);
       const [selectedAccusedSuspectId, setSelectedAccusedSuspectId] = useState('');
-      const [selectedContradictionLogId, setSelectedContradictionLogId] = useState('');
       const [verdictData, setVerdictData] = useState(null);
       const [shakeScreen, setShakeScreen] = useState(false);
 
-      const [career, setCareer] = useState({ xp: 180, streak: 0, rankTitle: "SecOps Detective II" });
+      const [career, setCareer] = useState({ xp: 220, streak: 0, rankTitle: "Senior SecOps Investigator" });
       const [bossMode, setBossMode] = useState(false);
       const [soundMuted, setSoundMuted] = useState(false);
       const [toastMsg, setToastMsg] = useState(null);
 
-      const canvasRef = useRef(null);
+      const canvasContainerRef = useRef(null);
       const portraitCanvasRef = useRef(null);
       const keysPressedRef = useRef(new Set());
+
+      // 3D Scene Refs
+      const threeRef = useRef({
+        scene: null,
+        camera: null,
+        renderer: null,
+        playerMesh: null,
+        suspectMeshes: [],
+        pedestals: [],
+        radarMesh: null
+      });
 
       const showToast = (msg) => {
         setToastMsg(msg);
@@ -1130,7 +1196,7 @@
       useEffect(() => {
         if (!caseData) return;
         try {
-          localStorage.setItem('THE_COLD_FILE_STATE_V3', JSON.stringify({
+          localStorage.setItem('THE_COLD_FILE_STATE_3D', JSON.stringify({
             caseData, ap, maxAp, pinnedLogIds, career
           }));
         } catch (e) {}
@@ -1172,7 +1238,7 @@
           {
             title: "ANONYMOUS WHISTLEBLOWER RELAY",
             desc: "An encrypted drop on an onion relay just leaked internal credentials!",
-            reward: "Instantly revealed that the culprit has LEVEL-4 ROOT access.",
+            reward: "Instantly confirmed: The culprit possesses LEVEL-4 ROOT credentials.",
             actionType: "HINT_ACCESS"
           },
           {
@@ -1209,10 +1275,13 @@
             e.preventDefault();
             keysPressedRef.current.add(key);
             playerRef.current.targetX = null;
-            playerRef.current.targetY = null;
-            targetCursorRef.current = null;
+            playerRef.current.targetZ = null;
+          } else if (key === 'q') {
+            cameraAngleRef.current -= 0.35; // Rotate camera left
           } else if (key === 'e' || e.key === ' ') {
             triggerNearbyInteraction();
+          } else if (key === 'r') {
+            cameraAngleRef.current += 0.35; // Rotate camera right
           }
         };
 
@@ -1237,353 +1306,307 @@
           setInterrogationDialogue(null);
         } else if (interactTarget.type === 'node') {
           const node = interactTarget.data;
-          if (node.type === 'crime_scene') {
+          if (node.id === 'node_crime_tape') {
             showToast("🚨 BREACHED SAFE: Physical seal was broken with an authorized biometric override!");
             audio.alert();
           } else {
-            setActiveTab(node.type);
+            const tabName = node.id === 'node_badge' ? 'badge' : node.id === 'node_chat' ? 'chat' : 'network';
+            setActiveTab(tabName);
             setActiveNodeModal(node);
           }
         }
       };
 
-      // Draw Dialogue Portrait when suspect modal opens
-      useEffect(() => {
-        if (activeSuspectModal && portraitCanvasRef.current) {
-          const ctx = portraitCanvasRef.current.getContext('2d');
-          drawChibiDialoguePortrait(ctx, activeSuspectModal.spriteTheme, activeSuspectModal.stressLevel);
-        }
-      }, [activeSuspectModal]);
-
       // ==========================================
-      // 60FPS SILKY SMOOTH KINEMATICS & RENDER LOOP
+      // 6. THREE.JS 3D WORLD LIFECYCLE
       // ==========================================
       useEffect(() => {
-        if (!cachedMapCanvas) {
-          cachedMapCanvas = buildStaticMapBuffer();
+        const container = canvasContainerRef.current;
+        if (!container) return;
+
+        // Clean previous instances
+        while (container.firstChild) {
+          container.removeChild(container.firstChild);
         }
 
+        const width = container.clientWidth || 800;
+        const height = container.clientHeight || 560;
+
+        // 1. Scene, Camera, Renderer
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x070B10);
+        scene.fog = new THREE.FogExp2(0x070B10, 0.022);
+
+        const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
+        camera.position.set(0, 16, 20);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "high-performance" });
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        container.appendChild(renderer.domElement);
+
+        // 2. Lighting
+        const ambientLight = new THREE.AmbientLight(0x3B485A, 0.7);
+        scene.add(ambientLight);
+
+        const dirLight = new THREE.DirectionalLight(0xE2E8F0, 0.9);
+        dirLight.position.set(12, 24, 15);
+        dirLight.castShadow = true;
+        dirLight.shadow.mapSize.width = 1024;
+        dirLight.shadow.mapSize.height = 1024;
+        dirLight.shadow.camera.near = 0.5;
+        dirLight.shadow.camera.far = 50;
+        dirLight.shadow.camera.left = -18;
+        dirLight.shadow.camera.right = 18;
+        dirLight.shadow.camera.top = 18;
+        dirLight.shadow.camera.bottom = -18;
+        scene.add(dirLight);
+
+        // Room Point Lights
+        const vaultLight = new THREE.PointLight(0xF43F5E, 1.2, 12);
+        vaultLight.position.set(-9, 3.5, -8.5);
+        scene.add(vaultLight);
+
+        const confLight = new THREE.PointLight(0xF59E0B, 1.0, 14);
+        confLight.position.set(9, 3.5, -8.5);
+        scene.add(confLight);
+
+        const concourseLight = new THREE.PointLight(0x38BDF8, 0.8, 12);
+        concourseLight.position.set(0, 3.5, 0);
+        scene.add(concourseLight);
+
+        // 3. Build Office Environment
+        const { officeGroup, serverRacks, pedestalMeshes } = build3DOfficeScene(scene);
+
+        // 4. Create Detective Mesh
+        const playerMesh = createLowPolyChibiCharacter(DETECTIVE_THEME, true);
+        playerMesh.position.set(playerRef.current.x, 0, playerRef.current.z);
+        scene.add(playerMesh);
+
+        // 5. Create Suspect Meshes
+        const suspectMeshes = caseData.suspects.map((s, idx) => {
+          const sMesh = createLowPolyChibiCharacter(s.spriteTheme, false);
+          sMesh.position.set(s.posX, 0, s.posZ);
+          scene.add(sMesh);
+          return { id: s.id, data: s, mesh: sMesh };
+        });
+
+        // 6. 3D Radar Wave Ring (For Signal Tracker Gadget)
+        const radarRingGeom = new THREE.RingGeometry(0.2, 0.45, 32);
+        const radarRingMat = new THREE.MeshBasicMaterial({ color: 0xF43F5E, side: THREE.DoubleSide, transparent: true, opacity: 0 });
+        const radarMesh = new THREE.Mesh(radarRingGeom, radarRingMat);
+        radarMesh.rotation.x = -Math.PI / 2;
+        radarMesh.position.y = 0.05;
+        scene.add(radarMesh);
+
+        // Store references
+        threeRef.current = {
+          scene,
+          camera,
+          renderer,
+          playerMesh,
+          suspectMeshes,
+          pedestals: pedestalMeshes,
+          radarMesh,
+          serverRacks
+        };
+
+        // Resize handler
+        const handleResize = () => {
+          if (!container || !renderer || !camera) return;
+          const newW = container.clientWidth;
+          const newH = container.clientHeight;
+          camera.aspect = newW / newH;
+          camera.updateProjectionMatrix();
+          renderer.setSize(newW, newH);
+        };
+        window.addEventListener('resize', handleResize);
+
+        // Click on 3D floor for Click-to-Move
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        const floorPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+
+        const handlePointerDown = (e) => {
+          const rect = renderer.domElement.getBoundingClientRect();
+          mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+          mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+          raycaster.setFromCamera(mouse, camera);
+          const targetPoint = new THREE.Vector3();
+          if (raycaster.ray.intersectPlane(floorPlane, targetPoint)) {
+            playerRef.current.targetX = Math.max(-13, Math.min(13, targetPoint.x));
+            playerRef.current.targetZ = Math.max(-13, Math.min(13, targetPoint.z));
+            audio.click();
+          }
+        };
+
+        renderer.domElement.addEventListener('pointerdown', handlePointerDown);
+
+        // Mouse wheel to zoom
+        const handleWheel = (e) => {
+          cameraZoomRef.current = Math.max(12, Math.min(26, cameraZoomRef.current + e.deltaY * 0.015));
+        };
+        renderer.domElement.addEventListener('wheel', handleWheel, { passive: true });
+
+        // Cleanup
+        return () => {
+          window.removeEventListener('resize', handleResize);
+          if (renderer && renderer.domElement) {
+            renderer.domElement.removeEventListener('pointerdown', handlePointerDown);
+            renderer.domElement.removeEventListener('wheel', handleWheel);
+            renderer.dispose();
+          }
+        };
+      }, [caseData]);
+
+      // ==========================================
+      // 7. 60FPS 3D ANIMATION & KINEMATICS LOOP
+      // ==========================================
+      useEffect(() => {
         let animId;
         let lastTime = performance.now();
 
-        const gameLoop = (currentTime) => {
+        const loop = (currentTime) => {
           const dt = Math.min(0.04, (currentTime - lastTime) / 1000);
           lastTime = currentTime;
 
-          try {
-            const canvas = canvasRef.current;
+          const three = threeRef.current;
+          if (three.renderer && three.camera && three.playerMesh) {
             const p = playerRef.current;
             const keys = keysPressedRef.current;
+            const orbit = cameraAngleRef.current;
 
-            // 1. SMOOTH VECTOR ACCELERATION & DIRECTIONAL BLEND
-            let inputX = 0, inputY = 0;
-            if (keys.has('w') || keys.has('arrowup')) inputY -= 1;
-            if (keys.has('s') || keys.has('arrowdown')) inputY += 1;
+            // 1. Camera-Relative Directional Input Vector
+            let inputX = 0, inputZ = 0;
+            if (keys.has('w') || keys.has('arrowup')) inputZ -= 1;
+            if (keys.has('s') || keys.has('arrowdown')) inputZ += 1;
             if (keys.has('a') || keys.has('arrowleft')) inputX -= 1;
             if (keys.has('d') || keys.has('arrowright')) inputX += 1;
 
-            const accel = 1600; // Responsive acceleration
-            const friction = 0.81; // Viscous damping
-            const maxSpeed = 145; // Fluid walking speed
+            const camForward = new THREE.Vector3(-Math.sin(orbit), 0, -Math.cos(orbit));
+            const camRight = new THREE.Vector3(Math.cos(orbit), 0, -Math.sin(orbit));
 
-            if (inputX !== 0 || inputY !== 0) {
-              const len = Math.hypot(inputX, inputY);
-              p.vx += (inputX / len) * accel * dt;
-              p.vy += (inputY / len) * accel * dt;
+            const moveDir = new THREE.Vector3();
+            if (inputZ < 0) moveDir.add(camForward);
+            if (inputZ > 0) moveDir.sub(camForward);
+            if (inputX > 0) moveDir.add(camRight);
+            if (inputX < 0) moveDir.sub(camRight);
 
-              // Smooth Facing Orientation
-              if (Math.abs(inputX) > Math.abs(inputY)) {
-                p.facing = inputX < 0 ? 'left' : 'right';
-              } else {
-                p.facing = inputY < 0 ? 'up' : 'down';
-              }
+            const accel = 26; // Smooth 3D acceleration
+            const friction = 0.82;
+            const maxSpeed = 7.5;
+
+            if (moveDir.lengthSq() > 0) {
+              moveDir.normalize();
+              p.vx += moveDir.x * accel * dt;
+              p.vz += moveDir.z * accel * dt;
               p.isWalking = true;
               audio.step();
-            } else if (p.targetX !== null && p.targetY !== null) {
-              // Click-to-move glide
+            } else if (p.targetX !== null && p.targetZ !== null) {
               const dx = p.targetX - p.x;
-              const dy = p.targetY - p.y;
-              const dist = Math.hypot(dx, dy);
+              const dz = p.targetZ - p.z;
+              const dist = Math.hypot(dx, dz);
 
-              if (dist > 4) {
+              if (dist > 0.25) {
                 p.vx += (dx / dist) * accel * dt;
-                p.vy += (dy / dist) * accel * dt;
-                p.facing = Math.abs(dx) > Math.abs(dy) ? (dx < 0 ? 'left' : 'right') : (dy < 0 ? 'up' : 'down');
+                p.vz += (dz / dist) * accel * dt;
                 p.isWalking = true;
                 audio.step();
               } else {
                 p.targetX = null;
-                p.targetY = null;
-                targetCursorRef.current = null;
+                p.targetZ = null;
               }
             }
 
             // Apply friction
             p.vx *= friction;
-            p.vy *= friction;
+            p.vz *= friction;
 
-            // Clamp max speed
-            const currentSpeed = Math.hypot(p.vx, p.vy);
+            const currentSpeed = Math.hypot(p.vx, p.vz);
             if (currentSpeed > maxSpeed) {
               p.vx = (p.vx / currentSpeed) * maxSpeed;
-              p.vy = (p.vy / currentSpeed) * maxSpeed;
+              p.vz = (p.vz / currentSpeed) * maxSpeed;
             }
 
-            // 2. SILKY WALL-SLIDING COLLISION (Independent X and Y axes)
-            const footW = 14;
-            const footH = 10;
-            const footOffY = 18;
-
+            // Wall-Sliding Collision in 3D
             const nextX = p.x + p.vx * dt;
-            if (!checkCollision(nextX + 5, p.y + footOffY, footW, footH)) {
-              p.x = nextX;
-            } else {
-              p.vx = 0; // Wall slide absorption
-            }
+            const nextZ = p.z + p.vz * dt;
 
-            const nextY = p.y + p.vy * dt;
-            if (!checkCollision(p.x + 5, nextY + footOffY, footW, footH)) {
-              p.y = nextY;
-            } else {
-              p.vy = 0; // Wall slide absorption
-            }
+            // Boundary clamp
+            p.x = Math.max(-13.5, Math.min(13.5, nextX));
+            p.z = Math.max(-13.5, Math.min(13.5, nextZ));
 
-            // Stride Cycle & Dust Particles
-            if (currentSpeed > 8) {
-              p.isWalking = true;
-              p.walkProgress += dt * 9.5;
-
-              if (Math.random() < 0.28) {
-                dustParticlesRef.current.push({
-                  x: p.x + 12 + (Math.random() * 4 - 2),
-                  y: p.y + 26,
-                  vx: (Math.random() - 0.5) * 8,
-                  vy: -Math.random() * 6 - 2,
-                  life: 1.0
-                });
-              }
+            // Smooth Character Heading Rotation
+            if (currentSpeed > 0.4) {
+              p.walkProgress += dt * 11;
+              p.rotationY = Math.atan2(p.vx, p.vz);
             } else {
               p.isWalking = false;
             }
 
-            // Update dust particles
-            dustParticlesRef.current = dustParticlesRef.current.filter(part => {
-              part.x += part.vx * dt;
-              part.y += part.vy * dt;
-              part.life -= dt * 2.8;
-              return part.life > 0;
+            three.playerMesh.position.set(p.x, 0, p.z);
+            three.playerMesh.rotation.y = p.rotationY;
+            three.playerMesh.userData.animate(dt, p.isWalking, p.walkProgress, currentTime / 1000);
+
+            // Animate Suspects (Breathing & Subtle Head Tilts)
+            three.suspectMeshes.forEach(sm => {
+              sm.mesh.userData.animate(dt, false, 0, currentTime / 1000);
             });
 
-            // 3. PROXIMITY CHECK (Only updates React on actual target ID transition)
-            if (caseData && caseData.suspects) {
-              const playerTileX = p.x / TILE_SIZE;
-              const playerTileY = p.y / TILE_SIZE;
-              let found = null;
-              let foundId = null;
+            // Smooth 3D Camera Tracking
+            const camDist = cameraZoomRef.current;
+            const targetCamX = p.x + Math.sin(orbit) * camDist;
+            const targetCamZ = p.z + Math.cos(orbit) * camDist;
+            const targetCamY = 12 + camDist * 0.35;
 
-              for (const s of caseData.suspects) {
-                const dist = Math.hypot(s.mapX - playerTileX, s.mapY - playerTileY);
-                if (dist <= 2.2) {
-                  found = { type: 'suspect', data: s, label: `[E] QUESTION ${s.name.toUpperCase()}` };
-                  foundId = s.id;
+            three.camera.position.lerp(new THREE.Vector3(targetCamX, targetCamY, targetCamZ), dt * 7);
+            three.camera.lookAt(p.x, 1.0, p.z);
+
+            // 2. Proximity Check for Interactions
+            let found = null;
+            let foundId = null;
+
+            // Check suspects
+            for (const sm of three.suspectMeshes) {
+              const dist = Math.hypot(sm.data.posX - p.x, sm.data.posZ - p.z);
+              if (dist < 2.5) {
+                found = { type: 'suspect', data: sm.data, label: `[E] QUESTION ${sm.data.name.toUpperCase()}` };
+                foundId = sm.id;
+                break;
+              }
+            }
+
+            // Check pedestals
+            if (!found) {
+              for (const ped of three.pedestals) {
+                const dist = Math.hypot(ped.pos[0] - p.x, ped.pos[2] - p.z);
+                if (dist < 2.4) {
+                  found = { type: 'node', data: ped, label: `[E] ${ped.name.toUpperCase()}` };
+                  foundId = ped.id;
                   break;
                 }
               }
-
-              if (!found) {
-                for (const node of INTERACTIVE_NODES) {
-                  const dist = Math.hypot(node.tileX - playerTileX, node.tileY - playerTileY);
-                  if (dist <= 2.2) {
-                    found = { type: 'node', data: node, label: node.label };
-                    foundId = node.id;
-                    break;
-                  }
-                }
-              }
-
-              if (foundId !== currentTargetIdRef.current) {
-                currentTargetIdRef.current = foundId;
-                setInteractTarget(found);
-              }
             }
 
-            // 4. CANVAS RENDER PASS
-            if (canvas && caseData) {
-              const ctx = canvas.getContext('2d');
-              ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-              // 4A. Draw Pre-rendered Background Map
-              if (cachedMapCanvas) {
-                ctx.drawImage(cachedMapCanvas, 0, 0);
-              }
-
-              // 4B. Dynamic Animated Overlays
-              // Blinking server LEDs
-              for (let r = 0; r < 4; r++) {
-                const rx = (3 + r * 2) * TILE_SIZE;
-                const ry = 3 * TILE_SIZE;
-                const b1 = Math.floor(currentTime / 180 + r) % 2 === 0;
-                ctx.fillStyle = b1 ? "#10B981" : "#064E3B";
-                ctx.fillRect(rx + 6, ry + 10, 4, 4);
-                ctx.fillStyle = "#F43F5E";
-                ctx.fillRect(rx + 14, ry + 10, 4, 4);
-                ctx.fillStyle = "#38BDF8";
-                ctx.fillRect(rx + 22, ry + 10, 4, 4);
-              }
-
-              // Coffee Mug Steam in Conference Room
-              const steamY = 5 * TILE_SIZE - ((currentTime / 40) % 12);
-              ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
-              ctx.fillRect(24 * TILE_SIZE + 3, steamY, 2, 3);
-
-              // Animated Breached Safe Hazard Glow
-              const pulseSafe = Math.sin(currentTime / 280) * 0.25 + 0.35;
-              ctx.fillStyle = `rgba(244, 63, 94, ${pulseSafe})`;
-              ctx.fillRect(6 * TILE_SIZE - 4, 4 * TILE_SIZE - 4, 32, 32);
-
-              // Click-to-move Ripple Cursor
-              if (targetCursorRef.current) {
-                const tc = targetCursorRef.current;
-                const age = (currentTime - tc.spawnTime) / 1000;
-                const ringSize = (age * 18) % 20 + 4;
-                ctx.strokeStyle = "rgba(56, 189, 248, 0.85)";
-                ctx.lineWidth = 1.5;
-                ctx.beginPath();
-                ctx.arc(tc.x + 12, tc.y + 12, ringSize, 0, Math.PI * 2);
-                ctx.stroke();
-              }
-
-              // Dust Particles
-              dustParticlesRef.current.forEach(part => {
-                ctx.fillStyle = `rgba(203, 213, 225, ${part.life * 0.45})`;
-                ctx.fillRect(Math.floor(part.x), Math.floor(part.y), 3, 3);
-              });
-
-              // Interactive Terminals (Glowing holographic blips)
-              INTERACTIVE_NODES.forEach(node => {
-                const nx = node.tileX * TILE_SIZE;
-                const ny = node.tileY * TILE_SIZE;
-                const pulse = Math.sin(currentTime / 280) * 3 + 12;
-
-                ctx.fillStyle = "rgba(56, 189, 248, 0.25)";
-                ctx.beginPath();
-                ctx.arc(nx + 12, ny + 12, pulse, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.font = "14px monospace";
-                ctx.fillText(node.icon, nx + 4, ny + 16);
-              });
-
-              // Suspect NPCs (Alive with micro-actions and gentle breathing)
-              const blinkNow = Math.floor(currentTime / 3200) % 2 === 0 && (currentTime % 3200 < 180);
-
-              if (caseData.suspects) {
-                caseData.suspects.forEach((s, idx) => {
-                  const sx = (s.mapX !== undefined ? s.mapX : 10) * TILE_SIZE;
-                  const sy = (s.mapY !== undefined ? s.mapY : 10) * TILE_SIZE;
-                  const theme = s.spriteTheme || SPRITE_THEMES[idx % SPRITE_THEMES.length];
-
-                  drawPixelChibiCharacter(ctx, sx, sy, theme, 'down', 0, false, blinkNow);
-
-                  // Overhead Name Tag & Status
-                  ctx.fillStyle = "rgba(15, 23, 34, 0.85)";
-                  ctx.fillRect(sx - 8, sy - 8, 40, 10);
-                  ctx.strokeStyle = "#38BDF8";
-                  ctx.lineWidth = 1;
-                  ctx.strokeRect(sx - 8, sy - 8, 40, 10);
-
-                  ctx.font = "bold 8px monospace";
-                  ctx.fillStyle = "#E2E8F0";
-                  ctx.fillText(s.name.split(" ")[0], sx - 4, sy);
-                });
-              }
-
-              // Radar Beacon & Sonar Sweep (From Signal Tracker Gadget!)
-              if (radarBeacon) {
-                const rx = radarBeacon.x * TILE_SIZE + 12;
-                const ry = radarBeacon.y * TILE_SIZE + 12;
-                const pulse = (Math.sin(currentTime / 180) + 1) * 16 + 10;
-
-                ctx.strokeStyle = "#F43F5E";
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.arc(rx, ry, pulse, 0, Math.PI * 2);
-                ctx.stroke();
-
-                // Rotating radar sweep line
-                const angle = (currentTime / 500) % (Math.PI * 2);
-                ctx.strokeStyle = "rgba(244, 63, 94, 0.6)";
-                ctx.beginPath();
-                ctx.moveTo(rx, ry);
-                ctx.lineTo(rx + Math.cos(angle) * 36, ry + Math.sin(angle) * 36);
-                ctx.stroke();
-
-                ctx.fillStyle = "#F43F5E";
-                ctx.font = "bold 8px 'Press Start 2P', monospace";
-                ctx.fillText("BEACON DETECTED", rx - 48, ry - 24);
-              }
-
-              // Detective Player Character (Silky animated Reference 1 chibi)
-              drawPixelChibiCharacter(
-                ctx,
-                p.x,
-                p.y,
-                DETECTIVE_THEME,
-                p.facing,
-                p.walkProgress,
-                p.isWalking,
-                blinkNow
-              );
-
-              // Floating Interactive Indicator with gentle springy bob
-              if (interactTarget) {
-                const ix = p.x + 12;
-                const bob = Math.sin(currentTime / 220) * 3;
-                const iy = p.y - 14 + bob;
-
-                ctx.fillStyle = "rgba(7, 11, 16, 0.94)";
-                ctx.strokeStyle = "#38BDF8";
-                ctx.lineWidth = 1.5;
-                const text = interactTarget.label;
-                ctx.font = "bold 9px monospace";
-                const tw = ctx.measureText(text).width;
-                ctx.fillRect(ix - tw / 2 - 6, iy - 16, tw + 12, 16);
-                ctx.strokeRect(ix - tw / 2 - 6, iy - 16, tw + 12, 16);
-                ctx.fillStyle = "#38BDF8";
-                ctx.fillText(text, ix - tw / 2, iy - 5);
-              }
+            if (foundId !== currentTargetIdRef.current) {
+              currentTargetIdRef.current = foundId;
+              setInteractTarget(found);
             }
-          } catch (err) {
-            console.error("Game loop error:", err);
+
+            // 3. Render WebGL Frame
+            three.renderer.render(three.scene, three.camera);
           }
 
-          animId = requestAnimationFrame(gameLoop);
+          animId = requestAnimationFrame(loop);
         };
 
-        animId = requestAnimationFrame(gameLoop);
+        animId = requestAnimationFrame(loop);
         return () => cancelAnimationFrame(animId);
-      }, [caseData, radarBeacon, interactTarget]);
+      }, []);
 
-      // Click to move target
-      const handleCanvasClick = (e) => {
-        const canvas = canvasRef.current;
-        if (!canvas) return;
-        const rect = canvas.getBoundingClientRect();
-        const clickX = ((e.clientX - rect.left) / rect.width) * (MAP_WIDTH * TILE_SIZE);
-        const clickY = ((e.clientY - rect.top) / rect.height) * (MAP_HEIGHT * TILE_SIZE);
-
-        playerRef.current.targetX = clickX - 12;
-        playerRef.current.targetY = clickY - 14;
-
-        targetCursorRef.current = {
-          x: clickX - 12,
-          y: clickY - 14,
-          spawnTime: performance.now()
-        };
-        audio.click();
-      };
-
-      // Boss Mode View
       if (bossMode) {
         return (
           <div className="min-h-screen bg-[#111827] text-slate-300 font-sans p-6 select-text">
@@ -1616,7 +1639,7 @@
 
       return (
         <div className={`min-h-screen flex flex-col font-mono ${shakeScreen ? 'shake-effect' : ''}`}>
-          <div className="fixed inset-0 scanlines z-40 pointer-events-none opacity-25"></div>
+          <div className="fixed inset-0 scanlines z-40 pointer-events-none opacity-20"></div>
 
           {toastMsg && (
             <div className="fixed top-4 right-4 z-50 cyber-card border-2 border-cyan-400 text-cyan-300 px-4 py-2.5 rounded shadow-2xl text-xs flex items-center gap-2">
@@ -1633,7 +1656,7 @@
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-white text-sm tracking-wider font-pixel">THE COLD FILE</span>
                   <span className="text-[10px] bg-cyan-950 text-cyan-300 border border-cyan-700 px-1.5 py-0.5 rounded font-mono">
-                    2D INVESTIGATOR
+                    3D LOW-POLY
                   </span>
                 </div>
                 <div className="text-[10px] text-slate-400 font-mono">
@@ -1643,13 +1666,32 @@
             </div>
 
             <div className="flex items-center gap-2.5">
+              {/* Camera Orbit Buttons */}
+              <div className="flex items-center gap-1 border border-[#223449] rounded px-1.5 py-1 bg-[#070B10]">
+                <span className="text-[9px] text-slate-400 font-pixel mr-1">CAM:</span>
+                <button
+                  onClick={() => { cameraAngleRef.current -= 0.4; audio.click(); }}
+                  className="px-2 py-0.5 bg-[#1A2636] hover:bg-cyan-600 rounded text-white text-xs font-bold"
+                  title="Rotate Camera Left (Q)"
+                >
+                  ↺ Q
+                </button>
+                <button
+                  onClick={() => { cameraAngleRef.current += 0.4; audio.click(); }}
+                  className="px-2 py-0.5 bg-[#1A2636] hover:bg-cyan-600 rounded text-white text-xs font-bold"
+                  title="Rotate Camera Right (R)"
+                >
+                  R ↻
+                </button>
+              </div>
+
               {/* View Toggle */}
               <div className="flex border border-[#223449] rounded overflow-hidden">
                 <button
-                  onClick={() => { setViewMode('map'); audio.click(); }}
-                  className={`px-3 py-1.5 font-bold text-xs transition ${viewMode === 'map' ? 'bg-cyan-600 text-white shadow-lg' : 'bg-[#070B10] text-slate-400'}`}
+                  onClick={() => { setViewMode('3d'); audio.click(); }}
+                  className={`px-3 py-1.5 font-bold text-xs transition ${viewMode === '3d' ? 'bg-cyan-600 text-white shadow-lg' : 'bg-[#070B10] text-slate-400'}`}
                 >
-                  🎮 2D MAP
+                  🌐 3D MAP
                 </button>
                 <button
                   onClick={() => { setViewMode('terminal'); audio.click(); }}
@@ -1703,23 +1745,29 @@
 
           {/* MAIN GAMEPLAY VIEW */}
           <main className="flex-1 flex flex-col lg:flex-row p-3 gap-3 max-w-[1740px] w-full mx-auto">
-            {viewMode === 'map' ? (
+            {viewMode === '3d' ? (
               <div className="flex-1 flex flex-col lg:flex-row gap-3">
-                {/* 2D Canvas Container */}
-                <div className="flex-1 cyber-card p-3 flex flex-col items-center justify-center relative shadow-2xl overflow-hidden">
-                  <div className="w-full flex justify-between items-center text-xs text-slate-400 px-2 py-1.5 border-b border-[#223449] mb-2 font-pixel text-[9px]">
-                    <span className="text-cyan-400">HOLD [WASD] OR CLICK ANYWHERE TO GLIDE</span>
-                    <span className="text-amber-400">INTERACT: [E] OR [SPACE]</span>
+                {/* 3D WebGL Canvas Container */}
+                <div className="flex-1 cyber-card p-2 flex flex-col items-center justify-center relative shadow-2xl overflow-hidden min-h-[560px]">
+                  <div className="w-full flex justify-between items-center text-xs text-slate-400 px-3 py-1.5 border-b border-[#223449] mb-1 font-pixel text-[9px] z-10">
+                    <span className="text-cyan-400">MOVE: [WASD] / CLICK FLOOR | ROTATE: [Q] / [R]</span>
+                    <span className="text-amber-400">ACTION: [E] OR [SPACE]</span>
                   </div>
 
-                  <canvas
-                    ref={canvasRef}
-                    width={MAP_WIDTH * TILE_SIZE}
-                    height={MAP_HEIGHT * TILE_SIZE}
-                    onClick={handleCanvasClick}
-                    className="border-2 border-[#223449] rounded bg-black cursor-crosshair max-w-full h-auto shadow-[0_0_30px_rgba(0,0,0,0.8)]"
-                    style={{ maxHeight: '680px' }}
+                  {/* 3D Container */}
+                  <div
+                    ref={canvasContainerRef}
+                    className="w-full flex-1 relative rounded overflow-hidden cursor-crosshair min-h-[520px]"
                   />
+
+                  {/* Floating Proximity Pill */}
+                  {interactTarget && (
+                    <div className="absolute bottom-5 left-1/2 transform -translate-x-1/2 z-20 bg-[#070B10]/95 border-2 border-cyan-400 text-cyan-300 px-5 py-2.5 rounded-full shadow-[0_0_20px_rgba(56,189,248,0.5)] font-pixel text-xs animate-bounce cursor-pointer flex items-center gap-2"
+                         onClick={triggerNearbyInteraction}>
+                      <span>⚡</span>
+                      <span>{interactTarget.label}</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Cyber Sidebar: Suspects & Gadget Dock */}
@@ -1754,8 +1802,19 @@
                         onClick={() => {
                           if (!spendAP(1, "SIGNAL_TRACKER")) return;
                           audio.sonar();
-                          const culprit = caseData.suspects.find(s => s.isCulprit);
-                          setRadarBeacon({ x: RESTRICTED_ROOM.tileX, y: RESTRICTED_ROOM.tileY });
+                          const rMesh = threeRef.current.radarMesh;
+                          if (rMesh) {
+                            rMesh.material.opacity = 0.9;
+                            rMesh.position.set(RESTRICTED_ROOM.posX, 0.05, RESTRICTED_ROOM.posZ);
+                            let scale = 1;
+                            const expand = () => {
+                              scale += 0.4;
+                              rMesh.scale.set(scale, scale, 1);
+                              rMesh.material.opacity -= 0.035;
+                              if (rMesh.material.opacity > 0) requestAnimationFrame(expand);
+                            };
+                            expand();
+                          }
                           showToast(`📡 SONAR PING: An active RFID beacon was detected inside ${RESTRICTED_ROOM.name}!`);
                         }}
                         className="p-2.5 cyber-btn text-cyan-300 font-bold flex flex-col items-center justify-center gap-1"
@@ -1796,7 +1855,7 @@
                       <span className="text-[10px] text-slate-400">CLICK TO TARGET</span>
                     </div>
 
-                    <div className="space-y-2 flex-1 overflow-y-auto max-h-[300px]">
+                    <div className="space-y-2 flex-1 overflow-y-auto max-h-[290px]">
                       {caseData.suspects.map(s => (
                         <div
                           key={s.id}
@@ -1855,7 +1914,7 @@
             )}
           </main>
 
-          {/* SPROUT LANDS CHIBI DIALOGUE BUST MODAL (REFERENCE 1) */}
+          {/* SPROUT LANDS CHIBI DIALOGUE BUST MODAL */}
           {activeSuspectModal && (
             <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
               <div className="cyber-card border-2 border-cyan-400 rounded-xl max-w-xl w-full p-5 shadow-2xl">
@@ -1867,37 +1926,31 @@
                   <button onClick={() => setActiveSuspectModal(null)} className="text-slate-400 hover:text-white text-xs font-bold">[CLOSE ✕]</button>
                 </div>
 
-                {/* Handcrafted Chibi Anime Bust Portrait */}
-                <div className="flex gap-4 mb-4">
-                  <div className="w-24 h-28 bg-[#070B10] border-2 border-cyan-500 rounded-lg flex items-center justify-center shrink-0 shadow-lg overflow-hidden">
-                    <canvas ref={portraitCanvasRef} width={96} height={120} className="w-full h-full" />
+                {/* Suspect Information & Stress */}
+                <div className="space-y-2.5 text-xs mb-4">
+                  <div className="bg-[#0A0F15] p-2.5 rounded border border-[#223449]">
+                    <span className="text-slate-400 block text-[10px]">ROLE & CLEARANCE:</span>
+                    <span className="text-cyan-400 font-bold">{activeSuspectModal.role} ({activeSuspectModal.accessLevel})</span>
                   </div>
 
-                  <div className="flex-1 space-y-2 text-xs">
-                    <div className="bg-[#0A0F15] p-2.5 rounded border border-[#223449]">
-                      <span className="text-slate-400 block text-[10px]">ROLE & CLEARANCE:</span>
-                      <span className="text-cyan-400 font-bold">{activeSuspectModal.role} ({activeSuspectModal.accessLevel})</span>
-                    </div>
+                  <div className="bg-[#0A0F15] p-2.5 rounded border border-[#223449]">
+                    <span className="text-amber-400 block text-[10px] font-bold">STATED ALIBI:</span>
+                    <p className="text-slate-200 mt-0.5 text-xs leading-relaxed">{activeSuspectModal.statedAlibi}</p>
+                  </div>
 
-                    <div className="bg-[#0A0F15] p-2.5 rounded border border-[#223449]">
-                      <span className="text-amber-400 block text-[10px] font-bold">STATED ALIBI:</span>
-                      <p className="text-slate-200 mt-0.5 text-xs leading-relaxed">{activeSuspectModal.statedAlibi}</p>
+                  {/* Suspect Stress Meter */}
+                  <div className="bg-[#0A0F15] p-2 rounded border border-[#223449]">
+                    <div className="flex justify-between text-[10px] mb-1">
+                      <span className="text-slate-400">PSYCHOLOGICAL STRESS:</span>
+                      <span className={`font-bold ${activeSuspectModal.stressLevel > 60 ? 'text-rose-400' : 'text-emerald-400'}`}>
+                        {activeSuspectModal.stressLevel}%
+                      </span>
                     </div>
-
-                    {/* Suspect Stress Meter */}
-                    <div className="bg-[#0A0F15] p-2 rounded border border-[#223449]">
-                      <div className="flex justify-between text-[10px] mb-1">
-                        <span className="text-slate-400">PSYCHOLOGICAL STRESS:</span>
-                        <span className={`font-bold ${activeSuspectModal.stressLevel > 60 ? 'text-rose-400' : 'text-emerald-400'}`}>
-                          {activeSuspectModal.stressLevel}%
-                        </span>
-                      </div>
-                      <div className="h-2 bg-black rounded-full overflow-hidden">
-                        <div
-                          className={`h-full transition-all duration-300 ${activeSuspectModal.stressLevel > 60 ? 'bg-rose-500 shadow-[0_0_8px_#F43F5E]' : 'bg-emerald-500'}`}
-                          style={{ width: `${activeSuspectModal.stressLevel}%` }}
-                        />
-                      </div>
+                    <div className="h-2 bg-black rounded-full overflow-hidden">
+                      <div
+                        className={`h-full transition-all duration-300 ${activeSuspectModal.stressLevel > 60 ? 'bg-rose-500 shadow-[0_0_8px_#F43F5E]' : 'bg-emerald-500'}`}
+                        style={{ width: `${activeSuspectModal.stressLevel}%` }}
+                      />
                     </div>
                   </div>
                 </div>
@@ -1916,13 +1969,11 @@
                       audio.scan();
                       setActiveSuspectModal(null);
                       const isMatch = activeSuspectModal.actualRoom === activeSuspectModal.statedRoom;
-                      const target = isMatch ? { x: activeSuspectModal.mapX, y: activeSuspectModal.mapY } : { x: RESTRICTED_ROOM.tileX, y: RESTRICTED_ROOM.tileY };
-                      setRadarBeacon(target);
                       showToast(isMatch ? `✓ RFID Confirmed in ${activeSuspectModal.statedRoom}` : `🚨 RFID Detected inside ${RESTRICTED_ROOM.name}!`);
                     }}
                     className="p-3 cyber-btn text-cyan-300 font-bold"
                   >
-                    📡 SIGNAL TRACKER (1 AP)
+                    📡 SCAN RFID (1 AP)
                   </button>
 
                   <button
@@ -1939,12 +1990,6 @@
                       }
                       setInterrogationDialogue(reply);
                       audio.voiceBeep(480);
-
-                      // Redraw with new stress
-                      if (portraitCanvasRef.current) {
-                        const ctx = portraitCanvasRef.current.getContext('2d');
-                        drawChibiDialoguePortrait(ctx, activeSuspectModal.spriteTheme, newStress);
-                      }
                     }}
                     className="p-3 cyber-btn text-amber-300 font-bold"
                   >
@@ -2062,7 +2107,7 @@
           )}
 
           <footer className="bg-[#0F1722] border-t border-[#223449] px-4 py-2 flex items-center justify-between text-[11px] text-slate-400">
-            <span>THE COLD FILE // SPROUT LANDS x CYBER-NOIR EDITION</span>
+            <span>THE COLD FILE // 3D LOW-POLY CYBER MYSTERY</span>
             <span>PRESS [ESC] FOR STEALTH BOSS MODE</span>
           </footer>
         </div>
