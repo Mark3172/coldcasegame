@@ -1035,6 +1035,7 @@
       // 2. Interior & Exterior Low-Poly Walls (with generous 3-unit doorways)
       const wallMat = mat(0x1F2C3D, 0.7, 0.1);
       const wallCapMat = mat(0x33485E, 0.5, 0.1);
+      const colliders = [];
 
       const addWall = (x, z, width, depth, height = 2.4) => {
         const wall = new THREE.Mesh(new THREE.BoxGeometry(width, height, depth), wallMat);
@@ -1045,6 +1046,14 @@
         const cap = new THREE.Mesh(new THREE.BoxGeometry(width + 0.06, 0.1, depth + 0.06), wallCapMat);
         cap.position.set(x, height + 0.05, z);
         officeGroup.add(cap);
+
+        // Solid Wall AABB Collider
+        colliders.push({
+          minX: x - width / 2,
+          maxX: x + width / 2,
+          minZ: z - depth / 2,
+          maxZ: z + depth / 2
+        });
       };
 
       // Perimeter Walls
@@ -1146,13 +1155,13 @@
           state: 0.0,
           update: function(pX, pZ, dt) {
             const dist = Math.hypot(this.x - pX, this.z - pZ);
-            const shouldOpen = dist < 3.2;
+            const shouldOpen = dist < 4.2;
             const target = shouldOpen ? 1.0 : 0.0;
             if (Math.abs(this.state - target) > 0.01) {
               if (shouldOpen && this.state < 0.1) {
                 audio.playTone(isHazard ? 380 : 560, 'sine', 0.06, 0.015);
               }
-              this.state += (target - this.state) * dt * 7.5;
+              this.state += (target - this.state) * dt * 14.0;
               panelL.position.x = -0.55 - this.state * 0.95;
               panelR.position.x = 0.55 + this.state * 0.95;
             }
@@ -1300,7 +1309,16 @@
         return { ...p, group: pedGroup };
       });
 
-      return { officeGroup, serverRacks, pedestalMeshes, doors };
+      // Furniture Colliders (Stop player from running through tables & equipment)
+      colliders.push({ minX: 6.8, maxX: 11.2, minZ: -9.6, maxZ: -7.6 }); // Conference Table
+      colliders.push({ minX: -7.8, maxX: -6.2, minZ: -12.2, maxZ: -10.8 }); // Vault Safe
+      colliders.push({ minX: -13.3, maxX: -11.7, minZ: 5.4, maxZ: 6.6 }); // Vending Machine
+      for (let r = 0; r < 4; r++) {
+        const rx = -12 + r * 1.8;
+        colliders.push({ minX: rx - 0.6, maxX: rx + 0.6, minZ: -12.2, maxZ: -10.8 }); // Server Racks
+      }
+
+      return { officeGroup, serverRacks, pedestalMeshes, doors, colliders };
     }
 
     // ==========================================
@@ -1396,6 +1414,27 @@
           />
         </React.Fragment>
       );
+    }
+
+    // Fast AABB Collision Checker (Player Radius: 0.38 units)
+    function checkCollision(x, z, colliders, radius = 0.38) {
+      if (!colliders || colliders.length === 0) return false;
+      // Outer perimeter boundary
+      if (x - radius < -14.0 || x + radius > 14.0 || z - radius < -14.0 || z + radius > 14.0) {
+        return true;
+      }
+      for (let i = 0; i < colliders.length; i++) {
+        const c = colliders[i];
+        if (
+          x + radius > c.minX &&
+          x - radius < c.maxX &&
+          z + radius > c.minZ &&
+          z - radius < c.maxZ
+        ) {
+          return true;
+        }
+      }
+      return false;
     }
 
     // ==========================================
@@ -1775,7 +1814,7 @@
         scene.add(concourseLight);
 
         // 3. Build Office Environment
-        const { officeGroup, serverRacks, pedestalMeshes, doors } = build3DOfficeScene(scene);
+        const { officeGroup, serverRacks, pedestalMeshes, doors, colliders } = build3DOfficeScene(scene);
 
         // 4. Create Detective Mesh
         const playerMesh = createLowPolyChibiCharacter(DETECTIVE_THEME, true);
@@ -1809,6 +1848,7 @@
           radarMesh,
           serverRacks,
           doors,
+          colliders,
           pointLights: [vaultLight, confLight, concourseLight]
         };
 
@@ -1980,13 +2020,40 @@
 
             const currentSpeed = Math.hypot(p.vx, p.vz);
 
-            // Wall-Sliding Collision in 3D
-            const nextX = p.x + p.vx * dt;
-            const nextZ = p.z + p.vz * dt;
+            // Robust Continuous Collision with Wall-Sliding (Cannot Tunnel Through Walls Even At 16.5 m/s Sprint)
+            const colliders = three.colliders;
+            if (currentSpeed > 0.05 && colliders) {
+              const totalDist = currentSpeed * dt;
+              const steps = Math.max(1, Math.ceil(totalDist / 0.15));
+              const subDt = dt / steps;
 
-            // Boundary clamp
-            p.x = Math.max(-13.5, Math.min(13.5, nextX));
-            p.z = Math.max(-13.5, Math.min(13.5, nextZ));
+              for (let s = 0; s < steps; s++) {
+                // 1. Try X movement
+                const testX = p.x + p.vx * subDt;
+                if (!checkCollision(testX, p.z, colliders)) {
+                  p.x = testX;
+                } else {
+                  p.vx = 0;
+                  if (p.targetX !== null) p.targetX = null;
+                }
+
+                // 2. Try Z movement
+                const testZ = p.z + p.vz * subDt;
+                if (!checkCollision(p.x, testZ, colliders)) {
+                  p.z = testZ;
+                } else {
+                  p.vz = 0;
+                  if (p.targetZ !== null) p.targetZ = null;
+                }
+              }
+            } else if (currentSpeed > 0.05) {
+              p.x = Math.max(-13.8, Math.min(13.8, p.x + p.vx * dt));
+              p.z = Math.max(-13.8, Math.min(13.8, p.z + p.vz * dt));
+            }
+
+            // Boundary safety clamp
+            p.x = Math.max(-13.8, Math.min(13.8, p.x));
+            p.z = Math.max(-13.8, Math.min(13.8, p.z));
 
             // Smooth Character Heading Rotation & High-Speed Leg Animation
             if (currentSpeed > 0.4) {
